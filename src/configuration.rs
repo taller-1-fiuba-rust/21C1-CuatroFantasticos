@@ -9,7 +9,7 @@ pub struct Configuration {
 pub enum ConfValue {
     Verbose(usize),
     Timeout(usize),
-    Port(usize),
+    Port(String),
     Dbfilename(String),
     LogFile(String),
 }
@@ -19,10 +19,17 @@ impl ConfValue {
         match key {
             "verbose" => ConfValue::Verbose(value.trim().parse().unwrap()),
             "timeout" => ConfValue::Timeout(value.trim().parse().unwrap()),
-            "port" => ConfValue::Port(value.trim().parse().unwrap()),
+            "port" => ConfValue::Port(value.trim().to_owned()),
             "dbfilename" => ConfValue::Dbfilename(value.trim().to_owned()),
             "logfile" => ConfValue::LogFile(value.trim().to_owned()),
             _ => panic!("{:?}", "ERROR AL PARSEAR CONFIG"),
+        }
+    }
+
+    pub fn get_port(&self) -> &String {
+        match self {
+            ConfValue::Port(value) => value,
+            _ => panic!("{:?}", "ESTO NO ES PORT"),
         }
     }
 }

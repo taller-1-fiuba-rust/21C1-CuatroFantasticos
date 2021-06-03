@@ -5,7 +5,7 @@ use std::env;
 fn main() {
     let args: Vec<String> = env::args().collect();
     let filename = &args[1];
-    let _conf = Configuration::new(filename);
+    let conf = Configuration::new(filename);
 
-    server::run_server();
+    server::run_server(conf);
 }
