@@ -1,7 +1,7 @@
 use crate::architecture::connection_handler;
 use crate::architecture::thread_pool::ThreadPool;
-use std::net::TcpListener;
 use crate::configuration::Configuration;
+use std::net::TcpListener;
 
 const THREAD_MAX_QUANTITY: usize = 1000;
 

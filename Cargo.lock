@@ -5,5 +5,5 @@ name = "logger"
 version = "0.1.0"
 
 [[package]]
-name = "server"
+name = "redis_server"
 version = "0.1.0"

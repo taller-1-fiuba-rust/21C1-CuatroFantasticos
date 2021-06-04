@@ -1,5 +1,7 @@
-use server::architecture::server;
-use server::configuration::Configuration;
+extern crate redis_server;
+
+use redis_server::architecture::server;
+use redis_server::configuration::Configuration;
 use std::env;
 
 fn main() {
