@@ -7,8 +7,7 @@ use std::time::Duration;
 const THREAD_MAX_QUANTITY: usize = 1000;
 
 pub fn run_server(conf: Configuration) {
-    let port = conf.get("port");
-    let addr = "127.0.0.1:".to_owned() + port;
+    let addr = "127.0.0.1:".to_owned() + conf.get("port");
     let listener = TcpListener::bind(addr).unwrap();
     let pool = ThreadPool::new(THREAD_MAX_QUANTITY);
 
