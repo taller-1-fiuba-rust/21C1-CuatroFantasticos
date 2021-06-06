@@ -7,8 +7,8 @@ pub struct Configuration {
 
 #[derive(Debug)]
 pub enum ConfValue {
-    Verbose(usize),
-    Timeout(usize),
+    Verbose(String),
+    Timeout(String),
     Port(String),
     Dbfilename(String),
     LogFile(String),
@@ -26,10 +26,13 @@ impl ConfValue {
         }
     }
 
-    pub fn get_port(&self) -> &String {
+    pub fn get(&self) -> &String {
         match self {
             ConfValue::Port(value) => value,
-            _ => panic!("{:?}", "ESTO NO ES PORT"),
+            ConfValue::Verbose(value) => value,
+            ConfValue::Timeout(value) => value,
+            ConfValue::Dbfilename(value) => value,
+            ConfValue::LogFile(value) => value,
         }
     }
 }
@@ -37,6 +40,12 @@ impl ConfValue {
 impl Configuration {
     pub fn new(filename: &str) -> Configuration {
         let mut conf: HashMap<String, ConfValue> = HashMap::new();
+
+        // Agregamos valores predeterminados
+        conf.insert(
+            "dbfilename".to_owned(),
+            ConfValue::new("dbfilename", "dump.rdb"),
+        );
 
         let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
         for line in contents.lines() {
@@ -49,7 +58,7 @@ impl Configuration {
         Configuration { conf }
     }
 
-    pub fn get(&self, key: &str) -> &ConfValue {
-        self.conf.get(key).unwrap()
+    pub fn get(&self, key: &str) -> &String {
+        self.conf.get(key).unwrap().get()
     }
 }
