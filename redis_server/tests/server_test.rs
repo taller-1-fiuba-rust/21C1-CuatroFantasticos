@@ -11,9 +11,24 @@ fn test() {
     thread::spawn(|| {
         server::run_server(conf);
     });
-    let client = redis::Client::open("redis://127.0.0.1:7878/").unwrap();
+    let client = redis::Client::open("redis://127.0.0.1:8080/").unwrap();
     let mut con = client.get_connection().unwrap();
-    sleep(Duration::new(4, 0));
+    //sleep(Duration::new(4, 0));
     let is_connect = con.check_connection();
+    sleep(Duration::new(5, 0));
     assert!(!is_connect);
+}
+
+#[test]
+fn test2() {
+    let conf = Configuration::new("../redis.conf");
+    thread::spawn(|| {
+        server::run_server(conf);
+    });
+    let client = redis::Client::open("redis://127.0.0.1:8080/").unwrap();
+    let mut con = client.get_connection().unwrap();
+    let cmd = redis::cmd("SET").arg("key").arg(7).get_packed_command();
+    con.send_packed_command(&cmd);
+    sleep(Duration::new(1, 0));
+    panic!("jeje");
 }
