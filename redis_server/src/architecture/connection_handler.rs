@@ -11,6 +11,7 @@ pub fn handle_connection(mut stream: TcpStream) {
             stream.flush().unwrap();
         }
         Err(_e) => {
+            println!("HOLIS ESTOY POR DESCONECTARME");
             stream.shutdown(Shutdown::Both).unwrap();
         }
     }

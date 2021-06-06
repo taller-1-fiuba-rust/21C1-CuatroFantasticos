@@ -1,7 +1,7 @@
 use crate::architecture::connection_handler;
 use crate::architecture::thread_pool::ThreadPool;
+use crate::configuration::verbose::Verbose;
 use crate::configuration::Configuration;
-use crate::verbose::Verbose;
 use std::net::TcpListener;
 use std::time::Duration;
 

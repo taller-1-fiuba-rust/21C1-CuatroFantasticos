@@ -3,9 +3,9 @@ pub struct Verbose {
 }
 
 impl Verbose {
-    pub fn new(asd: &str) -> Verbose {
+    pub fn new(status: &str) -> Verbose {
         let mut active = false;
-        if asd == "1" {
+        if status == "1" {
             active = true;
         }
         Verbose { active }

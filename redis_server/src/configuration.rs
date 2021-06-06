@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::fs;
 
+pub mod verbose;
+
 pub struct Configuration {
     conf: HashMap<String, String>,
 }
