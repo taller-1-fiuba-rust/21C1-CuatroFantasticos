@@ -3,14 +3,14 @@ use std::thread;
 use std::thread::JoinHandle;
 
 use message::LogMessage;
-use writer::LogWriter;
-use std::io::Write;
 use std::error::Error;
+use std::io::Write;
+use writer::LogWriter;
 
-mod writer;
 mod message;
 #[cfg(test)]
 mod test_resources;
+mod writer;
 
 pub struct Logger {
     log_sender: mpsc::Sender<LogMessage>,
@@ -21,7 +21,10 @@ impl Logger {
         Logger { log_sender }
     }
     pub fn log(&self, log_string: &str) -> Result<(), Box<dyn Error>> {
-        match self.log_sender.send(LogMessage::Log(log_string.to_string())) {
+        match self
+            .log_sender
+            .send(LogMessage::Log(log_string.to_string()))
+        {
             Ok(_) => Ok(()),
             Err(_) => Err("Error logging".into()),
         }
@@ -62,8 +65,8 @@ impl Drop for LogService {
 
 #[cfg(test)]
 mod tests {
-    use crate::log::LogService;
     use crate::log::test_resources::VectorWriter;
+    use crate::log::LogService;
 
     #[test]
     fn log_service_create() {

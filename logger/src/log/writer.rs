@@ -33,16 +33,16 @@ impl<T: Write> LogWriter<T> {
 
 #[cfg(test)]
 mod tests {
-    use std::sync::mpsc ;
+    use std::sync::mpsc;
     use std::thread;
 
-    use crate::log::writer::LogWriter;
     use crate::log::message::LogMessage;
     use crate::log::test_resources::VectorWriter;
+    use crate::log::writer::LogWriter;
 
     #[test]
     fn log_writer_create() {
-        let (_tx,rx) = mpsc::channel();
+        let (_tx, rx) = mpsc::channel();
         let output_buffer = VectorWriter::new();
         let _log_writer = LogWriter::new(rx, output_buffer);
         assert!(true)
@@ -50,33 +50,45 @@ mod tests {
 
     #[test]
     fn log_writer_init_and_shutdown() {
-        let (tx,rx) = mpsc::channel();
+        let (tx, rx) = mpsc::channel();
         let output_buffer = VectorWriter::new();
         let log_writer_thread_handler = thread::spawn(move || {
             let log_writer = LogWriter::new(rx, output_buffer);
             log_writer.init();
         });
-        tx.send(LogMessage::Terminate).expect("Error sending termination message");
-        log_writer_thread_handler.join().expect("Error joining threads");
+        tx.send(LogMessage::Terminate)
+            .expect("Error sending termination message");
+        log_writer_thread_handler
+            .join()
+            .expect("Error joining threads");
         assert!(true)
     }
 
     #[test]
     fn log_writer_receive_messages() {
-        let (tx,rx) = mpsc::channel();
+        let (tx, rx) = mpsc::channel();
         let output_buffer = VectorWriter::new();
         let vector_writes = output_buffer.get_vector_copy();
         let log_writer_thread_handler = thread::spawn(move || {
             let log_writer = LogWriter::new(rx, output_buffer);
             log_writer.init();
         });
-        tx.send(LogMessage::Log("first_log".to_string())).expect("Error sending first log");
-        tx.send(LogMessage::Log("second_log".to_string())).expect("Error sending second log");
-        tx.send(LogMessage::Log("third_log".to_string())).expect("Error sending third log");
-        tx.send(LogMessage::Log("fourth_log".to_string())).expect("Error sending fourth log");
-        tx.send(LogMessage::Terminate).expect("Error sending termination message");
-        log_writer_thread_handler.join().expect("Error joining threads");
-        let vector_writes = vector_writes.lock().expect("Error getting vector of writes");
+        tx.send(LogMessage::Log("first_log".to_string()))
+            .expect("Error sending first log");
+        tx.send(LogMessage::Log("second_log".to_string()))
+            .expect("Error sending second log");
+        tx.send(LogMessage::Log("third_log".to_string()))
+            .expect("Error sending third log");
+        tx.send(LogMessage::Log("fourth_log".to_string()))
+            .expect("Error sending fourth log");
+        tx.send(LogMessage::Terminate)
+            .expect("Error sending termination message");
+        log_writer_thread_handler
+            .join()
+            .expect("Error joining threads");
+        let vector_writes = vector_writes
+            .lock()
+            .expect("Error getting vector of writes");
         assert_eq!("first_log", vector_writes[0]);
         assert_eq!("\n", vector_writes[1]);
         assert_eq!("second_log", vector_writes[2]);
@@ -89,14 +101,16 @@ mod tests {
 
     #[test]
     fn log_writer_terminates_when_no_senders_are_left() {
-        let (tx,rx) = mpsc::channel();
+        let (tx, rx) = mpsc::channel();
         let output_buffer = VectorWriter::new();
         let log_writer_thread_handler = thread::spawn(move || {
             let log_writer = LogWriter::new(rx, output_buffer);
             log_writer.init();
         });
         drop(tx);
-        log_writer_thread_handler.join().expect("Error joining threads");
+        log_writer_thread_handler
+            .join()
+            .expect("Error joining threads");
         assert!(true);
     }
 }

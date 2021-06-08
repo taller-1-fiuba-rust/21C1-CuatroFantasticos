@@ -1,5 +1,5 @@
-use std::sync::{Arc, Mutex};
 use std::io::Write;
+use std::sync::{Arc, Mutex};
 
 pub struct VectorWriter {
     strings_received: Arc<Mutex<Vec<String>>>,
@@ -16,7 +16,7 @@ impl VectorWriter {
 }
 
 impl Write for VectorWriter {
-    fn write(&mut self, buf: &[u8]) -> Result<usize,std::io::Error> {
+    fn write(&mut self, buf: &[u8]) -> Result<usize, std::io::Error> {
         let s = match std::str::from_utf8(buf) {
             Ok(v) => v,
             Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
@@ -25,7 +25,7 @@ impl Write for VectorWriter {
         Ok(buf.len())
     }
 
-    fn flush(&mut self) -> Result<(),std::io::Error> {
+    fn flush(&mut self) -> Result<(), std::io::Error> {
         Ok(())
     }
 }
