@@ -1,35 +1,17 @@
+use std::io::Write;
 use std::sync::mpsc;
 use std::thread;
 use std::thread::JoinHandle;
 
+use crate::log::logger::Logger;
 use message::LogMessage;
-use std::error::Error;
-use std::io::Write;
 use writer::LogWriter;
 
+mod logger;
 mod message;
 #[cfg(test)]
 mod test_resources;
 mod writer;
-
-pub struct Logger {
-    log_sender: mpsc::Sender<LogMessage>,
-}
-
-impl Logger {
-    pub fn new(log_sender: mpsc::Sender<LogMessage>) -> Self {
-        Logger { log_sender }
-    }
-    pub fn log(&self, log_string: &str) -> Result<(), Box<dyn Error>> {
-        match self
-            .log_sender
-            .send(LogMessage::Log(log_string.to_string()))
-        {
-            Ok(_) => Ok(()),
-            Err(_) => Err("Error logging".into()),
-        }
-    }
-}
 
 pub struct LogService {
     log_sender: mpsc::Sender<LogMessage>,
