@@ -1,7 +1,9 @@
 use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};
+use crate::configuration::verbose::Verbose;
 
-pub fn handle_connection(mut stream: TcpStream) {
+pub fn handle_connection(mut stream: TcpStream, verbose: Verbose) {
+    verbose.print("handle_connection");
     let mut buffer = [0; 1024];
     let read_size = stream.read(&mut buffer);
     match read_size {
@@ -16,7 +18,7 @@ pub fn handle_connection(mut stream: TcpStream) {
             stream.flush().unwrap();
         }
         Err(_e) => {
-            println!("HOLIS ESTOY POR DESCONECTARME");
+            verbose.print("HOLIS ESTOY POR DESCONECTARME");
             stream.shutdown(Shutdown::Both).unwrap();
         }
     }

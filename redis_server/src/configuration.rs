@@ -9,7 +9,7 @@ pub struct Configuration {
 
 impl Configuration {
     pub fn new(filename: &str) -> Configuration {
-        let mut conf: HashMap<String, String> = HashMap::new();
+        let mut conf = Configuration::default_values();
         let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
         for line in contents.lines() {
             let split = line.split(':');
@@ -22,5 +22,14 @@ impl Configuration {
 
     pub fn get(&self, key: &str) -> Option<&String> {
         self.conf.get(key)
+    }
+
+    pub fn default_values() -> HashMap<String, String> {
+        let mut conf: HashMap<String, String> = HashMap::new();
+        conf.insert(String::from("verbose"), String::from("0"));
+        conf.insert(String::from("timeout"), String::from("0"));
+        conf.insert(String::from("bdfilename"), String::from("dump.rdb"));
+        conf.insert(String::from("lofgile"), String::from("logs.txt"));
+        conf
     }
 }

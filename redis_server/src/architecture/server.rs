@@ -8,34 +8,26 @@ use std::time::Duration;
 const THREAD_MAX_QUANTITY: usize = 1000;
 
 pub fn run_server(conf: Configuration) {
-    let status = conf.get("verbose").expect("No se registró verbose en conf");
+    let status = conf.get("verbose").unwrap();
     let verbose = Verbose::new(status);
     verbose.print("run_server");
 
-    let port = conf.get("port").expect("No se registró un port en conf");
+    let port = conf.get("port").expect("No se registró un port en conf.");
     let addr = "127.0.0.1:".to_owned() + port;
+    verbose.print("run_server: se conectó al puerto");
 
-    let listener = TcpListener::bind(addr).unwrap();
+    let listener = TcpListener::bind(addr).expect("No se pudo realizar la conexión.");
     let pool = ThreadPool::new(THREAD_MAX_QUANTITY);
+    verbose.print("run_server: se realizó la conexión con éxito");
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
 
-        let timeoutout = conf.get("timeout");
-        match timeoutout {
-            Some(..) => println!("TIMEOUT ES LO QUE ES"),
-            None => println!("TIMEOUT ES CERO"),
-        }
+        let timeout = conf.get("timeout").unwrap().parse().unwrap();
+        let _result = stream.set_read_timeout(Some(Duration::new(timeout, 0)));
 
-        let timeout = timeoutout.expect("asd").parse().unwrap();
-        if timeout != 0 {
-            stream
-                .set_read_timeout(Some(Duration::new(timeout, 0)))
-                .unwrap();
-        }
-
-        pool.execute(|| {
-            connection_handler::handle_connection(stream);
+        pool.execute(move || {
+            connection_handler::handle_connection(stream, verbose);
         });
     }
     println!("Game over");
