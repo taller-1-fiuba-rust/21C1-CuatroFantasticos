@@ -13,13 +13,12 @@ fn test() {
     });
     let client = redis::Client::open("redis://127.0.0.1:8080/").unwrap();
     let mut con = client.get_connection().unwrap();
-    //sleep(Duration::new(4, 0));
+    sleep(Duration::new(2, 0));
     let is_connect = con.check_connection();
-    sleep(Duration::new(5, 0));
     assert!(!is_connect);
 }
 
-#[test]
+/*#[test]
 fn test2() {
     let conf = Configuration::new("../redis.conf");
     thread::spawn(|| {
@@ -31,4 +30,4 @@ fn test2() {
     con.send_packed_command(&cmd);
     sleep(Duration::new(1, 0));
     panic!("jeje");
-}
+}*/

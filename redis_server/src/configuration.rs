@@ -20,7 +20,7 @@ impl Configuration {
         Configuration { conf }
     }
 
-    pub fn get(&self, key: &str) -> &String {
-        self.conf.get(key).unwrap()
+    pub fn get(&self, key: &str) -> Option<&String> {
+        self.conf.get(key)
     }
 }
