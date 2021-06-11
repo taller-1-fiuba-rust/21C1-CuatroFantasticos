@@ -1,10 +1,10 @@
+use crate::configuration::verbose::Verbose;
 use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};
-use crate::configuration::verbose::Verbose;
 
 pub fn handle_connection(mut stream: TcpStream, verbose: Verbose) {
-    verbose.print("handle_connection");
     let mut buffer = [0; 1024];
+    verbose.print("handle_connection: Waiting for request");
     let read_size = stream.read(&mut buffer);
     match read_size {
         Ok(_) => {
@@ -12,13 +12,13 @@ pub fn handle_connection(mut stream: TcpStream, verbose: Verbose) {
                 Ok(v) => v,
                 Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
             };
-            println!("{}", s);
+            verbose.print(&format!("handle_connection: {}", s));
             let response = "HTTP/1.1 200 OK\r\n\r\n";
             let _write_size = stream.write(response.as_bytes()).unwrap();
             stream.flush().unwrap();
         }
         Err(_e) => {
-            verbose.print("HOLIS ESTOY POR DESCONECTARME");
+            verbose.print("handle_connection: There is no request");
             stream.shutdown(Shutdown::Both).unwrap();
         }
     }

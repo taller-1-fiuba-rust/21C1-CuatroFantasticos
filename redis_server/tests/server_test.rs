@@ -6,7 +6,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 #[test]
-fn test() {
+fn test_timeout_should_disconnects_client() {
     let conf = Configuration::new("../redis.conf");
     thread::spawn(|| {
         server::run_server(conf);
@@ -18,7 +18,7 @@ fn test() {
     assert!(!is_connect);
 }
 
-/*#[test]
+/* #[test]
 fn test2() {
     let conf = Configuration::new("../redis.conf");
     thread::spawn(|| {

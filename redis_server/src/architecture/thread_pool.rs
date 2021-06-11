@@ -1,5 +1,6 @@
 use crate::architecture::message::Message;
 use crate::architecture::worker::Worker;
+use crate::configuration::verbose::Verbose;
 use std::sync::{mpsc, Arc, Mutex};
 
 pub struct ThreadPool {
@@ -8,17 +9,15 @@ pub struct ThreadPool {
 }
 
 impl ThreadPool {
-    pub fn new(size: usize) -> ThreadPool {
+    pub fn new(size: usize, verbose: Verbose) -> ThreadPool {
+        verbose.print("Threadpool: Creating Threadpool");
         assert!(size > 0);
-
         let (sender, receiver) = mpsc::channel();
-
         let receiver = Arc::new(Mutex::new(receiver));
-
         let mut workers = Vec::with_capacity(size);
 
         for id in 0..size {
-            workers.push(Worker::new(id, Arc::clone(&receiver)));
+            workers.push(Worker::new(id, Arc::clone(&receiver), verbose));
         }
 
         ThreadPool { workers, sender }

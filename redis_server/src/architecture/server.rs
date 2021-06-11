@@ -10,15 +10,18 @@ const THREAD_MAX_QUANTITY: usize = 1000;
 pub fn run_server(conf: Configuration) {
     let status = conf.get("verbose").unwrap();
     let verbose = Verbose::new(status);
-    verbose.print("run_server");
+    verbose.print(&format!(
+        "run_server: Starting server with configuration \n {:?}",
+        conf
+    ));
 
-    let port = conf.get("port").expect("No se registró un port en conf.");
+    let port = conf.get("port").expect("There is no port in Configuration");
     let addr = "127.0.0.1:".to_owned() + port;
-    verbose.print("run_server: se conectó al puerto");
+    verbose.print(&format!("run_server: connecting to {}", addr));
 
-    let listener = TcpListener::bind(addr).expect("No se pudo realizar la conexión.");
-    let pool = ThreadPool::new(THREAD_MAX_QUANTITY);
-    verbose.print("run_server: se realizó la conexión con éxito");
+    let listener = TcpListener::bind(addr).expect("Server was not able to connect");
+    let pool = ThreadPool::new(THREAD_MAX_QUANTITY, verbose);
+    verbose.print("run_server: Succesfully connected");
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
@@ -30,5 +33,5 @@ pub fn run_server(conf: Configuration) {
             connection_handler::handle_connection(stream, verbose);
         });
     }
-    println!("Game over");
+    verbose.print("Game over");
 }
