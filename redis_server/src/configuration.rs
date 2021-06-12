@@ -71,5 +71,4 @@ mod tests {
             String::from(CONST_LOGFILE)
         );
     }
-
 }
