@@ -11,8 +11,10 @@ fn test_timeout_should_disconnects_client() {
     thread::spawn(|| {
         server::run_server(conf);
     });
-    let client = redis::Client::open("redis://127.0.0.1:8080/").unwrap();
-    let mut con = client.get_connection().unwrap();
+    let client = redis::Client::open("redis://127.0.0.1:7878/").unwrap();
+    let mut con = client
+        .get_connection()
+        .expect("falló la conexión cliente-servidor");
     sleep(Duration::new(2, 0));
     let is_connect = con.check_connection();
     assert!(!is_connect);
