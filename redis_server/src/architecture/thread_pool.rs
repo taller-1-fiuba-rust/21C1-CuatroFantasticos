@@ -2,8 +2,6 @@ use crate::architecture::message::Message;
 use crate::architecture::worker::Worker;
 use std::sync::{mpsc, Arc, Mutex};
 
-
-#[derive(Debug)]
 pub struct ThreadPool {
     workers: Vec<Worker>,
     sender: mpsc::Sender<Message>,
@@ -54,24 +52,4 @@ impl Drop for ThreadPool {
             }
         }
     }
-}
-#[cfg(test)]
-mod test {
-    use crate::architecture::thread_pool::ThreadPool;
-
-
-#[test]
-    fn create_new_threadpool_has_no_errors() {
-        let pool = ThreadPool::new(2);
-}
-#[test]
-    fn drop_threadpool_has_no_errors() {
-        let pool = ThreadPool::new(4);
-        drop(pool)
-}
-#[test]
-    fn execute_threadpool_has_no_errors() {
-        let pool = ThreadPool::new(2);
-        pool.execute(|| println!("hello"));
-}
 }
