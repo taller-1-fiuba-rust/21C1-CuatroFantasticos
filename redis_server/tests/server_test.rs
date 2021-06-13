@@ -8,8 +8,8 @@ use std::time::Duration;
 #[test]
 fn test_timeout_should_disconnects_client() {
     let conf = Configuration::new("../redis.conf");
-    thread::spawn(|| {
-        server::run_server(conf);
+    thread::spawn(move || {
+        server::run_server(&conf);
     });
     sleep(Duration::new(1, 0));
     let client = redis::Client::open("redis://127.0.0.1:7878/").unwrap();
