@@ -1,6 +1,4 @@
-struct Parser {
-
-}
+struct Parser {}
 
 impl Parser {
     pub fn new() -> Self {
@@ -10,4 +8,3 @@ impl Parser {
         Parser {}
     }
 }
-
