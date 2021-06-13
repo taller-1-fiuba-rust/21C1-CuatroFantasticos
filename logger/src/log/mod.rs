@@ -7,12 +7,13 @@ use crate::log::logger::Logger;
 use message::LogMessage;
 use writer::LogWriter;
 
-mod logger;
-mod message;
+pub mod logger;
+pub mod message;
 #[cfg(test)]
 mod test_resources;
 mod writer;
 
+#[derive(Debug)]
 pub struct LogService {
     log_sender: mpsc::Sender<LogMessage>,
     log_writer_thread_handler: Option<JoinHandle<()>>,

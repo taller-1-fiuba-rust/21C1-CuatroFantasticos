@@ -4,6 +4,7 @@ use core::result::Result::{Err, Ok};
 use std::error::Error;
 use std::sync::mpsc;
 
+#[derive(Clone, Debug)]
 pub struct Logger {
     log_sender: mpsc::Sender<LogMessage>,
 }

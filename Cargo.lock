@@ -119,6 +119,7 @@ dependencies = [
 name = "redis_server"
 version = "0.1.0"
 dependencies = [
+ "logger",
  "redis",
 ]
 

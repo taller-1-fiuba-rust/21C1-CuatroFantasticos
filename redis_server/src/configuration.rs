@@ -1,11 +1,15 @@
+use crate::configuration::verbose::Verbose;
+use logger::log::logger::Logger;
 use std::collections::HashMap;
 use std::fs;
 
 pub mod verbose;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Configuration {
     conf: HashMap<String, String>,
+    logger: Option<Logger>,
+    verbose: Verbose,
 }
 
 const CONST_VERBOSE: &str = "0";
@@ -22,7 +26,13 @@ impl Configuration {
             let parsed_line: Vec<&str> = split.collect();
             conf.insert(parsed_line[0].to_owned(), parsed_line[1].trim().to_owned());
         }
-        Configuration { conf }
+        let verbose =
+            Configuration::create_verbose(conf.get("verbose").expect("No hay un verbose definido"));
+        Configuration {
+            conf,
+            verbose,
+            logger: None,
+        }
     }
 
     pub fn get(&self, key: &str) -> Option<&String> {
@@ -36,6 +46,21 @@ impl Configuration {
         conf.insert(String::from("dbfilename"), String::from(CONST_DBFILENAME));
         conf.insert(String::from("logfile"), String::from(CONST_LOGFILE));
         conf
+    }
+
+    fn create_verbose(verbose: &str) -> Verbose {
+        Verbose::new(verbose)
+    }
+    pub fn set_logservice(&mut self, logger: Logger) {
+        self.logger = Some(logger);
+    }
+
+    pub fn create_logger(&self) -> Logger {
+        self.logger.as_ref().expect("no hay un logservice").clone()
+    }
+
+    pub fn verbose(&self, content: &str) {
+        self.verbose.print(content);
     }
 }
 
