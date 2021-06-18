@@ -1,18 +1,20 @@
+use crate::log::logger::Logger;
+use message::LogMessage;
 use std::io::Write;
 use std::sync::mpsc;
 use std::thread;
 use std::thread::JoinHandle;
-
-use crate::log::logger::Logger;
-use message::LogMessage;
 use writer::LogWriter;
 
-mod logger;
-mod message;
-#[cfg(test)]
-mod test_resources;
+pub mod logger;
+
+pub mod message;
 mod writer;
 
+#[cfg(test)]
+mod test_resources;
+
+#[derive(Debug)]
 pub struct LogService {
     log_sender: mpsc::Sender<LogMessage>,
     log_writer_thread_handler: Option<JoinHandle<()>>,
