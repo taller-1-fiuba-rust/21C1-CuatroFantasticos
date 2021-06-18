@@ -23,3 +23,19 @@ impl Logger {
         }
     }
 }
+
+// Testear
+
+#[cfg(test)]
+
+mod tests {
+
+    use crate::log::Logger;
+    use std::sync::mpsc;
+
+    #[test]
+    fn new_logger_created() {
+        let (sender, _receiver) = mpsc::channel();
+        Logger::new(sender);
+    }
+}
