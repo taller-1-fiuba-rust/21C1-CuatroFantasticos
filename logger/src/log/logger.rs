@@ -4,6 +4,7 @@ use core::result::Result::{Err, Ok};
 use std::error::Error;
 use std::sync::mpsc;
 
+#[derive(Clone, Debug)]
 pub struct Logger {
     log_sender: mpsc::Sender<LogMessage>,
 }
@@ -20,5 +21,21 @@ impl Logger {
             Ok(_) => Ok(()),
             Err(_) => Err("Error logging".into()),
         }
+    }
+}
+
+// Testear
+
+#[cfg(test)]
+
+mod tests {
+
+    use crate::log::Logger;
+    use std::sync::mpsc;
+
+    #[test]
+    fn new_logger_created() {
+        let (sender, _receiver) = mpsc::channel();
+        Logger::new(sender);
     }
 }

@@ -1,4 +1,5 @@
 use crate::architecture::message::Message;
+use crate::configuration::Configuration;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
@@ -9,19 +10,22 @@ pub struct Worker {
 }
 
 impl Worker {
-    pub fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Message>>>) -> Worker {
+    pub fn new(
+        id: usize,
+        receiver: Arc<Mutex<mpsc::Receiver<Message>>>,
+        conf: &Configuration,
+    ) -> Worker {
+        let conf2 = conf.clone();
         let thread = thread::spawn(move || loop {
             let message = receiver.lock().unwrap().recv().unwrap();
 
             match message {
                 Message::NewJob(job) => {
-                    println!("Worker {} got a job; executing.", id);
-
+                    conf2.verbose(&format!("Worker: {} got a job; Executing", id));
                     job();
                 }
                 Message::Terminate => {
-                    println!("Worker {} was told to terminate.", id);
-
+                    conf2.verbose(&format!("Worker: {} is terminating", id));
                     break;
                 }
             }
