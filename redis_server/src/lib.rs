@@ -1,3 +1,4 @@
 pub mod architecture;
-mod request_handler;
+pub mod command;
 pub mod configuration;
+mod request_handler;
