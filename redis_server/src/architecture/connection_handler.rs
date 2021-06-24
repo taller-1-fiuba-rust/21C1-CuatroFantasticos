@@ -1,8 +1,8 @@
 use crate::configuration::Configuration;
+use crate::data::redis_request::RedisRequest;
 use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};
 use std::sync::mpsc;
-use crate::data::redis_request::RedisRequest;
 
 pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
     let mut buffer = [0; 1024];
@@ -19,8 +19,8 @@ pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
             };
             conf.verbose(&format!("handle_connection: {}", s));
 
-            let request = RedisRequest::new( s.to_owned() , sender );
-            match conf.get_data_sender().send(request){
+            let request = RedisRequest::new(s.to_owned(), sender);
+            match conf.get_data_sender().send(request) {
                 Ok(_) => {
                     conf.verbose("Sent request successfully");
                 }
@@ -39,5 +39,4 @@ pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
 
     //hace algo el receiver con lo que recibe
     println!("Recibi esto: {}", receiver.recv().unwrap());
-
 }

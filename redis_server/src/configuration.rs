@@ -1,9 +1,9 @@
 use crate::configuration::verbose::Verbose;
+use crate::data::redis_request::RedisRequest;
 use logger::log::logger::Logger;
 use std::collections::HashMap;
 use std::fs;
 use std::sync::mpsc;
-use crate::data::redis_request::RedisRequest;
 
 pub mod verbose;
 
@@ -59,12 +59,14 @@ impl Configuration {
         self.logger = Some(logger);
     }
 
-    pub fn set_data_sender(&mut self, data_sender: mpsc::Sender<RedisRequest>){
+    pub fn set_data_sender(&mut self, data_sender: mpsc::Sender<RedisRequest>) {
         self.data_sender = Some(data_sender);
     }
 
-    pub fn get_data_sender(&mut self) -> &mpsc::Sender<RedisRequest>{
-        self.data_sender.as_ref().expect("No sender in configuration")
+    pub fn get_data_sender(&mut self) -> &mpsc::Sender<RedisRequest> {
+        self.data_sender
+            .as_ref()
+            .expect("No sender in configuration")
     }
 
     pub fn create_logger(&self) -> Logger {
