@@ -4,8 +4,8 @@ extern crate redis_server;
 use logger::log::LogService;
 use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
-use redis_server::data::data_receiver::DataReceiver;
 use redis_server::data::redis_request::RedisRequest;
+use redis_server::data::storage::Storage;
 use std::env;
 use std::fs::OpenOptions;
 use std::sync::{mpsc, Arc, Mutex};
@@ -30,10 +30,11 @@ fn main() {
     let receiver = Arc::new(Mutex::new(receiver));
 
     conf.set_data_sender(sender);
-
+    let storage = Storage::new(conf.get("dbfilename").unwrap());
+    storage.imprimir();
     thread::spawn(move || loop {
-        let mut receiver = DataReceiver::new(Arc::clone(&receiver));
-        let mut request = receiver.receive();
+        let receiver = Arc::clone(&receiver);
+        let mut request = receiver.lock().unwrap().recv().unwrap();
         request
             .get_sender()
             .send("ESTO FUNCIONA? siiiiii".to_string())
