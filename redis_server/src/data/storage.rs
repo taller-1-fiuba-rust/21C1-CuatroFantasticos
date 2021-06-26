@@ -33,7 +33,7 @@ impl Storage {
                     let value = RedisValueList::new(parsed_line[2].trim().to_owned());
                     storage.insert(parsed_line[0].trim().to_owned(), Box::new(value));
                 }
-                "hash" => {
+                "set" => {
                     let value = RedisValueSet::new(parsed_line[2].trim().to_owned());
                     storage.insert(parsed_line[0].trim().to_owned(), Box::new(value));
                 }
