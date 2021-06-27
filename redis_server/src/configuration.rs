@@ -1,7 +1,9 @@
 use crate::configuration::verbose::Verbose;
+use crate::data::redis_request::RedisRequest;
 use logger::log::logger::Logger;
 use std::collections::HashMap;
 use std::fs;
+use std::sync::mpsc;
 
 pub mod verbose;
 
@@ -10,6 +12,7 @@ pub struct Configuration {
     conf: HashMap<String, String>,
     logger: Option<Logger>,
     verbose: Verbose,
+    data_sender: Option<mpsc::Sender<RedisRequest>>,
 }
 
 const CONST_VERBOSE: &str = "0";
@@ -32,6 +35,7 @@ impl Configuration {
             conf,
             verbose,
             logger: None,
+            data_sender: None,
         }
     }
 
@@ -53,6 +57,16 @@ impl Configuration {
     }
     pub fn set_logservice(&mut self, logger: Logger) {
         self.logger = Some(logger);
+    }
+
+    pub fn set_data_sender(&mut self, data_sender: mpsc::Sender<RedisRequest>) {
+        self.data_sender = Some(data_sender);
+    }
+
+    pub fn get_data_sender(&mut self) -> &mpsc::Sender<RedisRequest> {
+        self.data_sender
+            .as_ref()
+            .expect("No sender in configuration")
     }
 
     pub fn create_logger(&self) -> Logger {
