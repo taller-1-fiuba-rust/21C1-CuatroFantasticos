@@ -4,6 +4,7 @@ extern crate redis_server;
 use logger::log::LogService;
 use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
+use redis_server::request_handler::parser::Parser;
 use std::env;
 use std::fs::OpenOptions;
 
@@ -22,4 +23,6 @@ fn main() {
     conf.set_logservice(log_service.create_logger());
 
     server::run_server(&conf);
+
+    let _parser = Parser::new();
 }

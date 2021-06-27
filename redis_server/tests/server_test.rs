@@ -1,4 +1,4 @@
-use redis::ConnectionLike;
+/*use redis::ConnectionLike;
 use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
 use std::thread;
@@ -19,4 +19,4 @@ fn test_timeout_should_disconnects_client() {
     sleep(Duration::new(2, 0));
     let is_connect = con.check_connection();
     assert!(!is_connect);
-}
+}*/
