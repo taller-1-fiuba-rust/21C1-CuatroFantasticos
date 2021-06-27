@@ -1,7 +1,7 @@
 use crate::command::RedisCommand;
 use std::str::Split;
 
-static TOKEN_SEPARATOR: &str = "\r\n";
+const TOKEN_SEPARATOR: &str = "\r\n";
 
 struct Parser {}
 // Simple implementation of parser for our TP
@@ -12,7 +12,7 @@ impl Parser {
 
     pub fn parse(&self, packed_command: &[u8]) -> Result<Box<dyn RedisCommand>, String> {
         let mut command_iter = std::str::from_utf8(packed_command)
-            .or(Err("Not an utf-8 string".to_string()))?
+            .map_err(|_| "Not an utf-8 string".to_string())?
             .split(TOKEN_SEPARATOR);
         let bulk_len_token = command_iter.next().ok_or("Empty command")?;
         let argc = self.parse_bulk_len(bulk_len_token)?;
@@ -27,6 +27,8 @@ impl Parser {
         let command_type = self.parse_string(&mut command_iter)?;
         match command_type.as_str() {
             "INFO" => self.create_command_type_info(),
+            "MONITOR" => self.create_command_type_info(),
+            "FLUSHDB" => self.create_command_type_info(),
             _ => Err("Command not implemented".to_string()),
         }
     }
@@ -37,7 +39,7 @@ impl Parser {
         }
         let len = (&command_part[1..])
             .parse::<usize>()
-            .or(Err("Not a numeric length".to_string()))?;
+            .map_err(|_| "Not a numeric length".to_string())?;
         Ok(len)
     }
 
