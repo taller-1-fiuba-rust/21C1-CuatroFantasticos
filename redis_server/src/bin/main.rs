@@ -6,6 +6,7 @@ use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
 use redis_server::data::redis_request::RedisRequest;
 use redis_server::data::storage::Storage;
+use redis_server::request_handler::parser::Parser;
 use std::env;
 use std::fs::OpenOptions;
 use std::sync::{mpsc, Arc, Mutex};
@@ -42,4 +43,6 @@ fn main() {
     });
 
     server::run_server(&conf);
+
+    let _parser = Parser::new();
 }
