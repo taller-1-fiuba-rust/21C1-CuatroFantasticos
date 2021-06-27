@@ -30,3 +30,23 @@ impl RedisValueSet {
         RedisValueSet { contents }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::data::redis_value::RedisValue;
+    use crate::data::redis_value_set::RedisValueSet;
+
+    #[test]
+    fn test_create_empty_redis_value() {
+        let string = String::from("");
+        let redis_value_set = RedisValueSet::new(string.clone());
+        assert_eq!(redis_value_set.serialize(), string);
+    }
+
+    #[test]
+    fn test_create_redis_value() {
+        let string = String::from("hola");
+        let redis_value_set = RedisValueSet::new(string.clone());
+        assert_eq!(redis_value_set.serialize(), string);
+    }
+}

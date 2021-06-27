@@ -1,4 +1,5 @@
-hola: string: chau
+key: type: value
+hola: string: chau anda?
 messi: string: rve
-lista: list: loque, quiera
-hashkey: set: asd, dsa
+list: list: loque, quieras, !
+hash: set: asd, dsa

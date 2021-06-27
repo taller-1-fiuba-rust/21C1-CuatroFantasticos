@@ -37,7 +37,7 @@ impl Storage {
                     let value = RedisValueSet::new(parsed_line[2].trim().to_owned());
                     storage.insert(parsed_line[0].trim().to_owned(), Box::new(value));
                 }
-                _ => println!("aun no implementado"),
+                _ => println!("aún no implementado"),
             }
         }
         storage
@@ -62,5 +62,16 @@ impl Storage {
             println!("{:?}", key);
             println!("{:?}", value.serialize());
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::data::storage::Storage;
+
+    #[test]
+    fn test_create_empty_storage() {
+        let storage = Storage::deserialize_empty();
+        assert!(storage.is_empty());
     }
 }
