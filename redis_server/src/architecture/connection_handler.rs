@@ -3,6 +3,7 @@ use crate::data::redis_request::RedisRequest;
 use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};
 use std::sync::mpsc;
+use crate::request_handler::parser::Parser;
 
 pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
     let mut buffer = [0; 1024];
@@ -11,6 +12,7 @@ pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
 
     conf.verbose("handle_connection: Waiting for request");
     let read_size = stream.read(&mut buffer);
+
     match read_size {
         Ok(_) => {
             let s = match std::str::from_utf8(&buffer) {
@@ -19,7 +21,10 @@ pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
             };
             conf.verbose(&format!("handle_connection: {}", s));
 
-            let request = RedisRequest::new(s.to_owned(), sender);
+            let parser = Parser::new();
+            let command = parser.parse(s.as_ref()).expect("error al parsear el comando");
+            let message = command.execute();
+            let request = RedisRequest::new(message.to_owned(), sender);
             match conf.get_data_sender().send(request) {
                 Ok(_) => {
                     conf.verbose("Sent request successfully");

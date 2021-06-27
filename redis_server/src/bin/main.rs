@@ -32,7 +32,7 @@ fn main() {
 
     conf.set_data_sender(sender);
     let storage = Storage::new(conf.get("dbfilename").unwrap());
-    storage.imprimir();
+    storage.print();
     thread::spawn(move || loop {
         let receiver = Arc::clone(&receiver);
         let mut request = receiver.lock().unwrap().recv().unwrap();
@@ -41,8 +41,5 @@ fn main() {
             .send("ESTO FUNCIONA? siiiiii".to_string())
             .unwrap();
     });
-
     server::run_server(&conf);
-
-    let _parser = Parser::new();
 }

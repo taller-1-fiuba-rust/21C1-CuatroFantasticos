@@ -57,6 +57,10 @@ impl Parser {
     fn create_command_type_info(&self) -> Result<Box<dyn RedisCommand>, String> {
         todo!()
     }
+    
+    fn create_command_type_dbsize(&self) -> Result<Box<dyn RedisCommand>, String> {
+        
+    }
 }
 
 impl Default for Parser {

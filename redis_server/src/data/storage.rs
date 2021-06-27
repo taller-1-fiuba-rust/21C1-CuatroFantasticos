@@ -57,11 +57,16 @@ impl Storage {
         contents
     }
 
-    pub fn imprimir(&self) {
+    pub fn print(&self) {
         for (key, value) in &self.storage {
             println!("{:?}", key);
             println!("{:?}", value.serialize());
         }
+    }
+    
+    pub fn get_dbsize(&self) -> usize {
+        let size = self.storage.len();
+        size
     }
 }
 
