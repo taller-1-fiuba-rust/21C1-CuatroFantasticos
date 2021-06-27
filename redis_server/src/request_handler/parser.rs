@@ -3,7 +3,7 @@ use std::str::Split;
 
 const TOKEN_SEPARATOR: &str = "\r\n";
 
-struct Parser {}
+pub struct Parser {}
 // Simple implementation of parser for our TP
 impl Parser {
     pub fn new() -> Self {
@@ -22,7 +22,7 @@ impl Parser {
     fn parse_command(
         &self,
         mut command_iter: Split<&str>,
-        command_qty: usize,
+        _command_qty: usize,
     ) -> Result<Box<dyn RedisCommand>, String> {
         let command_type = self.parse_string(&mut command_iter)?;
         match command_type.as_str() {
@@ -56,5 +56,11 @@ impl Parser {
 impl Parser {
     fn create_command_type_info(&self) -> Result<Box<dyn RedisCommand>, String> {
         todo!()
+    }
+}
+
+impl Default for Parser {
+    fn default() -> Self {
+        Self::new()
     }
 }
