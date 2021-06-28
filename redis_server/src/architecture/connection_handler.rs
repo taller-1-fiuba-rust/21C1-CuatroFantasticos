@@ -1,16 +1,15 @@
 use crate::configuration::Configuration;
-use crate::data::redis_request::RedisRequest;
+use crate::data::storage_accessor::StorageAccessor;
+use crate::request_handler::parser::Parser;
 use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};
-use std::sync::mpsc;
 
 pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
     let mut buffer = [0; 1024];
 
-    let (sender, receiver): (mpsc::Sender<String>, mpsc::Receiver<String>) = mpsc::channel();
-
     conf.verbose("handle_connection: Waiting for request");
     let read_size = stream.read(&mut buffer);
+
     match read_size {
         Ok(_) => {
             let s = match std::str::from_utf8(&buffer) {
@@ -19,15 +18,19 @@ pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
             };
             conf.verbose(&format!("handle_connection: {}", s));
 
-            let request = RedisRequest::new(s.to_owned(), sender);
-            match conf.get_data_sender().send(request) {
-                Ok(_) => {
-                    conf.verbose("Sent request successfully");
-                }
-                Err(e) => {
-                    panic!("Could not send request: {}", e);
-                }
-            }
+            let accessor = StorageAccessor::new(conf.get_data_sender().clone());
+            let parser = Parser::new();
+            let command = parser
+                .parse(s.as_ref())
+                .expect("error al parsear el comando");
+            let message = match command.execute(accessor) {
+                Ok(s) => s,
+                Err(e) => e,
+            };
+
+            stream
+                .write_all(message.as_ref())
+                .expect("Could not write a response");
 
             stream.flush().unwrap();
         }
@@ -36,7 +39,4 @@ pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
             stream.shutdown(Shutdown::Both).unwrap();
         }
     }
-
-    //hace algo el receiver con lo que recibe
-    println!("Recibi esto: {}", receiver.recv().unwrap());
 }

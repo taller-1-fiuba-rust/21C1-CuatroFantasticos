@@ -2,21 +2,24 @@ use crate::data::redis_value::RedisValue;
 use crate::data::redis_value_list::RedisValueList;
 use crate::data::redis_value_set::RedisValueSet;
 use crate::data::redis_value_string::RedisValueString;
+use crate::data::storage_message::{StorageMessage, StorageMessageEnum};
 use std::collections::HashMap;
 use std::fs;
+use std::sync::mpsc;
 
 pub struct Storage {
     storage: HashMap<String, Box<dyn RedisValue>>,
+    receiver: mpsc::Receiver<StorageMessage>,
 }
 
 impl Storage {
-    pub fn new(filename: &str) -> Storage {
+    pub fn new(filename: &str, receiver: mpsc::Receiver<StorageMessage>) -> Storage {
         let contents = fs::read_to_string(filename);
         let storage = match contents {
             Ok(contents) => Storage::deserialize(contents),
             Err(_) => Storage::deserialize_empty(),
         };
-        Storage { storage }
+        Storage { storage, receiver }
     }
 
     pub fn deserialize(contents: String) -> HashMap<String, Box<dyn RedisValue>> {
@@ -37,7 +40,7 @@ impl Storage {
                     let value = RedisValueSet::new(parsed_line[2].trim().to_owned());
                     storage.insert(parsed_line[0].trim().to_owned(), Box::new(value));
                 }
-                _ => println!("aún no implementado"),
+                _ => println!("Data type not supported in deserialization"),
             }
         }
         storage
@@ -57,10 +60,31 @@ impl Storage {
         contents
     }
 
-    pub fn imprimir(&self) {
+    pub fn print(&self) {
         for (key, value) in &self.storage {
             println!("{:?}", key);
             println!("{:?}", value.serialize());
+        }
+    }
+
+    pub fn get_dbsize(&self) -> usize {
+        self.storage.len()
+    }
+
+    pub fn init(self) {
+        for message in self.receiver {
+            match message.get_message() {
+                StorageMessageEnum::GetDbsize => {
+                    let value = self.storage.len().to_string();
+                    message
+                        .get_sender()
+                        .send(value)
+                        .expect("Client thread is not listening to storage response");
+                }
+                StorageMessageEnum::Terminate => {
+                    break;
+                }
+            }
         }
     }
 }

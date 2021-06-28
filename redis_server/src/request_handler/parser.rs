@@ -1,3 +1,5 @@
+use crate::command::dbsize::RedisCommandDbSize;
+use crate::command::ping::RedisCommandPing;
 use crate::command::RedisCommand;
 use std::str::Split;
 
@@ -26,10 +28,11 @@ impl Parser {
     ) -> Result<Box<dyn RedisCommand>, String> {
         let command_type = self.parse_string(&mut command_iter)?;
         match command_type.as_str() {
-            "INFO" => self.create_command_type_info(),
-            "MONITOR" => self.create_command_type_info(),
-            "FLUSHDB" => self.create_command_type_info(),
-            _ => Err("Command not implemented".to_string()),
+            "COMMAND" => Ok(Box::new(RedisCommandPing::new())),
+            "PING" => Ok(Box::new(RedisCommandPing::new())),
+            "INFO" => todo!(),
+            "DBSIZE" => Ok(Box::new(RedisCommandDbSize::new())),
+            c => Err(format!("Command not implemented: {}", c)),
         }
     }
 
@@ -50,12 +53,6 @@ impl Parser {
         }
         let command_part = command_iter.next().ok_or("End of input")?;
         Ok(command_part.to_string())
-    }
-}
-
-impl Parser {
-    fn create_command_type_info(&self) -> Result<Box<dyn RedisCommand>, String> {
-        todo!()
     }
 }
 
