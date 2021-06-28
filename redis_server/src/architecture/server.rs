@@ -13,7 +13,7 @@ pub fn run_server(conf: &Configuration) {
     ));
 
     let port = conf.get("port").expect("There is no port in Configuration");
-    let addr = "127.0.0.1:".to_owned() + port;
+    let addr = "127.0.0.1:".to_owned() + &port;
     conf.verbose(&format!("run_server: connecting to {}", addr));
 
     let listener = TcpListener::bind(addr).expect("Server was not able to connect");

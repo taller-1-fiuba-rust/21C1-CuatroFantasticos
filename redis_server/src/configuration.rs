@@ -4,6 +4,7 @@ use logger::log::logger::Logger;
 use std::collections::HashMap;
 use std::fs;
 use std::sync::mpsc;
+use crate::data::storage_message::StorageMessage;
 
 pub mod verbose;
 
@@ -12,7 +13,7 @@ pub struct Configuration {
     conf: HashMap<String, String>,
     logger: Option<Logger>,
     verbose: Verbose,
-    data_sender: Option<mpsc::Sender<RedisRequest>>,
+    data_sender: Option<mpsc::Sender<StorageMessage>>,
 }
 
 const CONST_VERBOSE: &str = "0";
@@ -39,8 +40,8 @@ impl Configuration {
         }
     }
 
-    pub fn get(&self, key: &str) -> Option<&String> {
-        self.conf.get(key)
+    pub fn get(&self, key: &str) -> Option<String> {
+        self.conf.get(key).to_owned()
     }
 
     pub fn default_values() -> HashMap<String, String> {
@@ -59,11 +60,11 @@ impl Configuration {
         self.logger = Some(logger);
     }
 
-    pub fn set_data_sender(&mut self, data_sender: mpsc::Sender<RedisRequest>) {
+    pub fn set_data_sender(&mut self, data_sender: mpsc::Sender<StorageMessage>) {
         self.data_sender = Some(data_sender);
     }
 
-    pub fn get_data_sender(&mut self) -> &mpsc::Sender<RedisRequest> {
+    pub fn get_data_sender(&mut self) -> &mpsc::Sender<StorageMessage> {
         self.data_sender
             .as_ref()
             .expect("No sender in configuration")

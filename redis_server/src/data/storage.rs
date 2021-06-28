@@ -4,19 +4,22 @@ use crate::data::redis_value_set::RedisValueSet;
 use crate::data::redis_value_string::RedisValueString;
 use std::collections::HashMap;
 use std::fs;
+use crate::data::storage_message::{StorageMessage, StorageMessageEnum};
+use std::sync::mpsc;
 
 pub struct Storage {
     storage: HashMap<String, Box<dyn RedisValue>>,
+    receiver: mpsc::Receiver<StorageMessage>
 }
 
 impl Storage {
-    pub fn new(filename: &str) -> Storage {
+    pub fn new(filename: &str, receiver: mpsc::Receiver<StorageMessage>) -> Storage {
         let contents = fs::read_to_string(filename);
         let storage = match contents {
             Ok(contents) => Storage::deserialize(contents),
             Err(_) => Storage::deserialize_empty(),
         };
-        Storage { storage }
+        Storage { storage, receiver }
     }
 
     pub fn deserialize(contents: String) -> HashMap<String, Box<dyn RedisValue>> {
@@ -67,6 +70,20 @@ impl Storage {
     pub fn get_dbsize(&self) -> usize {
         let size = self.storage.len();
         size
+    }
+
+    pub fn init(mut self) {
+        for message in self.receiver {
+            match message.getMessage() {
+                StorageMessageEnum::GetDbsize => {
+                    let value = self.storage.len().to_string();
+                    message.getSender().send(value);
+                }
+                StorageMessageEnum::Terminate => {
+                    break;
+                }
+            }
+        }
     }
 }
 
