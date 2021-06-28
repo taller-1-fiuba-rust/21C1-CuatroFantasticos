@@ -10,11 +10,11 @@ impl StorageMessage {
         StorageMessage { message, sender }
     }
 
-    pub fn getMessage(&self) -> StorageMessageEnum {
+    pub fn get_message(&self) -> StorageMessageEnum {
         self.message.clone()
     }
 
-    pub fn getSender(&self) -> mpsc::Sender<String> {
+    pub fn get_sender(&self) -> mpsc::Sender<String> {
         self.sender.clone()
     }
 }

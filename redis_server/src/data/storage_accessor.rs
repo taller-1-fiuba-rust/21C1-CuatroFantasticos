@@ -20,9 +20,12 @@ impl StorageAccessor {
 
     pub fn access(&self, message: StorageMessageEnum) -> Result<String, String> {
         let storage_message = StorageMessage::new(message, self.sender_for_storage.clone());
-        self.sender
+        match self.sender
             .send(storage_message)
-            .map_err(|_| "Error sending message to storage".to_string());
-        Ok(self.receiver.recv().unwrap())
+            .map_err(|_| "Error sending message to storage".to_string()){
+       Ok(_) => Ok(self.receiver.recv().unwrap()),
+       Err(e) =>  Err(e)
+
+       }
     }
 }

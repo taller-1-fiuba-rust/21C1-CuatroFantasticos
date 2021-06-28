@@ -73,11 +73,11 @@ impl Storage {
 
     pub fn init(self) {
         for message in self.receiver {
-            match message.getMessage() {
+            match message.get_message() {
                 StorageMessageEnum::GetDbsize => {
                     let value = self.storage.len().to_string();
                     message
-                        .getSender()
+                        .get_sender()
                         .send(value)
                         .expect("Client thread is not listening to storage response");
                 }

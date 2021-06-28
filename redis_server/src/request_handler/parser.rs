@@ -28,7 +28,7 @@ impl Parser {
         let command_type = self.parse_string(&mut command_iter)?;
         match command_type.as_str() {
             "INFO" => self.create_command_type_info(),
-            "DBSIZE" => self.create_command_type_dbsize(),
+            "DBSIZE" => Ok(self.create_command_type_dbsize()),
             _ => Err("Command not implemented".to_string()),
         }
     }
@@ -58,8 +58,9 @@ impl Parser {
         todo!()
     }
 
-    fn create_command_type_dbsize(&self) -> Result<Box<dyn RedisCommand>, String> {
-        Ok(Box::new(RedisCommandDbSize::new()))
+    fn create_command_type_dbsize(&self) ->  std::boxed::Box<(dyn RedisCommand + 'static)> {
+         Box::new(RedisCommandDbSize::new())
+
     }
 }
 
