@@ -33,7 +33,7 @@ fn main() {
     let dbfilename = conf.get("dbfilename").unwrap();
     thread::spawn(move || {
         let storage = Storage::new(&dbfilename, receiver);
-        storage.print();
+        //storage.print();
         storage.init();
     });
     server::run_server(&conf);

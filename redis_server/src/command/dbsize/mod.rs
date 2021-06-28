@@ -12,7 +12,9 @@ impl RedisCommandDbSize {
 
 impl RedisCommand for RedisCommandDbSize {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        accessor.access(StorageMessageEnum::GetDbsize)
+        let dbsize = accessor.access(StorageMessageEnum::GetDbsize)?;
+        let response = format!(":{}\r\n", dbsize);
+        Ok(response)
     }
 }
 

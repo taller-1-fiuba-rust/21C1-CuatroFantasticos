@@ -40,7 +40,7 @@ impl Storage {
                     let value = RedisValueSet::new(parsed_line[2].trim().to_owned());
                     storage.insert(parsed_line[0].trim().to_owned(), Box::new(value));
                 }
-                _ => println!("aún no implementado"),
+                _ => println!("Data type not supported in deserialization"),
             }
         }
         storage
