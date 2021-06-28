@@ -40,10 +40,7 @@ impl Configuration {
     }
 
     pub fn get(&self, key: &str) -> Option<String> {
-        match self.conf.get(key) {
-            Some(s) => Some(s.to_string()),
-            None => None,
-        }
+        self.conf.get(key).map(|s| s.to_string())
     }
 
     pub fn default_values() -> HashMap<String, String> {
