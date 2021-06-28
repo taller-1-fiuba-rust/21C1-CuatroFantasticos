@@ -11,17 +11,18 @@ impl StorageAccessor {
     pub fn new(sender: mpsc::Sender<StorageMessage>) -> StorageAccessor {
         let (sender_for_storage, receiver) = mpsc::channel::<String>();
 
-        StorageAccessor{
+        StorageAccessor {
             sender,
             sender_for_storage,
-            receiver
+            receiver,
         }
     }
 
-    pub fn access(&self, message: StorageMessageEnum) -> Result<String,String> {
+    pub fn access(&self, message: StorageMessageEnum) -> Result<String, String> {
         let storage_message = StorageMessage::new(message, self.sender_for_storage.clone());
-        self.sender.send(storage_message).map_err(|_| "Error sending message to storage".to_string());
+        self.sender
+            .send(storage_message)
+            .map_err(|_| "Error sending message to storage".to_string());
         Ok(self.receiver.recv().unwrap())
     }
-
 }

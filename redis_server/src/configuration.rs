@@ -1,10 +1,9 @@
 use crate::configuration::verbose::Verbose;
-use crate::data::redis_request::RedisRequest;
+use crate::data::storage_message::StorageMessage;
 use logger::log::logger::Logger;
 use std::collections::HashMap;
 use std::fs;
 use std::sync::mpsc;
-use crate::data::storage_message::StorageMessage;
 
 pub mod verbose;
 
@@ -41,7 +40,10 @@ impl Configuration {
     }
 
     pub fn get(&self, key: &str) -> Option<String> {
-        self.conf.get(key).to_owned()
+        match self.conf.get(key) {
+            Some(s) => Some(s.to_string()),
+            None => None,
+        }
     }
 
     pub fn default_values() -> HashMap<String, String> {

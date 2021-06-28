@@ -1,6 +1,6 @@
+use crate::command::dbsize::RedisCommandDbSize;
 use crate::command::RedisCommand;
 use std::str::Split;
-use crate::command::dbsize::RedisCommandDbSize;
 
 const TOKEN_SEPARATOR: &str = "\r\n";
 
@@ -58,7 +58,7 @@ impl Parser {
     fn create_command_type_info(&self) -> Result<Box<dyn RedisCommand>, String> {
         todo!()
     }
-    
+
     fn create_command_type_dbsize(&self) -> Result<Box<dyn RedisCommand>, String> {
         Ok(Box::new(RedisCommandDbSize::new()))
     }

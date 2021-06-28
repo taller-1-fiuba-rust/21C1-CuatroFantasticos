@@ -1,17 +1,16 @@
 extern crate logger;
 extern crate redis_server;
 
+use std::env;
+use std::fs::OpenOptions;
+use std::sync::mpsc;
+use std::thread;
+
 use logger::log::LogService;
 use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
-use redis_server::data::redis_request::RedisRequest;
 use redis_server::data::storage::Storage;
-use redis_server::request_handler::parser::Parser;
-use std::env;
-use std::fs::OpenOptions;
-use std::sync::{mpsc, Arc, Mutex};
-use std::thread;
-use redis_server::data::storage_message::{StorageMessage, StorageMessageEnum};
+use redis_server::data::storage_message::StorageMessage;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -32,11 +31,10 @@ fn main() {
 
     conf.set_data_sender(sender);
     let dbfilename = conf.get("dbfilename").unwrap();
-    thread::spawn(move ||  {
-        let storage = Storage::new(dbfilename, receiver);
+    thread::spawn(move || {
+        let storage = Storage::new(&dbfilename, receiver);
         storage.print();
         storage.init();
     });
     server::run_server(&conf);
-
 }

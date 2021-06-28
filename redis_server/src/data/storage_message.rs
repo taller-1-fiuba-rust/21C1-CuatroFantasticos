@@ -7,24 +7,20 @@ pub struct StorageMessage {
 
 impl StorageMessage {
     pub fn new(message: StorageMessageEnum, sender: mpsc::Sender<String>) -> StorageMessage {
-        StorageMessage{
-            message,
-            sender
-        }
+        StorageMessage { message, sender }
     }
 
-    pub fn getMessage(&self) -> StorageMessageEnum{
+    pub fn getMessage(&self) -> StorageMessageEnum {
         self.message.clone()
     }
 
-    pub fn getSender(&self) -> mpsc::Sender<String>{
+    pub fn getSender(&self) -> mpsc::Sender<String> {
         self.sender.clone()
     }
-
 }
 
 #[derive(Clone)]
 pub enum StorageMessageEnum {
     GetDbsize,
-    Terminate
+    Terminate,
 }
