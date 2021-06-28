@@ -15,3 +15,9 @@ impl RedisCommand for RedisCommandDbSize {
         accessor.access(StorageMessageEnum::GetDbsize)
     }
 }
+
+impl Default for RedisCommandDbSize {
+    fn default() -> Self {
+        Self::new()
+    }
+}

@@ -68,8 +68,7 @@ impl Storage {
     }
 
     pub fn get_dbsize(&self) -> usize {
-        let size = self.storage.len();
-        size
+        self.storage.len()
     }
 
     pub fn init(self) {
@@ -77,7 +76,10 @@ impl Storage {
             match message.getMessage() {
                 StorageMessageEnum::GetDbsize => {
                     let value = self.storage.len().to_string();
-                    message.getSender().send(value);
+                    message
+                        .getSender()
+                        .send(value)
+                        .expect("Client thread is not listening to storage response");
                 }
                 StorageMessageEnum::Terminate => {
                     break;

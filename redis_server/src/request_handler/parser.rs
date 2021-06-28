@@ -28,8 +28,7 @@ impl Parser {
         let command_type = self.parse_string(&mut command_iter)?;
         match command_type.as_str() {
             "INFO" => self.create_command_type_info(),
-            "MONITOR" => self.create_command_type_info(),
-            "FLUSHDB" => self.create_command_type_info(),
+            "DBSIZE" => self.create_command_type_dbsize(),
             _ => Err("Command not implemented".to_string()),
         }
     }
