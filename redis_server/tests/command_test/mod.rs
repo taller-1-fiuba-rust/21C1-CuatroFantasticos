@@ -9,7 +9,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 #[test]
-fn test_flushdb_works() {
+fn test_client_receives_ok_response_when_flushdb() {
     //make sure redis.conf file is set properly with with timeout 1 sec
     let mut conf = Configuration::new("../redis.conf");
     thread::spawn(move || {
