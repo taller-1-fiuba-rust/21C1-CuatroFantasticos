@@ -71,7 +71,7 @@ impl Storage {
         self.storage.len()
     }
 
-    pub fn init(self) {
+    pub fn init(mut self) {
         for message in self.receiver {
             match message.get_message() {
                 StorageMessageEnum::GetDbsize => {
@@ -80,6 +80,13 @@ impl Storage {
                         .get_sender()
                         .send(value)
                         .expect("Client thread is not listening to storage response");
+                }
+                StorageMessageEnum::FlushDb => {
+                    self.storage.clear();
+                    message
+                        .get_sender()
+                        .send(String::from("OK"))
+                        .expect("Client thread is not listening to storage response")
                 }
                 StorageMessageEnum::Terminate => {
                     break;

@@ -1,4 +1,5 @@
 use crate::command::dbsize::RedisCommandDbSize;
+use crate::command::flushdb::RedisCommandFlushDb;
 use crate::command::ping::RedisCommandPing;
 use crate::command::RedisCommand;
 use std::str::Split;
@@ -32,6 +33,7 @@ impl Parser {
             "PING" => Ok(Box::new(RedisCommandPing::new())),
             "INFO" => todo!(),
             "DBSIZE" => Ok(Box::new(RedisCommandDbSize::new())),
+            "FLUSHDB" => Ok(Box::new(RedisCommandFlushDb::new())),
             c => Err(format!("Command not implemented: {}", c)),
         }
     }

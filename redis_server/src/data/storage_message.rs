@@ -22,5 +22,6 @@ impl StorageMessage {
 #[derive(Clone)]
 pub enum StorageMessageEnum {
     GetDbsize,
+    FlushDb,
     Terminate,
 }
