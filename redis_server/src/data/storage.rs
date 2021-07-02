@@ -88,6 +88,21 @@ impl Storage {
                         .send(String::from("OK"))
                         .expect("Client thread is not listening to storage response")
                 }
+                StorageMessageEnum::Rename(key, newkey) => {
+                    if let Some(value) = self.storage.remove(&key) {
+                        self.storage.insert(newkey, value);
+                        message
+                            .get_sender()
+                            .send(String::from("OK"))
+                            .expect("Client thread is not listening to storage response")
+                    }
+                    // habría que charlarlo entre todos para ver como solucionarlo
+                    // porque el formato esta del otro lado
+                    message
+                        .get_sender()
+                        .send(String::from("ERROR"))
+                        .expect("Client thread is not listening to storage response")
+                }
                 StorageMessageEnum::Exists(key) => {
                     let result = self.storage.contains_key(&key);
                     message

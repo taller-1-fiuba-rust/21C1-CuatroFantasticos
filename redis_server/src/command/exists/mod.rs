@@ -14,8 +14,8 @@ impl RedisCommandExists {
 
 impl RedisCommand for RedisCommandExists {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let flush_db = accessor.access(StorageMessageEnum::Exists(self.key.clone()))?;
-        let response = format!(":{}\r\n", flush_db);
+        let exists = accessor.access(StorageMessageEnum::Exists(self.key.clone()))?;
+        let response = format!(":{}\r\n", exists);
         Ok(response)
     }
 }
