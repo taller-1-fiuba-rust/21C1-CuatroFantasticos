@@ -23,5 +23,6 @@ impl StorageMessage {
 pub enum StorageMessageEnum {
     GetDbsize,
     FlushDb,
+    Exists(String),
     Terminate,
 }

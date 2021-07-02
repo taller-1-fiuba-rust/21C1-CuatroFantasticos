@@ -26,7 +26,7 @@ fn test_connection_timeouts_when_server_sleeps_two_seconds() {
         server::run_server(&conf);
     });
     sleep(Duration::new(1, 0));
-    let client = redis::Client::open("redis://127.0.0.1:7878/").unwrap();
+    let client = redis::Client::open("redis://127.0.0.1:6379/").unwrap();
     let mut con = client
         .get_connection()
         .expect("falló la conexión cliente-servidor");
@@ -53,7 +53,7 @@ fn test_connection_doesnt_timeout_when_server_doesnt_sleep() {
         server::run_server(&conf);
     });
     sleep(Duration::new(1, 0));
-    let client = redis::Client::open("redis://127.0.0.1:7878/").unwrap();
+    let client = redis::Client::open("redis://127.0.0.1:6379/").unwrap();
     let mut con = client
         .get_connection()
         .expect("falló la conexión cliente-servidor");

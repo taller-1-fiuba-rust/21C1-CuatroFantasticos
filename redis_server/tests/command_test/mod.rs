@@ -26,7 +26,7 @@ fn test_client_receives_ok_response_when_flushdb() {
         server::run_server(&conf);
     });
     sleep(Duration::new(1, 0));
-    let client = redis::Client::open("redis://127.0.0.1:7878/").unwrap();
+    let client = redis::Client::open("redis://127.0.0.1:6379/").unwrap();
     let mut con = client
         .get_connection()
         .expect("falló la conexión cliente-servidor");
