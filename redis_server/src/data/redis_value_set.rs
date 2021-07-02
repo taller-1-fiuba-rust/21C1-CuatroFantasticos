@@ -17,6 +17,10 @@ impl RedisValue for RedisValueSet {
         }
         res
     }
+
+    fn get_type(&self) -> String {
+        String::from("Set")
+    }
 }
 
 impl RedisValueSet {

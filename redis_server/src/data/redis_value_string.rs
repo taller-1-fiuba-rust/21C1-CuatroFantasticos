@@ -8,6 +8,10 @@ impl RedisValue for RedisValueString {
     fn serialize(&self) -> String {
         self.contents.clone()
     }
+
+    fn get_type(&self) -> String {
+        String::from("String")
+    }
 }
 
 impl RedisValueString {
