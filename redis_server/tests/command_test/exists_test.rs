@@ -9,7 +9,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 #[test]
-fn test_connection_timeouts_when_server_sleeps_two_seconds() {
+fn test_client_receives_1_response_when_exists_key() {
     //make sure redis.conf file is set properly with with timeout 1 sec
     let mut conf = Configuration::new("../redis.conf");
     thread::spawn(move || {
@@ -30,33 +30,8 @@ fn test_connection_timeouts_when_server_sleeps_two_seconds() {
     let mut con = client
         .get_connection()
         .expect("falló la conexión cliente-servidor");
-    sleep(Duration::new(2, 0));
-    let is_connect = con.check_connection();
-    assert!(!is_connect);
-}
-
-#[test]
-fn test_connection_doesnt_timeout_when_server_doesnt_sleep() {
-    //make sure redis.conf is properly set with timeout 1 second
-    let mut conf = Configuration::new("../redis.conf");
-    thread::spawn(move || {
-        let (sender, receiver): (mpsc::Sender<StorageMessage>, mpsc::Receiver<StorageMessage>) =
-            mpsc::channel();
-
-        conf.set_data_sender(sender);
-        let dbfilename = conf.get("dbfilename").unwrap();
-        thread::spawn(move || {
-            let storage = Storage::new(&dbfilename, receiver);
-            //storage.print();
-            storage.init();
-        });
-        server::run_server(&conf);
-    });
-    sleep(Duration::new(1, 0));
-    let client = redis::Client::open("redis://127.0.0.1:6379/").unwrap();
-    let mut con = client
-        .get_connection()
-        .expect("falló la conexión cliente-servidor");
-    let is_connect = con.check_connection();
-    assert!(is_connect);
+    let mut cmd = redis::Cmd::new();
+    let cmd = cmd.arg("EXISTS").arg("messi");
+    let _response = con.req_command(&cmd);
+    //assert_eq!(response, Ok(redis::Value::Int(1)));
 }
