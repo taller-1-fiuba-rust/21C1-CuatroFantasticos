@@ -20,7 +20,6 @@ impl RedisValue for RedisValueList {
     fn get_type(&self) -> String {
         String::from("List")
     }
-
 }
 
 impl RedisValueList {

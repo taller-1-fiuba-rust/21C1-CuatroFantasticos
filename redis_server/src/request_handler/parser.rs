@@ -2,7 +2,8 @@ use crate::command::dbsize::RedisCommandDbSize;
 use crate::command::exists::RedisCommandExists;
 use crate::command::flushdb::RedisCommandFlushDb;
 use crate::command::ping::RedisCommandPing;
-use crate::command::{RedisCommandType, RedisCommand};
+use crate::command::r#type::RedisCommandType;
+use crate::command::RedisCommand;
 use std::str::Split;
 
 const TOKEN_SEPARATOR: &str = "\r\n";
