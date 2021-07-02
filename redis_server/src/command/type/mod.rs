@@ -15,7 +15,7 @@ impl RedisCommandType {
 impl RedisCommand for RedisCommandType {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
         let flush_db = accessor.access(StorageMessageEnum::Type(self.key.clone()))?;
-        let response = format!(":{}\r\n", flush_db);
+        let response = format!("+{}\r\n", flush_db);
         Ok(response)
     }
 }

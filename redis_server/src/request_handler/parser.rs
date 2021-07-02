@@ -2,7 +2,7 @@ use crate::command::dbsize::RedisCommandDbSize;
 use crate::command::exists::RedisCommandExists;
 use crate::command::flushdb::RedisCommandFlushDb;
 use crate::command::ping::RedisCommandPing;
-use crate::command::RedisCommand;
+use crate::command::{RedisCommandType, RedisCommand};
 use std::str::Split;
 
 const TOKEN_SEPARATOR: &str = "\r\n";
@@ -35,6 +35,7 @@ impl Parser {
             "INFO" => todo!(),
             "DBSIZE" => Ok(Box::new(RedisCommandDbSize::new())),
             "FLUSHDB" => Ok(Box::new(RedisCommandFlushDb::new())),
+            "TYPE" => self.parse_command_type(&mut command_iter),
             "EXISTS" => self.parse_command_exists(&mut command_iter),
             c => Err(format!("Command not implemented: {}", c)),
         }
@@ -67,6 +68,14 @@ impl Parser {
     ) -> Result<Box<dyn RedisCommand>, String> {
         let key = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandExists::new(key)))
+    }
+
+    fn parse_command_type(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandType::new(key)))
     }
 }
 
