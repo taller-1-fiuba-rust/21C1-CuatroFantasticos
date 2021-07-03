@@ -1,25 +1,22 @@
-use std::collections::HashSet;
+use crate::data::redis_value::RedisValue;
 
-pub struct StorageResponse {
+pub struct StorageResponse{
     value_response: StorageResponseEnum,
 }
 
-impl StorageResponse {
+impl StorageResponse{
     pub fn new(value_response: StorageResponseEnum) -> StorageResponse {
         StorageResponse { value_response }
     }
 
-    pub fn get_value(&self) -> StorageResponseEnum {
-        self.value_response.clone()
+    pub fn get_value(&self) -> &StorageResponseEnum {
+        &self.value_response
     }
 }
 
-#[derive(Clone)]
-pub enum StorageResponseEnum {
+pub enum StorageResponseEnum{
     ResponseInt(usize),
-    ResponseStr(String),
-    ResponseList(Vec<String>),
-    ResponseSet(HashSet<String>),
+    ResponseRedisValue(Box<dyn Send + RedisValue>),
     ResponseBool(bool),
     ResponseError(String),
 }

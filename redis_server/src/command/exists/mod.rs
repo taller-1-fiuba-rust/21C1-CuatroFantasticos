@@ -17,7 +17,7 @@ impl RedisCommand for RedisCommandExists {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
         let exists = accessor.access(StorageMessageEnum::Exists(self.key.clone()))?;
         let value = match exists.get_value() {
-            StorageResponseEnum::ResponseBool(value) => Ok(if value { "1" } else { "0" }),
+            StorageResponseEnum::ResponseBool(value) => Ok(if *value { "1" } else { "0" }),
             _ => Err("falle jeje"),
         };
         let response = format!(":{}\r\n", value.unwrap());
