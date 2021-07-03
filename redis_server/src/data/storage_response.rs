@@ -1,10 +1,10 @@
 use crate::data::redis_value::RedisValue;
 
-pub struct StorageResponse{
+pub struct StorageResponse {
     value_response: StorageResponseEnum,
 }
 
-impl StorageResponse{
+impl StorageResponse {
     pub fn new(value_response: StorageResponseEnum) -> StorageResponse {
         StorageResponse { value_response }
     }
@@ -14,7 +14,7 @@ impl StorageResponse{
     }
 }
 
-pub enum StorageResponseEnum{
+pub enum StorageResponseEnum {
     ResponseInt(usize),
     ResponseRedisValue(Box<dyn Send + RedisValue>),
     ResponseBool(bool),
