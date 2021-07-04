@@ -108,6 +108,15 @@ impl Storage {
                         .send(response)
                         .expect("Client thread is not listening to storage response")
                 }
+                StorageMessageEnum::Del(key) => {
+                    let result = self.storage.contains_key(&key);
+                    let response = StorageResponse::new(StorageResponseEnum::ResponseBool(result));
+                    self.storage.remove(&key);
+                    message
+                        .get_sender()
+                        .send(response)
+                        .expect("Client thread is not listening to storage response")
+                }
                 StorageMessageEnum::Exists(key) => {
                     let value = self.storage.contains_key(&key);
                     let response = StorageResponse::new(StorageResponseEnum::ResponseBool(value));

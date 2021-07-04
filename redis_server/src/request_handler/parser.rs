@@ -1,4 +1,5 @@
 use crate::command::dbsize::RedisCommandDbSize;
+use crate::command::del::RedisCommandDel;
 use crate::command::exists::RedisCommandExists;
 use crate::command::flushdb::RedisCommandFlushDb;
 use crate::command::ping::RedisCommandPing;
@@ -38,6 +39,7 @@ impl Parser {
             "FLUSHDB" => Ok(Box::new(RedisCommandFlushDb::new())),
             "EXISTS" => self.parse_command_exists(&mut command_iter),
             "RENAME" => self.parse_command_rename(&mut command_iter),
+            "DEL" => self.parse_command_del(&mut command_iter),
             c => Err(format!("Command not implemented: {}", c)),
         }
     }
@@ -69,6 +71,14 @@ impl Parser {
     ) -> Result<Box<dyn RedisCommand>, String> {
         let key = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandExists::new(key)))
+    }
+
+    fn parse_command_del(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandDel::new(key)))
     }
 
     fn parse_command_rename(
