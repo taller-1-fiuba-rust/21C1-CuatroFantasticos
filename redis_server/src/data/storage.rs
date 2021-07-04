@@ -3,6 +3,7 @@ use crate::data::redis_value_list::RedisValueList;
 use crate::data::redis_value_set::RedisValueSet;
 use crate::data::redis_value_string::RedisValueString;
 use crate::data::storage_message::{StorageMessage, StorageMessageEnum};
+use crate::data::storage_response::{StorageResponse, StorageResponseEnum};
 use std::collections::HashMap;
 use std::fs;
 use std::sync::mpsc;
@@ -75,24 +76,27 @@ impl Storage {
         for message in self.receiver {
             match message.get_message() {
                 StorageMessageEnum::GetDbsize => {
-                    let value = self.storage.len().to_string();
+                    let value = self.storage.len();
+                    let response = StorageResponse::new(StorageResponseEnum::ResponseInt(value));
                     message
                         .get_sender()
-                        .send(value)
+                        .send(response)
                         .expect("Client thread is not listening to storage response");
                 }
                 StorageMessageEnum::FlushDb => {
                     self.storage.clear();
+                    let response = StorageResponse::new(StorageResponseEnum::ResponseBool(true));
                     message
                         .get_sender()
-                        .send(String::from("OK"))
-                        .expect("Client thread is not listening to storage response")
+                        .send(response)
+                        .expect("Client thread is not listening to storage response");
                 }
                 StorageMessageEnum::Exists(key) => {
-                    let result = self.storage.contains_key(&key);
+                    let value = self.storage.contains_key(&key);
+                    let response = StorageResponse::new(StorageResponseEnum::ResponseBool(value));
                     message
                         .get_sender()
-                        .send(String::from(if result { "1" } else { "0" }))
+                        .send(response)
                         .expect("Client thread is not listening to storage response")
                 }
                 StorageMessageEnum::Type(key) => {

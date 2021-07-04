@@ -1,12 +1,16 @@
+use crate::data::storage_response::StorageResponse;
 use std::sync::mpsc;
 
 pub struct StorageMessage {
     message: StorageMessageEnum,
-    sender: mpsc::Sender<String>,
+    sender: mpsc::Sender<StorageResponse>,
 }
 
 impl StorageMessage {
-    pub fn new(message: StorageMessageEnum, sender: mpsc::Sender<String>) -> StorageMessage {
+    pub fn new(
+        message: StorageMessageEnum,
+        sender: mpsc::Sender<StorageResponse>,
+    ) -> StorageMessage {
         StorageMessage { message, sender }
     }
 
@@ -14,7 +18,7 @@ impl StorageMessage {
         self.message.clone()
     }
 
-    pub fn get_sender(&self) -> mpsc::Sender<String> {
+    pub fn get_sender(&self) -> mpsc::Sender<StorageResponse> {
         self.sender.clone()
     }
 }

@@ -6,3 +6,4 @@ pub mod redis_value_string;
 pub mod storage;
 pub mod storage_accessor;
 pub mod storage_message;
+pub mod storage_response;
