@@ -1,6 +1,7 @@
 use crate::command::RedisCommand;
 use crate::data::storage_accessor::StorageAccessor;
 use crate::data::storage_message::StorageMessageEnum;
+use crate::data::storage_response::StorageResponseEnum;
 
 pub struct RedisCommandRename {
     key: String,
@@ -19,7 +20,13 @@ impl RedisCommand for RedisCommandRename {
             self.key.clone(),
             self.new_key.clone(),
         ))?;
-        let response = format!("+{}\r\n", rename);
+        let response = match rename.get_value() {
+            StorageResponseEnum::ResponseOk => "+OK\r\n".to_string(),
+            StorageResponseEnum::ResponseError(message) => {
+                format!("-{}\r\n", message)
+            }
+            _ => "falle jeje".to_string(),
+        };
         Ok(response)
     }
 }

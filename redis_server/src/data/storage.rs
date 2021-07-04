@@ -85,7 +85,7 @@ impl Storage {
                 }
                 StorageMessageEnum::FlushDb => {
                     self.storage.clear();
-                    let response = StorageResponse::new(StorageResponseEnum::ResponseBool(true));
+                    let response = StorageResponse::new(StorageResponseEnum::ResponseOk);
                     message
                         .get_sender()
                         .send(response)
@@ -94,16 +94,18 @@ impl Storage {
                 StorageMessageEnum::Rename(key, newkey) => {
                     if let Some(value) = self.storage.remove(&key) {
                         self.storage.insert(newkey, value);
+                        let response = StorageResponse::new(StorageResponseEnum::ResponseOk);
                         message
                             .get_sender()
-                            .send(String::from("OK"))
+                            .send(response)
                             .expect("Client thread is not listening to storage response")
                     }
-                    // habría que charlarlo entre todos para ver como solucionarlo
-                    // porque el formato esta del otro lado
+                    let response = StorageResponse::new(StorageResponseEnum::ResponseError(
+                        "The key doesnt exist".to_string(),
+                    ));
                     message
                         .get_sender()
-                        .send(String::from("ERROR"))
+                        .send(response)
                         .expect("Client thread is not listening to storage response")
                 }
                 StorageMessageEnum::Exists(key) => {

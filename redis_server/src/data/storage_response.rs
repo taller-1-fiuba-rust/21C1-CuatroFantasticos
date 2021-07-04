@@ -18,5 +18,6 @@ pub enum StorageResponseEnum {
     ResponseInt(usize),
     ResponseRedisValue(Box<dyn Send + RedisValue>),
     ResponseBool(bool),
+    ResponseOk,
     ResponseError(String),
 }
