@@ -28,5 +28,6 @@ pub enum StorageMessageEnum {
     GetDbsize,
     FlushDb,
     Exists(String),
+    Rename(String, String),
     Terminate,
 }

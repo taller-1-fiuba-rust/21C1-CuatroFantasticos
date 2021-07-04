@@ -85,11 +85,28 @@ impl Storage {
                 }
                 StorageMessageEnum::FlushDb => {
                     self.storage.clear();
-                    let response = StorageResponse::new(StorageResponseEnum::ResponseBool(true));
+                    let response = StorageResponse::new(StorageResponseEnum::ResponseOk);
                     message
                         .get_sender()
                         .send(response)
                         .expect("Client thread is not listening to storage response");
+                }
+                StorageMessageEnum::Rename(key, newkey) => {
+                    if let Some(value) = self.storage.remove(&key) {
+                        self.storage.insert(newkey, value);
+                        let response = StorageResponse::new(StorageResponseEnum::ResponseOk);
+                        message
+                            .get_sender()
+                            .send(response)
+                            .expect("Client thread is not listening to storage response")
+                    }
+                    let response = StorageResponse::new(StorageResponseEnum::ResponseError(
+                        "The key doesnt exist".to_string(),
+                    ));
+                    message
+                        .get_sender()
+                        .send(response)
+                        .expect("Client thread is not listening to storage response")
                 }
                 StorageMessageEnum::Exists(key) => {
                     let value = self.storage.contains_key(&key);
