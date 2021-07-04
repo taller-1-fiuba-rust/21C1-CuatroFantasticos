@@ -12,9 +12,8 @@ impl RedisCommandFlushDb {
 
 impl RedisCommand for RedisCommandFlushDb {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let flush_db = accessor.access(StorageMessageEnum::FlushDb)?;
-        let response = format!("+{}\r\n", flush_db);
-        Ok(response)
+        accessor.access(StorageMessageEnum::FlushDb)?;
+        Ok("+OK\r\n".to_string())
     }
 }
 
