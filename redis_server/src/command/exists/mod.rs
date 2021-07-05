@@ -1,7 +1,7 @@
 use crate::command::RedisCommand;
 use crate::data::storage::accessor::StorageAccessor;
 use crate::data::storage::request_message::StorageRequestMessageEnum;
-use crate::data::storage::response_message::StorageResponseMessageEnum;
+use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandExists {
     key: String,
@@ -15,12 +15,8 @@ impl RedisCommandExists {
 
 impl RedisCommand for RedisCommandExists {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let exists = accessor.access(StorageRequestMessageEnum::Exists(self.key.clone()))?;
-        let value = match exists.get_value() {
-            StorageResponseMessageEnum::ResponseBool(value) => Ok(if *value { "1" } else { "0" }),
-            _ => Err("falle jeje"),
-        };
-        let response = format!(":{}\r\n", value.unwrap());
+        let response = accessor.access(StorageRequestMessageEnum::Exists(self.key.clone()))?;
+        let response = response.get_value().protocol_serialize_to_int();
         Ok(response)
     }
 }

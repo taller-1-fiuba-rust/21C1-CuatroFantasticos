@@ -1,7 +1,7 @@
 use crate::command::RedisCommand;
 use crate::data::storage::accessor::StorageAccessor;
 use crate::data::storage::request_message::StorageRequestMessageEnum;
-use crate::data::storage::response_message::StorageResponseMessageEnum;
+use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandDbSize {}
 
@@ -13,12 +13,8 @@ impl RedisCommandDbSize {
 
 impl RedisCommand for RedisCommandDbSize {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let dbsize = accessor.access(StorageRequestMessageEnum::GetDbsize)?;
-        let value = match dbsize.get_value() {
-            StorageResponseMessageEnum::ResponseInt(value) => Ok(value),
-            _ => Err("falle jeje"),
-        };
-        let response = format!(":{}\r\n", value.unwrap());
+        let response = accessor.access(StorageRequestMessageEnum::GetDbsize)?;
+        let response = response.get_value().protocol_serialize_to_int();
         Ok(response)
     }
 }
