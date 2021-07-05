@@ -1,5 +1,6 @@
 use crate::data::redis_value::RedisValue;
 
+#[derive(Clone)]
 pub struct RedisValueString {
     contents: String,
 }
@@ -7,6 +8,10 @@ pub struct RedisValueString {
 impl RedisValue for RedisValueString {
     fn serialize(&self) -> String {
         self.contents.clone()
+    }
+
+    fn get_type(&self) -> String {
+        String::from("String")
     }
 }
 

@@ -1,5 +1,6 @@
 use crate::data::redis_value::RedisValue;
 
+#[derive(Clone)]
 pub struct RedisValueList {
     contents: Vec<String>,
 }
@@ -15,6 +16,10 @@ impl RedisValue for RedisValueList {
             }
         }
         res
+    }
+
+    fn get_type(&self) -> String {
+        String::from("List")
     }
 }
 

@@ -1,6 +1,7 @@
 use crate::data::redis_value::RedisValue;
 use std::collections::HashSet;
 
+#[derive(Clone)]
 pub struct RedisValueSet {
     contents: HashSet<String>,
 }
@@ -16,6 +17,10 @@ impl RedisValue for RedisValueSet {
             }
         }
         res
+    }
+
+    fn get_type(&self) -> String {
+        String::from("Set")
     }
 }
 

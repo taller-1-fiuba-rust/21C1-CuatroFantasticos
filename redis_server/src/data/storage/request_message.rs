@@ -29,5 +29,6 @@ pub enum StorageRequestMessageEnum {
     FlushDb,
     Exists(String),
     Rename(String, String),
+    Type(String),
     Terminate,
 }

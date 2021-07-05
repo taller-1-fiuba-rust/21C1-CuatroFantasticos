@@ -127,6 +127,27 @@ impl Storage {
                         .send(response)
                         .expect("Client thread is not listening to storage response")
                 }
+                StorageRequestMessageEnum::Type(key) => {
+                    let value = self.storage.get(&key);
+                    match value {
+                        Some(value) => {
+                            message
+                                .get_sender()
+                                .send(StorageResponseMessage::new(
+                                    StorageResponseMessageEnum::ResponseRedisValue(value.clone()),
+                                ))
+                                .expect("Client thread is not listening to storage response");
+                        }
+                        None => {
+                            message
+                                .get_sender()
+                                .send(StorageResponseMessage::new(
+                                    StorageResponseMessageEnum::ResponseError(String::from("none")),
+                                ))
+                                .expect("Client thread is not listening to storage response");
+                        }
+                    }
+                }
                 StorageRequestMessageEnum::Terminate => {
                     break;
                 }
