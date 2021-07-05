@@ -1,11 +1,11 @@
 use crate::data::redis_value::RedisValue;
-use std::collections::HashSet;
 
-pub struct RedisValueSet {
-    contents: HashSet<String>,
+#[derive(Clone)]
+pub struct RedisValueList {
+    contents: Vec<String>,
 }
 
-impl RedisValue for RedisValueSet {
+impl RedisValue for RedisValueList {
     fn serialize(&self) -> String {
         let mut res = String::new();
         for (idx, value) in self.contents.iter().enumerate() {
@@ -17,36 +17,40 @@ impl RedisValue for RedisValueSet {
         }
         res
     }
+
+    fn get_type(&self) -> String {
+        String::from("List")
+    }
 }
 
-impl RedisValueSet {
-    pub fn new(contents_string: String) -> RedisValueSet {
-        let mut contents = HashSet::new();
+impl RedisValueList {
+    pub fn new(contents_string: String) -> RedisValueList {
+        let mut contents = Vec::new();
         let split = contents_string.split(',');
         let parsed_line: Vec<&str> = split.collect();
         for value in parsed_line {
-            contents.insert(value.trim().to_owned());
+            contents.push(value.trim().to_owned());
         }
-        RedisValueSet { contents }
+        RedisValueList { contents }
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::data::redis_value::list::RedisValueList;
     use crate::data::redis_value::RedisValue;
-    use crate::data::redis_value_set::RedisValueSet;
 
     #[test]
     fn test_create_empty_redis_value() {
         let string = String::from("");
-        let redis_value_set = RedisValueSet::new(string.clone());
-        assert_eq!(redis_value_set.serialize(), string);
+        let redis_value_list = RedisValueList::new(string.clone());
+        assert_eq!(redis_value_list.serialize(), string);
     }
 
     #[test]
     fn test_create_redis_value() {
-        let string = String::from("hola");
-        let redis_value_set = RedisValueSet::new(string.clone());
+        let string = String::from("hola, como, estas, ?");
+        let redis_value_set = RedisValueList::new(string.clone());
         assert_eq!(redis_value_set.serialize(), string);
     }
 }

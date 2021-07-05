@@ -9,8 +9,8 @@ use std::thread;
 use logger::log::LogService;
 use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
+use redis_server::data::storage::request_message::StorageRequestMessage;
 use redis_server::data::storage::Storage;
-use redis_server::data::storage_message::StorageMessage;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -26,8 +26,10 @@ fn main() {
     let log_service: LogService = LogService::new(file);
     conf.set_logservice(log_service.create_logger());
 
-    let (sender, receiver): (mpsc::Sender<StorageMessage>, mpsc::Receiver<StorageMessage>) =
-        mpsc::channel();
+    let (sender, receiver): (
+        mpsc::Sender<StorageRequestMessage>,
+        mpsc::Receiver<StorageRequestMessage>,
+    ) = mpsc::channel();
 
     conf.set_data_sender(sender);
     let dbfilename = conf.get("dbfilename").unwrap();

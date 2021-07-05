@@ -1,20 +1,25 @@
-use crate::data::redis_value::RedisValue;
-use crate::data::redis_value_list::RedisValueList;
-use crate::data::redis_value_set::RedisValueSet;
-use crate::data::redis_value_string::RedisValueString;
-use crate::data::storage_message::{StorageMessage, StorageMessageEnum};
-use crate::data::storage_response::{StorageResponse, StorageResponseEnum};
 use std::collections::HashMap;
 use std::fs;
 use std::sync::mpsc;
 
+use crate::data::redis_value::list::RedisValueList;
+use crate::data::redis_value::set::RedisValueSet;
+use crate::data::redis_value::string::RedisValueString;
+use crate::data::redis_value::RedisValue;
+use crate::data::storage::request_message::{StorageRequestMessage, StorageRequestMessageEnum};
+use crate::data::storage::response_message::{StorageResponseMessage, StorageResponseMessageEnum};
+
+pub mod accessor;
+pub mod request_message;
+pub mod response_message;
+
 pub struct Storage {
     storage: HashMap<String, Box<dyn RedisValue>>,
-    receiver: mpsc::Receiver<StorageMessage>,
+    receiver: mpsc::Receiver<StorageRequestMessage>,
 }
 
 impl Storage {
-    pub fn new(filename: &str, receiver: mpsc::Receiver<StorageMessage>) -> Storage {
+    pub fn new(filename: &str, receiver: mpsc::Receiver<StorageRequestMessage>) -> Storage {
         let contents = fs::read_to_string(filename);
         let storage = match contents {
             Ok(contents) => Storage::deserialize(contents),
@@ -75,57 +80,86 @@ impl Storage {
     pub fn init(mut self) {
         for message in self.receiver {
             match message.get_message() {
-                StorageMessageEnum::GetDbsize => {
+                StorageRequestMessageEnum::GetDbsize => {
                     let value = self.storage.len();
-                    let response = StorageResponse::new(StorageResponseEnum::ResponseInt(value));
+                    let response =
+                        StorageResponseMessage::new(StorageResponseMessageEnum::ResponseInt(value));
                     message
                         .get_sender()
                         .send(response)
                         .expect("Client thread is not listening to storage response");
                 }
-                StorageMessageEnum::FlushDb => {
+                StorageRequestMessageEnum::FlushDb => {
                     self.storage.clear();
-                    let response = StorageResponse::new(StorageResponseEnum::ResponseOk);
+                    let response =
+                        StorageResponseMessage::new(StorageResponseMessageEnum::ResponseOk);
                     message
                         .get_sender()
                         .send(response)
                         .expect("Client thread is not listening to storage response");
                 }
-                StorageMessageEnum::Rename(key, newkey) => {
+                StorageRequestMessageEnum::Rename(key, newkey) => {
                     if let Some(value) = self.storage.remove(&key) {
                         self.storage.insert(newkey, value);
-                        let response = StorageResponse::new(StorageResponseEnum::ResponseOk);
+                        let response =
+                            StorageResponseMessage::new(StorageResponseMessageEnum::ResponseOk);
                         message
                             .get_sender()
                             .send(response)
                             .expect("Client thread is not listening to storage response")
                     }
-                    let response = StorageResponse::new(StorageResponseEnum::ResponseError(
-                        "The key doesnt exist".to_string(),
-                    ));
+                    let response =
+                        StorageResponseMessage::new(StorageResponseMessageEnum::ResponseError(
+                            "The key doesnt exist".to_string(),
+                        ));
                     message
                         .get_sender()
                         .send(response)
                         .expect("Client thread is not listening to storage response")
                 }
-                StorageMessageEnum::Del(key) => {
+                StorageRequestMessageEnum::Exists(key) => {
+                    let value = self.storage.contains_key(&key);
+                    let response = StorageResponseMessage::new(
+                        StorageResponseMessageEnum::ResponseBool(value),
+                    );
+                    message
+                        .get_sender()
+                        .send(response)
+                        .expect("Client thread is not listening to storage response")
+                }
+                StorageRequestMessageEnum::Del(key) => {
                     let result = self.storage.contains_key(&key);
-                    let response = StorageResponse::new(StorageResponseEnum::ResponseBool(result));
+                    let response = StorageResponseMessage::new(
+                        StorageResponseMessageEnum::ResponseBool(result),
+                    );
                     self.storage.remove(&key);
                     message
                         .get_sender()
                         .send(response)
                         .expect("Client thread is not listening to storage response")
                 }
-                StorageMessageEnum::Exists(key) => {
-                    let value = self.storage.contains_key(&key);
-                    let response = StorageResponse::new(StorageResponseEnum::ResponseBool(value));
-                    message
-                        .get_sender()
-                        .send(response)
-                        .expect("Client thread is not listening to storage response")
+                StorageRequestMessageEnum::Type(key) => {
+                    let value = self.storage.get(&key);
+                    match value {
+                        Some(value) => {
+                            message
+                                .get_sender()
+                                .send(StorageResponseMessage::new(
+                                    StorageResponseMessageEnum::ResponseRedisValue(value.clone()),
+                                ))
+                                .expect("Client thread is not listening to storage response");
+                        }
+                        None => {
+                            message
+                                .get_sender()
+                                .send(StorageResponseMessage::new(
+                                    StorageResponseMessageEnum::ResponseError(String::from("none")),
+                                ))
+                                .expect("Client thread is not listening to storage response");
+                        }
+                    }
                 }
-                StorageMessageEnum::Terminate => {
+                StorageRequestMessageEnum::Terminate => {
                     break;
                 }
             }

@@ -1,5 +1,5 @@
 use crate::configuration::Configuration;
-use crate::data::storage_accessor::StorageAccessor;
+use crate::data::storage::accessor::StorageAccessor;
 use crate::request_handler::parser::Parser;
 use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};
