@@ -7,6 +7,7 @@ use crate::data::storage_response::{StorageResponse, StorageResponseEnum};
 use std::collections::HashMap;
 use std::fs;
 use std::sync::mpsc;
+use std::ops::Deref;
 
 pub struct Storage {
     storage: HashMap<String, Box<dyn RedisValue>>,
@@ -105,13 +106,13 @@ impl Storage {
                         Some(value) => {
                             message
                                 .get_sender()
-                                .send(value.get_type())
+                                .send(StorageResponse::new(StorageResponseEnum::ResponseRedisValue(value)))
                                 .expect("Client thread is not listening to storage response");
                         }
                         None => {
                             message
                                 .get_sender()
-                                .send(String::from("none"))
+                                .send(StorageResponse::new(StorageResponseEnum::ResponseString(String::from("none"))))
                                 .expect("Client thread is not listening to storage response");
                         }
                     }
