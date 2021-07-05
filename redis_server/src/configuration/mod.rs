@@ -1,5 +1,5 @@
 use crate::configuration::verbose::Verbose;
-use crate::data::storage_message::StorageMessage;
+use crate::data::storage::request_message::StorageRequestMessage;
 use logger::log::logger::Logger;
 use std::collections::HashMap;
 use std::fs;
@@ -12,7 +12,7 @@ pub struct Configuration {
     conf: HashMap<String, String>,
     logger: Option<Logger>,
     verbose: Verbose,
-    data_sender: Option<mpsc::Sender<StorageMessage>>,
+    data_sender: Option<mpsc::Sender<StorageRequestMessage>>,
 }
 
 const CONST_VERBOSE: &str = "0";
@@ -59,11 +59,11 @@ impl Configuration {
         self.logger = Some(logger);
     }
 
-    pub fn set_data_sender(&mut self, data_sender: mpsc::Sender<StorageMessage>) {
+    pub fn set_data_sender(&mut self, data_sender: mpsc::Sender<StorageRequestMessage>) {
         self.data_sender = Some(data_sender);
     }
 
-    pub fn get_data_sender(&mut self) -> &mpsc::Sender<StorageMessage> {
+    pub fn get_data_sender(&mut self) -> &mpsc::Sender<StorageRequestMessage> {
         self.data_sender
             .as_ref()
             .expect("No sender in configuration")
