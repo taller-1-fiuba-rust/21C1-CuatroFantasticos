@@ -1,8 +1,8 @@
 use redis::ConnectionLike;
 use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
+use redis_server::data::storage::request_message::StorageRequestMessage;
 use redis_server::data::storage::Storage;
-use redis_server::data::storage_message::StorageMessage;
 use std::sync::mpsc;
 use std::thread;
 use std::thread::sleep;
@@ -13,8 +13,10 @@ fn test_client_receives_1_response_when_exists_key() {
     //make sure redis.conf file is set properly with with timeout 1 sec
     let mut conf = Configuration::new("../redis.conf");
     thread::spawn(move || {
-        let (sender, receiver): (mpsc::Sender<StorageMessage>, mpsc::Receiver<StorageMessage>) =
-            mpsc::channel();
+        let (sender, receiver): (
+            mpsc::Sender<StorageRequestMessage>,
+            mpsc::Receiver<StorageRequestMessage>,
+        ) = mpsc::channel();
 
         conf.set_data_sender(sender);
         let dbfilename = conf.get("dbfilename").unwrap();

@@ -1,4 +1,4 @@
-use crate::data::storage_accessor::StorageAccessor;
+use crate::data::storage::accessor::StorageAccessor;
 
 pub mod dbsize;
 pub mod exists;

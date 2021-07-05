@@ -18,8 +18,8 @@ impl RedisValueString {
 
 #[cfg(test)]
 mod tests {
+    use crate::data::redis_value::string::RedisValueString;
     use crate::data::redis_value::RedisValue;
-    use crate::data::redis_value_string::RedisValueString;
 
     #[test]
     fn test_create_empty_redis_value() {
