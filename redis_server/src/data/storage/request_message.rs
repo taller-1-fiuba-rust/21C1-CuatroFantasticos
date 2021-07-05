@@ -30,5 +30,6 @@ pub enum StorageRequestMessageEnum {
     Exists(String),
     Rename(String, String),
     Type(String),
+    Del(String),
     Terminate,
 }
