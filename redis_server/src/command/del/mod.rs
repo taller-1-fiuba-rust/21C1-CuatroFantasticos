@@ -1,7 +1,7 @@
 use crate::command::RedisCommand;
 use crate::data::storage::accessor::StorageAccessor;
 use crate::data::storage::request_message::StorageRequestMessageEnum;
-use crate::data::storage::response_message::StorageResponseMessageEnum;
+use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandDel {
     key: String,
@@ -15,12 +15,8 @@ impl RedisCommandDel {
 
 impl RedisCommand for RedisCommandDel {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let rename = accessor.access(StorageRequestMessageEnum::Del(self.key.clone()))?;
-        let value = match rename.get_value() {
-            StorageResponseMessageEnum::ResponseBool(value) => Ok(if *value { "1" } else { "0" }),
-            _ => Err("falle jeje"),
-        };
-        let response = format!(":{}\r\n", value.unwrap());
+        let response = accessor.access(StorageRequestMessageEnum::Del(self.key.clone()))?;
+        let response = response.get_value().protocol_serialize_to_int();
         Ok(response)
     }
 }

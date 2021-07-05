@@ -83,7 +83,7 @@ impl Storage {
                 StorageRequestMessageEnum::GetDbsize => {
                     let value = self.storage.len();
                     let response =
-                        StorageResponseMessage::new(StorageResponseMessageEnum::ResponseInt(value));
+                        StorageResponseMessage::new(StorageResponseMessageEnum::Int(value));
                     message
                         .get_sender()
                         .send(response)
@@ -91,8 +91,7 @@ impl Storage {
                 }
                 StorageRequestMessageEnum::FlushDb => {
                     self.storage.clear();
-                    let response =
-                        StorageResponseMessage::new(StorageResponseMessageEnum::ResponseOk);
+                    let response = StorageResponseMessage::new(StorageResponseMessageEnum::Ok);
                     message
                         .get_sender()
                         .send(response)
@@ -101,17 +100,15 @@ impl Storage {
                 StorageRequestMessageEnum::Rename(key, newkey) => {
                     if let Some(value) = self.storage.remove(&key) {
                         self.storage.insert(newkey, value);
-                        let response =
-                            StorageResponseMessage::new(StorageResponseMessageEnum::ResponseOk);
+                        let response = StorageResponseMessage::new(StorageResponseMessageEnum::Ok);
                         message
                             .get_sender()
                             .send(response)
                             .expect("Client thread is not listening to storage response")
                     }
-                    let response =
-                        StorageResponseMessage::new(StorageResponseMessageEnum::ResponseError(
-                            "The key doesnt exist".to_string(),
-                        ));
+                    let response = StorageResponseMessage::new(StorageResponseMessageEnum::Error(
+                        "The key doesnt exist".to_string(),
+                    ));
                     message
                         .get_sender()
                         .send(response)
@@ -119,9 +116,8 @@ impl Storage {
                 }
                 StorageRequestMessageEnum::Exists(key) => {
                     let value = self.storage.contains_key(&key);
-                    let response = StorageResponseMessage::new(
-                        StorageResponseMessageEnum::ResponseBool(value),
-                    );
+                    let response =
+                        StorageResponseMessage::new(StorageResponseMessageEnum::Bool(value));
                     message
                         .get_sender()
                         .send(response)
@@ -129,9 +125,8 @@ impl Storage {
                 }
                 StorageRequestMessageEnum::Del(key) => {
                     let result = self.storage.contains_key(&key);
-                    let response = StorageResponseMessage::new(
-                        StorageResponseMessageEnum::ResponseBool(result),
-                    );
+                    let response =
+                        StorageResponseMessage::new(StorageResponseMessageEnum::Bool(result));
                     self.storage.remove(&key);
                     message
                         .get_sender()
@@ -145,7 +140,7 @@ impl Storage {
                             message
                                 .get_sender()
                                 .send(StorageResponseMessage::new(
-                                    StorageResponseMessageEnum::ResponseRedisValue(value.clone()),
+                                    StorageResponseMessageEnum::RedisValue(value.clone()),
                                 ))
                                 .expect("Client thread is not listening to storage response");
                         }
@@ -153,7 +148,7 @@ impl Storage {
                             message
                                 .get_sender()
                                 .send(StorageResponseMessage::new(
-                                    StorageResponseMessageEnum::ResponseError(String::from("none")),
+                                    StorageResponseMessageEnum::Error(String::from("none")),
                                 ))
                                 .expect("Client thread is not listening to storage response");
                         }

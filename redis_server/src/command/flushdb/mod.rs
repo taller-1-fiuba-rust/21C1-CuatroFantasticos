@@ -1,6 +1,7 @@
 use crate::command::RedisCommand;
 use crate::data::storage::accessor::StorageAccessor;
 use crate::data::storage::request_message::StorageRequestMessageEnum;
+use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandFlushDb {}
 
@@ -12,8 +13,9 @@ impl RedisCommandFlushDb {
 
 impl RedisCommand for RedisCommandFlushDb {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        accessor.access(StorageRequestMessageEnum::FlushDb)?;
-        Ok("+OK\r\n".to_string())
+        let response = accessor.access(StorageRequestMessageEnum::FlushDb)?;
+        let response = response.get_value().protocol_serialize_to_simple_string();
+        Ok(response)
     }
 }
 

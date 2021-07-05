@@ -1,5 +1,6 @@
 use crate::command::RedisCommand;
 use crate::data::storage::accessor::StorageAccessor;
+use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandPing {}
 
@@ -11,7 +12,7 @@ impl RedisCommandPing {
 
 impl RedisCommand for RedisCommandPing {
     fn execute(&self, _accessor: StorageAccessor) -> Result<String, String> {
-        let response = "+PONG\r\n".to_owned();
+        let response = "PONG".protocol_serialize_to_simple_string();
         Ok(response)
     }
 }

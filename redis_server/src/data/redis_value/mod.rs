@@ -1,8 +1,10 @@
+use crate::protocol_serialization::ProtocolSerializer;
+
 pub mod list;
 pub mod set;
 pub mod string;
 
-pub trait RedisValue: RedisValueClone + Send {
+pub trait RedisValue: RedisValueClone + Send + ProtocolSerializer {
     fn serialize(&self) -> String;
     fn get_type(&self) -> String;
 }

@@ -1,4 +1,5 @@
 use crate::data::redis_value::RedisValue;
+use crate::protocol_serialization::ProtocolSerializer;
 use std::collections::HashSet;
 
 #[derive(Clone)]
@@ -21,6 +22,20 @@ impl RedisValue for RedisValueSet {
 
     fn get_type(&self) -> String {
         String::from("Set")
+    }
+}
+
+impl ProtocolSerializer for RedisValueSet {
+    fn protocol_serialize_to_simple_string(&self) -> String {
+        todo!()
+    }
+
+    fn protocol_serialize_to_int(&self) -> String {
+        todo!()
+    }
+
+    fn protocol_serialize_to_bulk_string(&self) -> String {
+        todo!()
     }
 }
 

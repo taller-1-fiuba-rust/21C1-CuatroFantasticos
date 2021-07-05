@@ -1,7 +1,7 @@
 use crate::command::RedisCommand;
 use crate::data::storage::accessor::StorageAccessor;
 use crate::data::storage::request_message::StorageRequestMessageEnum;
-use crate::data::storage::response_message::StorageResponseMessageEnum;
+use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandRename {
     key: String,
@@ -20,13 +20,7 @@ impl RedisCommand for RedisCommandRename {
             self.key.clone(),
             self.new_key.clone(),
         ))?;
-        let response = match rename.get_value() {
-            StorageResponseMessageEnum::ResponseOk => "+OK\r\n".to_string(),
-            StorageResponseMessageEnum::ResponseError(message) => {
-                format!("-{}\r\n", message)
-            }
-            _ => "falle jeje".to_string(),
-        };
+        let response = rename.get_value().protocol_serialize_to_simple_string();
         Ok(response)
     }
 }

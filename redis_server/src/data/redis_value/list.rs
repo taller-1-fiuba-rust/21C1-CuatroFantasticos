@@ -1,4 +1,5 @@
 use crate::data::redis_value::RedisValue;
+use crate::protocol_serialization::ProtocolSerializer;
 
 #[derive(Clone)]
 pub struct RedisValueList {
@@ -20,6 +21,20 @@ impl RedisValue for RedisValueList {
 
     fn get_type(&self) -> String {
         String::from("List")
+    }
+}
+
+impl ProtocolSerializer for RedisValueList {
+    fn protocol_serialize_to_simple_string(&self) -> String {
+        todo!()
+    }
+
+    fn protocol_serialize_to_int(&self) -> String {
+        todo!()
+    }
+
+    fn protocol_serialize_to_bulk_string(&self) -> String {
+        todo!()
     }
 }
 
