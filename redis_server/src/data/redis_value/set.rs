@@ -1,6 +1,7 @@
 use crate::data::redis_value::RedisValue;
 use std::collections::HashSet;
 
+#[derive(Clone)]
 pub struct RedisValueSet {
     contents: HashSet<String>,
 }
@@ -37,8 +38,8 @@ impl RedisValueSet {
 
 #[cfg(test)]
 mod tests {
+    use crate::data::redis_value::set::RedisValueSet;
     use crate::data::redis_value::RedisValue;
-    use crate::data::redis_value_set::RedisValueSet;
 
     #[test]
     fn test_create_empty_redis_value() {

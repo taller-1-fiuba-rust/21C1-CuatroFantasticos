@@ -1,5 +1,6 @@
 use crate::data::redis_value::RedisValue;
 
+#[derive(Clone)]
 pub struct RedisValueList {
     contents: Vec<String>,
 }
@@ -36,8 +37,8 @@ impl RedisValueList {
 
 #[cfg(test)]
 mod tests {
+    use crate::data::redis_value::list::RedisValueList;
     use crate::data::redis_value::RedisValue;
-    use crate::data::redis_value_list::RedisValueList;
 
     #[test]
     fn test_create_empty_redis_value() {

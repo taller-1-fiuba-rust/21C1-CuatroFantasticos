@@ -1,9 +1,10 @@
-use crate::data::storage_accessor::StorageAccessor;
+use crate::data::storage::accessor::StorageAccessor;
 
 pub mod dbsize;
 pub mod exists;
 pub mod flushdb;
 pub mod ping;
+pub mod rename;
 pub mod r#type;
 
 pub trait RedisCommand {

@@ -1,6 +1,6 @@
 use crate::command::RedisCommand;
-use crate::data::storage_accessor::StorageAccessor;
-use crate::data::storage_message::StorageMessageEnum;
+use crate::data::storage::accessor::StorageAccessor;
+use crate::data::storage::request_message::StorageRequestMessageEnum;
 
 pub struct RedisCommandFlushDb {}
 
@@ -12,7 +12,7 @@ impl RedisCommandFlushDb {
 
 impl RedisCommand for RedisCommandFlushDb {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        accessor.access(StorageMessageEnum::FlushDb)?;
+        accessor.access(StorageRequestMessageEnum::FlushDb)?;
         Ok("+OK\r\n".to_string())
     }
 }
