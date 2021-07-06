@@ -38,7 +38,7 @@ impl ProtocolSerializer for StorageResponseMessageEnum {
                 format!("+{}\r\n", if *value { "1" } else { "0" })
             }
             StorageResponseMessageEnum::Ok => format!("+{}\r\n", "OK"),
-            StorageResponseMessageEnum::Error(value) => format!("+{}\r\n", value),
+            StorageResponseMessageEnum::Error(value) => format!("-{}\r\n", value),
         }
     }
 
@@ -51,7 +51,7 @@ impl ProtocolSerializer for StorageResponseMessageEnum {
                 format!(":{}\r\n", if *value { "1" } else { "0" })
             }
             StorageResponseMessageEnum::Ok => format!(":{}\r\n", "OK"),
-            StorageResponseMessageEnum::Error(value) => format!("+{}\r\n", value),
+            StorageResponseMessageEnum::Error(value) => format!("-{}\r\n", value),
         }
     }
 
