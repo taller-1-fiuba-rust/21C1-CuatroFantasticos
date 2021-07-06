@@ -3,6 +3,7 @@ use crate::command::dbsize::RedisCommandDbSize;
 use crate::command::del::RedisCommandDel;
 use crate::command::exists::RedisCommandExists;
 use crate::command::flushdb::RedisCommandFlushDb;
+use crate::command::get::RedisCommandGet;
 use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
@@ -44,6 +45,7 @@ impl Parser {
             "RENAME" => self.parse_command_rename(&mut command_iter),
             "DEL" => self.parse_command_del(&mut command_iter),
             "COPY" => self.parse_command_copy(&mut command_iter),
+            "GET" => self.parse_command_get(&mut command_iter),
             c => Err(format!("Command not implemented: {}", c)),
         }
     }
@@ -109,6 +111,14 @@ impl Parser {
         let source_key = self.parse_string(command_iter)?;
         let destination_key = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandCopy::new(source_key, destination_key)))
+    }
+
+    fn parse_command_get(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandGet::new(key)))
     }
 }
 
