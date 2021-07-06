@@ -1,3 +1,4 @@
+use crate::command::copy::RedisCommandCopy;
 use crate::command::dbsize::RedisCommandDbSize;
 use crate::command::del::RedisCommandDel;
 use crate::command::exists::RedisCommandExists;
@@ -7,7 +8,6 @@ use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::RedisCommand;
 use std::str::Split;
-use crate::command::copy::RedisCommandCopy;
 
 const TOKEN_SEPARATOR: &str = "\r\n";
 
@@ -102,11 +102,13 @@ impl Parser {
         Ok(Box::new(RedisCommandType::new(key)))
     }
 
-    fn parse_command_copy(&self, command_iter: &mut Split<&str>,) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_copy(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
         let source_key = self.parse_string(command_iter)?;
         let destination_key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandCopy::new(source_key,destination_key)))
-
+        Ok(Box::new(RedisCommandCopy::new(source_key, destination_key)))
     }
 }
 

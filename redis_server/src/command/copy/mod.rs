@@ -10,7 +10,10 @@ pub struct RedisCommandCopy {
 
 impl RedisCommandCopy {
     pub fn new(source_key: String, destination_key: String) -> RedisCommandCopy {
-        RedisCommandCopy { source_key, destination_key }
+        RedisCommandCopy {
+            source_key,
+            destination_key,
+        }
     }
 }
 

@@ -27,7 +27,7 @@ impl StorageRequestMessage {
 pub enum StorageRequestMessageEnum {
     GetDbsize,
     FlushDb,
-    Copy(String,String),
+    Copy(String, String),
     Exists(String),
     Rename(String, String),
     Type(String),
