@@ -85,8 +85,7 @@ impl Storage {
                     let response =
                         StorageResponseMessage::new(StorageResponseMessageEnum::Int(value));
                     message
-                        .get_sender()
-                        .send(response)
+                        .respond(response)
                         .expect("Client thread is not listening to storage response");
                 }
                 StorageRequestMessageEnum::FlushDb => {
