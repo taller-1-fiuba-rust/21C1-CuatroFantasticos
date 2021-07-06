@@ -154,6 +154,41 @@ impl Storage {
                         }
                     }
                 }
+                StorageRequestMessageEnum::Copy(source_key, destination_key) => {
+                    let destination = self.storage.contains_key(&destination_key);
+                    if destination {
+                        message
+                            .get_sender()
+                            .send(StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Error(String::from("The destination key already exists")),
+                            ))
+                            .expect("Client thread is not listening to storage response");
+                    }else{
+                        let value = self.storage.get(&source_key).cloned();
+                        match value{
+                            Some(value) => {
+                                self.storage.insert(destination_key,value);
+                                message
+                                    .get_sender()
+                                    .send(StorageResponseMessage::new(
+                                        StorageResponseMessageEnum::Bool(true)),
+                                    )
+                                    .expect("Client thread is not listening to storage response");
+                            }
+                            None => {
+                                message
+                                    .get_sender()
+                                    .send(StorageResponseMessage::new(
+                                        StorageResponseMessageEnum::Bool(false)),
+                                    )
+                                    .expect("Client thread is not listening to storage response");
+                            }
+                        }
+
+
+
+                    }
+                }
                 StorageRequestMessageEnum::Terminate => {
                     break;
                 }

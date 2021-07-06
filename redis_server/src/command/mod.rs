@@ -7,6 +7,7 @@ pub mod flushdb;
 pub mod ping;
 pub mod rename;
 pub mod r#type;
+pub mod copy;
 
 pub trait RedisCommand {
     fn execute(&self, accesor: StorageAccessor) -> Result<String, String>;

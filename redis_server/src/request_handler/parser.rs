@@ -7,6 +7,7 @@ use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::RedisCommand;
 use std::str::Split;
+use crate::command::copy::RedisCommandCopy;
 
 const TOKEN_SEPARATOR: &str = "\r\n";
 
@@ -42,6 +43,7 @@ impl Parser {
             "EXISTS" => self.parse_command_exists(&mut command_iter),
             "RENAME" => self.parse_command_rename(&mut command_iter),
             "DEL" => self.parse_command_del(&mut command_iter),
+            "COPY" => self.parse_command_copy(&mut command_iter),
             c => Err(format!("Command not implemented: {}", c)),
         }
     }
@@ -98,6 +100,13 @@ impl Parser {
     ) -> Result<Box<dyn RedisCommand>, String> {
         let key = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandType::new(key)))
+    }
+
+    fn parse_command_copy(&self, command_iter: &mut Split<&str>,) -> Result<Box<dyn RedisCommand>, String> {
+        let source_key = self.parse_string(command_iter)?;
+        let destination_key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandCopy::new(source_key,destination_key)))
+
     }
 }
 
