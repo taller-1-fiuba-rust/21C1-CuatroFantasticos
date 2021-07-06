@@ -1,5 +1,6 @@
 use crate::data::storage::accessor::StorageAccessor;
 
+pub mod copy;
 pub mod dbsize;
 pub mod del;
 pub mod exists;
