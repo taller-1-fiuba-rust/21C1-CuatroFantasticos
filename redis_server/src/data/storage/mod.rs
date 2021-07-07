@@ -107,13 +107,20 @@ impl Storage {
                     if let Some(value) = self.storage.remove(&key) {
                         let result = format!("{}{}", value.serialize(), new_value);
                         self.storage
-                            .insert(key, Box::new(RedisValueString::new(result)));
-                        let response = StorageResponseMessage::new(StorageResponseMessageEnum::Ok);
-                        let _ = message.respond(response);
+                            .insert(key.clone(), Box::new(RedisValueString::new(result)));
                     } else {
                         self.storage
-                            .insert(key, Box::new(RedisValueString::new(new_value)));
-                        let response = StorageResponseMessage::new(StorageResponseMessageEnum::Ok);
+                            .insert(key.clone(), Box::new(RedisValueString::new(new_value)));
+                    }
+                    if let Some(value) = self.storage.get(&key).cloned() {
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Int(value.serialize().len()),
+                        );
+                        let _ = message.respond(response);
+                    } else {
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Error(String::from("Key does not exist")),
+                        );
                         let _ = message.respond(response);
                     }
                 }
