@@ -10,8 +10,8 @@ use crate::command::getset::RedisCommandGetSet;
 use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
-use crate::command::RedisCommand;
 use crate::command::strlen::RedisCommandStrlen;
+use crate::command::RedisCommand;
 use std::str::Split;
 
 const TOKEN_SEPARATOR: &str = "\r\n";
@@ -152,8 +152,6 @@ impl Parser {
         let new_value = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandGetSet::new(key, new_value)))
     }
-
-
 
     fn parse_command_getdel(
         &self,
