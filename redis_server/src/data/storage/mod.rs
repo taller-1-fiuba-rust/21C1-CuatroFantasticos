@@ -124,6 +124,19 @@ impl Storage {
                         let _ = message.respond(response);
                     }
                 }
+                StorageRequestMessageEnum::Strlen(key) => {
+                   if let Some(value) = self.storage.get(&key).cloned() {
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Int(value.serialize().len()),
+                        );
+                        let _ = message.respond(response);
+                    } else {
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Int(0),
+                        );
+                        let _ = message.respond(response);
+                    }
+                }
 
                 StorageRequestMessageEnum::Exists(key) => {
                     let value = self.storage.contains_key(&key);

@@ -8,6 +8,7 @@ pub mod exists;
 pub mod flushdb;
 pub mod get;
 pub mod getdel;
+pub mod strlen;
 pub mod getset;
 pub mod ping;
 pub mod rename;

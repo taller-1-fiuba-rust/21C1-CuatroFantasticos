@@ -11,6 +11,7 @@ use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::RedisCommand;
+use crate::command::strlen::RedisCommandStrlen;
 use std::str::Split;
 
 const TOKEN_SEPARATOR: &str = "\r\n";
@@ -52,6 +53,7 @@ impl Parser {
             "APPEND" => self.parse_command_append(&mut command_iter),
             "GETDEL" => self.parse_command_getdel(&mut command_iter),
             "GETSET" => self.parse_command_getset(&mut command_iter),
+            "STRLEN" => self.parse_command_strlen(&mut command_iter),
             c => Err(format!("Command not implemented: {}", c)),
         }
     }
@@ -134,6 +136,13 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandGet::new(key)))
     }
+    fn parse_command_strlen(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandStrlen::new(key)))
+    }
 
     fn parse_command_getset(
         &self,
@@ -143,6 +152,8 @@ impl Parser {
         let new_value = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandGetSet::new(key, new_value)))
     }
+
+
 
     fn parse_command_getdel(
         &self,
