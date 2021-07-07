@@ -33,6 +33,7 @@ impl StorageRequestMessage {
 pub enum StorageRequestMessageEnum {
     GetDbsize,
     FlushDb,
+    Get(String),
     Copy(String, String),
     Exists(String),
     Rename(String, String),

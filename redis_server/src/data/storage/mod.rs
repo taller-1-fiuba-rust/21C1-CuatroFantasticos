@@ -133,6 +133,24 @@ impl Storage {
                         }
                     }
                 }
+                StorageRequestMessageEnum::Get(key) => {
+                    let value = self.storage.get(&key).cloned();
+                    match value {
+                        Some(value) => {
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::RedisValue(value),
+                            );
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            let response =
+                                StorageResponseMessage::new(StorageResponseMessageEnum::Error(
+                                    String::from("Key does not exist"),
+                                ));
+                            let _ = message.respond(response);
+                        }
+                    }
+                }
                 StorageRequestMessageEnum::Copy(source_key, destination_key) => {
                     let destination = self.storage.contains_key(&destination_key);
                     if destination {
