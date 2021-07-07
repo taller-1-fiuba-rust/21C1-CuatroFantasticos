@@ -19,13 +19,9 @@ impl RedisCommand for RedisCommandType {
         let response = accessor.access(StorageRequestMessageEnum::Type(self.key.clone()))?;
         let response = match response.get_value() {
             StorageResponseMessageEnum::RedisValue(value) => {
-                StorageResponseMessageEnum::String(value.get_type())
-                    .protocol_serialize_to_simple_string()
+                value.get_type().protocol_serialize_to_simple_string()
             }
-            StorageResponseMessageEnum::Error(value) => {
-                StorageResponseMessageEnum::Error(value.to_string())
-                    .protocol_serialize_to_simple_string()
-            }
+            StorageResponseMessageEnum::Error(value) => value.protocol_serialize_to_simple_string(),
             _ => "Client did not receive a correct response from the database".to_string(),
         };
         Ok(response)

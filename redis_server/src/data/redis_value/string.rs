@@ -18,15 +18,15 @@ impl RedisValue for RedisValueString {
 
 impl ProtocolSerializer for RedisValueString {
     fn protocol_serialize_to_simple_string(&self) -> String {
-        todo!()
+        self.contents.protocol_serialize_to_simple_string()
     }
 
     fn protocol_serialize_to_int(&self) -> String {
-        todo!()
+        self.contents.protocol_serialize_to_int()
     }
 
     fn protocol_serialize_to_bulk_string(&self) -> String {
-        todo!()
+        self.contents.protocol_serialize_to_bulk_string()
     }
 }
 
