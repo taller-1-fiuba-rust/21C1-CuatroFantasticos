@@ -137,22 +137,17 @@ impl Storage {
                     let value = self.storage.get(&key).cloned();
                     match value {
                         Some(value) => {
-                            message
-                                .get_sender()
-                                .send(StorageResponseMessage::new(
-                                    StorageResponseMessageEnum::RedisValue(value),
-                                ))
-                                .expect("Client thread is not listening to storage response");
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::RedisValue(value),
+                            );
+                            let _ = message.respond(response);
                         }
                         None => {
-                            message
-                                .get_sender()
-                                .send(StorageResponseMessage::new(
-                                    StorageResponseMessageEnum::Error(String::from(
-                                        "Key does not exist",
-                                    )),
-                                ))
-                                .expect("Client thread is not listening to storage response");
+                            let response =
+                                StorageResponseMessage::new(StorageResponseMessageEnum::Error(
+                                    String::from("Key does not exist"),
+                                ));
+                            let _ = message.respond(response);
                         }
                     }
                 }

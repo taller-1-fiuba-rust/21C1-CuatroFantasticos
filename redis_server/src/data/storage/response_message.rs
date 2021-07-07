@@ -71,7 +71,7 @@ impl ProtocolSerializer for StorageResponseMessageEnum {
                 bulk_string_formatter(if *value { "1" } else { "0" })
             }
             StorageResponseMessageEnum::Ok => bulk_string_formatter("OK"),
-            StorageResponseMessageEnum::Error(value) => bulk_string_formatter(value),
+            StorageResponseMessageEnum::Error(_) => "$-1\r\n".to_string(),
         }
     }
 }
