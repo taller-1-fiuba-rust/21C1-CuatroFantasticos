@@ -16,11 +16,11 @@ impl RedisCommandAppend {
 
 impl RedisCommand for RedisCommandAppend {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let append = accessor.access(StorageRequestMessageEnum::Append(
+        let response = accessor.access(StorageRequestMessageEnum::Append(
             self.key.clone(),
             self.new_value.clone(),
         ))?;
-        let response = append.get_value().protocol_serialize_to_simple_string();
+        let response = response.get_value().protocol_serialize_to_int();
         Ok(response)
     }
 }
