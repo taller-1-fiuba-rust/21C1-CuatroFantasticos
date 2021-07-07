@@ -1,15 +1,15 @@
+use crate::command::append::RedisCommandAppend;
 use crate::command::copy::RedisCommandCopy;
 use crate::command::dbsize::RedisCommandDbSize;
 use crate::command::del::RedisCommandDel;
 use crate::command::exists::RedisCommandExists;
 use crate::command::flushdb::RedisCommandFlushDb;
 use crate::command::get::RedisCommandGet;
+use crate::command::getdel::RedisCommandGetDel;
+use crate::command::getset::RedisCommandGetSet;
 use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
-use crate::command::append::RedisCommandAppend;
-use crate::command::getdel::RedisCommandGetDel;
-use crate::command::getset::RedisCommandGetSet;
 use crate::command::RedisCommand;
 use std::str::Split;
 

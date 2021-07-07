@@ -42,5 +42,5 @@ pub enum StorageRequestMessageEnum {
     Terminate,
     Append(String, String),
     GetDel(String),
-    GetSet(String,String),
+    GetSet(String, String),
 }

@@ -106,14 +106,16 @@ impl Storage {
                 StorageRequestMessageEnum::Append(key, new_value) => {
                     if let Some(value) = self.storage.remove(&key) {
                         let result = format!("{}{}", value.serialize(), new_value);
-                        self.storage.insert(key, Box::new(RedisValueString::new(result)));
+                        self.storage
+                            .insert(key, Box::new(RedisValueString::new(result)));
                         let response = StorageResponseMessage::new(StorageResponseMessageEnum::Ok);
                         let _ = message.respond(response);
                     } else {
-                        self.storage.insert(key,Box::new(RedisValueString::new(new_value)));
+                        self.storage
+                            .insert(key, Box::new(RedisValueString::new(new_value)));
                         let response = StorageResponseMessage::new(StorageResponseMessageEnum::Ok);
                         let _ = message.respond(response);
-                        }
+                    }
                 }
 
                 StorageRequestMessageEnum::Exists(key) => {
@@ -129,7 +131,6 @@ impl Storage {
                     self.storage.remove(&key);
                     let _ = message.respond(response);
                 }
-
 
                 StorageRequestMessageEnum::Type(key) => {
                     let value = self.storage.get(&key).cloned();
@@ -169,17 +170,18 @@ impl Storage {
                 }
                 StorageRequestMessageEnum::GetSet(key, new_value) => {
                     if let Some(value) = self.storage.remove(&key) {
-                        let response = StorageResponseMessage::new(StorageResponseMessageEnum::RedisValue(value,));
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::RedisValue(value),
+                        );
                         let _ = message.respond(response);
-
                     } else {
-
-                        let response =StorageResponseMessage::new(StorageResponseMessageEnum::Error(String::from("Key does not exist"),));
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Error(String::from("Key does not exist")),
+                        );
                         let _ = message.respond(response);
-
-                        }
-                    self.storage.insert(key, Box::new(RedisValueString::new(new_value)));
-
+                    }
+                    self.storage
+                        .insert(key, Box::new(RedisValueString::new(new_value)));
                 }
 
                 StorageRequestMessageEnum::GetDel(key) => {

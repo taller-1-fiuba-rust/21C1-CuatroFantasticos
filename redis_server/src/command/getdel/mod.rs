@@ -3,7 +3,7 @@ use crate::data::storage::accessor::StorageAccessor;
 use crate::data::storage::request_message::StorageRequestMessageEnum;
 use crate::protocol_serialization::ProtocolSerializer;
 
-pub struct RedisCommandGetDel{
+pub struct RedisCommandGetDel {
     key: String,
 }
 
