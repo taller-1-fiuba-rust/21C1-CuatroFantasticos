@@ -11,5 +11,5 @@ pub mod rename;
 pub mod r#type;
 
 pub trait RedisCommand {
-    fn execute(&self, accesor: StorageAccessor) -> Result<String, String>;
+    fn execute(&self, accessor: StorageAccessor) -> Result<String, String>;
 }

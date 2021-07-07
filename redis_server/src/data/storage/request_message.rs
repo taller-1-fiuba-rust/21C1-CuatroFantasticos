@@ -18,8 +18,14 @@ impl StorageRequestMessage {
         self.message.clone()
     }
 
-    pub fn get_sender(&self) -> mpsc::Sender<StorageResponseMessage> {
+    fn get_sender(&self) -> mpsc::Sender<StorageResponseMessage> {
         self.sender.clone()
+    }
+
+    pub fn respond(&self, response: StorageResponseMessage) -> Result<(), String> {
+        self.get_sender()
+            .send(response)
+            .map_err(|_| "Client thread is not listening to storage response".to_string())
     }
 }
 

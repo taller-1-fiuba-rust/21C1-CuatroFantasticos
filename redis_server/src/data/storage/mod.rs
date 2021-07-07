@@ -84,73 +84,52 @@ impl Storage {
                     let value = self.storage.len();
                     let response =
                         StorageResponseMessage::new(StorageResponseMessageEnum::Int(value));
-                    message
-                        .get_sender()
-                        .send(response)
-                        .expect("Client thread is not listening to storage response");
+                    let _ = message.respond(response);
                 }
                 StorageRequestMessageEnum::FlushDb => {
                     self.storage.clear();
                     let response = StorageResponseMessage::new(StorageResponseMessageEnum::Ok);
-                    message
-                        .get_sender()
-                        .send(response)
-                        .expect("Client thread is not listening to storage response");
+                    let _ = message.respond(response);
                 }
-                StorageRequestMessageEnum::Rename(key, newkey) => {
+                StorageRequestMessageEnum::Rename(key, new_key) => {
                     if let Some(value) = self.storage.remove(&key) {
-                        self.storage.insert(newkey, value);
+                        self.storage.insert(new_key, value);
                         let response = StorageResponseMessage::new(StorageResponseMessageEnum::Ok);
-                        message
-                            .get_sender()
-                            .send(response)
-                            .expect("Client thread is not listening to storage response")
+                        let _ = message.respond(response);
+                    } else {
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Error("The key doesnt exist".to_string()),
+                        );
+                        let _ = message.respond(response);
                     }
-                    let response = StorageResponseMessage::new(StorageResponseMessageEnum::Error(
-                        "The key doesnt exist".to_string(),
-                    ));
-                    message
-                        .get_sender()
-                        .send(response)
-                        .expect("Client thread is not listening to storage response")
                 }
                 StorageRequestMessageEnum::Exists(key) => {
                     let value = self.storage.contains_key(&key);
                     let response =
                         StorageResponseMessage::new(StorageResponseMessageEnum::Bool(value));
-                    message
-                        .get_sender()
-                        .send(response)
-                        .expect("Client thread is not listening to storage response")
+                    let _ = message.respond(response);
                 }
                 StorageRequestMessageEnum::Del(key) => {
                     let result = self.storage.contains_key(&key);
                     let response =
                         StorageResponseMessage::new(StorageResponseMessageEnum::Bool(result));
                     self.storage.remove(&key);
-                    message
-                        .get_sender()
-                        .send(response)
-                        .expect("Client thread is not listening to storage response")
+                    let _ = message.respond(response);
                 }
                 StorageRequestMessageEnum::Type(key) => {
-                    let value = self.storage.get(&key);
+                    let value = self.storage.get(&key).cloned();
                     match value {
                         Some(value) => {
-                            message
-                                .get_sender()
-                                .send(StorageResponseMessage::new(
-                                    StorageResponseMessageEnum::RedisValue(value.clone()),
-                                ))
-                                .expect("Client thread is not listening to storage response");
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::RedisValue(value),
+                            );
+                            let _ = message.respond(response);
                         }
                         None => {
-                            message
-                                .get_sender()
-                                .send(StorageResponseMessage::new(
-                                    StorageResponseMessageEnum::Error(String::from("none")),
-                                ))
-                                .expect("Client thread is not listening to storage response");
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Error(String::from("none")),
+                            );
+                            let _ = message.respond(response);
                         }
                     }
                 }
@@ -180,33 +159,26 @@ impl Storage {
                 StorageRequestMessageEnum::Copy(source_key, destination_key) => {
                     let destination = self.storage.contains_key(&destination_key);
                     if destination {
-                        message
-                            .get_sender()
-                            .send(StorageResponseMessage::new(
-                                StorageResponseMessageEnum::Error(String::from(
-                                    "The destination key already exists",
-                                )),
-                            ))
-                            .expect("Client thread is not listening to storage response");
+                        let response =
+                            StorageResponseMessage::new(StorageResponseMessageEnum::Error(
+                                String::from("The destination key already exists"),
+                            ));
+                        let _ = message.respond(response);
                     } else {
                         let value = self.storage.get(&source_key).cloned();
                         match value {
                             Some(value) => {
                                 self.storage.insert(destination_key, value);
-                                message
-                                    .get_sender()
-                                    .send(StorageResponseMessage::new(
-                                        StorageResponseMessageEnum::Bool(true),
-                                    ))
-                                    .expect("Client thread is not listening to storage response");
+                                let response = StorageResponseMessage::new(
+                                    StorageResponseMessageEnum::Bool(true),
+                                );
+                                let _ = message.respond(response);
                             }
                             None => {
-                                message
-                                    .get_sender()
-                                    .send(StorageResponseMessage::new(
-                                        StorageResponseMessageEnum::Bool(false),
-                                    ))
-                                    .expect("Client thread is not listening to storage response");
+                                let response = StorageResponseMessage::new(
+                                    StorageResponseMessageEnum::Bool(false),
+                                );
+                                let _ = message.respond(response);
                             }
                         }
                     }
