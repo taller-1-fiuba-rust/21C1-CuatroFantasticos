@@ -113,7 +113,7 @@ impl Storage {
                             new_value
                         }
                     };
-                    let response = StorageResponseMessage::new(StorageResponseMessageEnum::String(result));
+                    let response = StorageResponseMessage::new(StorageResponseMessageEnum::Int(result.len()));
                     let _ = message.respond(response);
                 }
 
@@ -136,6 +136,7 @@ impl Storage {
                         StorageResponseMessage::new(StorageResponseMessageEnum::Bool(value));
                     let _ = message.respond(response);
                 }
+
                 StorageRequestMessageEnum::Del(key) => {
                     let result = self.storage.contains_key(&key);
                     let response =
@@ -155,7 +156,7 @@ impl Storage {
                         }
                         None => {
                             let response = StorageResponseMessage::new(
-                                StorageResponseMessageEnum::Error(String::from("none")),
+                                StorageResponseMessageEnum::String(String::from("none")),
                             );
                             let _ = message.respond(response);
                         }

@@ -9,7 +9,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 #[test]
-fn test_client_receives_ok_response_when_flushdb() {
+fn test_client_receives_okay_response_when_rename() {
     //make sure redis.conf file is set properly with with timeout 1 sec
     let mut conf = Configuration::new("../redis.conf");
     thread::spawn(move || {
@@ -32,7 +32,8 @@ fn test_client_receives_ok_response_when_flushdb() {
     let mut con = client
         .get_connection()
         .expect("falló la conexión cliente-servidor");
-    let cmd = redis::cmd("FLUSHDB");
-    let _response = con.req_command(&cmd);
-    //assert_eq!(response, Ok(redis::Value::Okay));
+    let mut cmd = redis::Cmd::new();
+    let cmd = cmd.arg("RENAME").arg("messi").arg("ronaldo");
+    let response = con.req_command(&cmd);
+    assert_eq!(response, Ok(redis::Value::Okay));
 }

@@ -21,8 +21,7 @@ impl RedisCommand for RedisCommandType {
             StorageResponseMessageEnum::RedisValue(value) => {
                 value.get_type().protocol_serialize_to_simple_string()
             }
-            StorageResponseMessageEnum::Error(value) => value.protocol_serialize_to_simple_string(),
-            _ => "Client did not receive a correct response from the database".to_string(),
+            value => value.protocol_serialize_to_simple_string(),
         };
         Ok(response)
     }
