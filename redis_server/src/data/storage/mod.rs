@@ -104,26 +104,19 @@ impl Storage {
                     }
                 }
                 StorageRequestMessageEnum::Append(key, new_value) => {
-                    if let Some(value) = self.storage.remove(&key) {
-                        let result = format!("{}{}", value.serialize(), new_value);
-                        self.storage
-                            .insert(key.clone(), Box::new(RedisValueString::new(result)));
-                    } else {
-                        self.storage
-                            .insert(key.clone(), Box::new(RedisValueString::new(new_value)));
-                    }
-                    if let Some(value) = self.storage.get(&key).cloned() {
-                        let response = StorageResponseMessage::new(
-                            StorageResponseMessageEnum::Int(value.serialize().len()),
-                        );
-                        let _ = message.respond(response);
-                    } else {
-                        let response = StorageResponseMessage::new(
-                            StorageResponseMessageEnum::Error(String::from("Key does not exist")),
-                        );
-                        let _ = message.respond(response);
-                    }
+                    let result = match self.storage.get_mut(&key){
+                        Some(RedisValue::String(value)) => {
+                            value.append(&new_value)
+                        }
+                        _ => {
+                            self.storage.insert(key,RedisValue::String(RedisValueString::new(new_value.clone())));
+                            new_value
+                        }
+                    };
+                    let response = StorageResponseMessage::new(StorageResponseMessageEnum::String(result));
+                    let _ = message.respond(response);
                 }
+
                 StorageRequestMessageEnum::Strlen(key) => {
                     if let Some(value) = self.storage.get(&key).cloned() {
                         let response = StorageResponseMessage::new(
@@ -200,7 +193,7 @@ impl Storage {
                         let _ = message.respond(response);
                     }
                     self.storage
-                        .insert(key, Box::new(RedisValueString::new(new_value)));
+                        .insert(key, RedisValue::String(RedisValueString::new(new_value)));
                 }
 
                 StorageRequestMessageEnum::GetDel(key) => {
