@@ -1,4 +1,3 @@
-use crate::data::redis_value::RedisValue;
 use crate::protocol_serialization::ProtocolSerializer;
 
 #[derive(Clone)]
@@ -6,8 +5,8 @@ pub struct RedisValueList {
     contents: Vec<String>,
 }
 
-impl RedisValue for RedisValueList {
-    fn serialize(&self) -> String {
+impl RedisValueList {
+    pub fn serialize(&self) -> String {
         let mut res = String::new();
         for (idx, value) in self.contents.iter().enumerate() {
             if idx == 0 {
@@ -19,7 +18,7 @@ impl RedisValue for RedisValueList {
         res
     }
 
-    fn get_type(&self) -> String {
+    pub fn get_type(&self) -> String {
         String::from("List")
     }
 }
@@ -53,7 +52,6 @@ impl RedisValueList {
 #[cfg(test)]
 mod tests {
     use crate::data::redis_value::list::RedisValueList;
-    use crate::data::redis_value::RedisValue;
 
     #[test]
     fn test_create_empty_redis_value() {
