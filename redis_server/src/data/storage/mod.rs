@@ -184,19 +184,31 @@ impl Storage {
                     }
                 }
                 StorageRequestMessageEnum::GetSet(key, new_value) => {
-                    if let Some(value) = self.storage.remove(&key) {
-                        let response = StorageResponseMessage::new(
-                            StorageResponseMessageEnum::RedisValue(value),
-                        );
-                        let _ = message.respond(response);
-                    } else {
-                        let response = StorageResponseMessage::new(
-                            StorageResponseMessageEnum::Error(String::from("Key does not exist")),
-                        );
-                        let _ = message.respond(response);
-                    }
-                    self.storage
-                        .insert(key, RedisValue::String(RedisValueString::new(new_value)));
+                    match self.storage.get(&key) {
+                        Some(RedisValue::String(value)) => {
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::String(value.get_value()),
+                            );
+                            self.storage
+                                .insert(key, RedisValue::String(RedisValueString::new(new_value)));
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response =
+                                StorageResponseMessage::new(StorageResponseMessageEnum::Error(
+                                    String::from("Value is not of type String"),
+                                ));
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            self.storage
+                                .insert(key, RedisValue::String(RedisValueString::new(new_value)));
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::String(String::from("nil")),
+                            );
+                            let _ = message.respond(response);
+                        }
+                    };
                 }
 
                 StorageRequestMessageEnum::GetDel(key) => {
