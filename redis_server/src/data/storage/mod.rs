@@ -12,6 +12,7 @@ use crate::data::storage::response_message::{StorageResponseMessage, StorageResp
 pub mod accessor;
 pub mod request_message;
 pub mod response_message;
+pub mod value;
 
 pub struct Storage {
     storage: HashMap<String, RedisValue>,
