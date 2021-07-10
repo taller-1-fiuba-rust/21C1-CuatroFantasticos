@@ -34,6 +34,7 @@ pub enum StorageRequestMessageEnum {
     GetDbsize,
     FlushDb,
     Get(String),
+    Lindex(String, i32),
     Copy(String, String),
     Exists(String),
     Rename(String, String),

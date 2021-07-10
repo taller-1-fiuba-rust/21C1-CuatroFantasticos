@@ -1,4 +1,5 @@
 use crate::protocol_serialization::ProtocolSerializer;
+use crate::data::redis_value::list::RedisValueList;
 
 pub mod list;
 pub mod set;
@@ -7,6 +8,7 @@ pub mod string;
 pub trait RedisValue: RedisValueClone + Send + ProtocolSerializer {
     fn serialize(&self) -> String;
     fn get_type(&self) -> String;
+    fn as_list(&self) -> Result<RedisValueList,String>;
 }
 
 pub trait RedisValueClone {
