@@ -34,6 +34,6 @@ fn test_client_receives_1_response_when_exists_key() {
         .expect("falló la conexión cliente-servidor");
     let mut cmd = redis::Cmd::new();
     let cmd = cmd.arg("EXISTS").arg("messi");
-    let _response = con.req_command(&cmd);    
+    let _response = con.req_command(&cmd);
     //assert_eq!(response, Ok(redis::Value::Int(1)));
 }
