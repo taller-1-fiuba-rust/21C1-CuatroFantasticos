@@ -200,24 +200,30 @@ impl Storage {
                 }
 
                 StorageRequestMessageEnum::GetDel(key) => {
-                    let value = self.storage.get(&key).cloned();
-                    match value {
-                        Some(value) => {
+                    match self.storage.get(&key) {
+                        Some(RedisValue::String(value)) => {
                             let response = StorageResponseMessage::new(
-                                StorageResponseMessageEnum::RedisValue(value),
+                                StorageResponseMessageEnum::String(value.get_value()),
                             );
                             self.storage.remove(&key);
                             let _ = message.respond(response);
                         }
-                        None => {
+                        Some(_) => {
                             let response =
                                 StorageResponseMessage::new(StorageResponseMessageEnum::Error(
-                                    String::from("Key does not exist"),
+                                    String::from("Value is not of type String"),
                                 ));
                             let _ = message.respond(response);
                         }
-                    }
+                        None => {
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::String(String::from("nil")),
+                            );
+                            let _ = message.respond(response);
+                        }
+                    };
                 }
+
                 StorageRequestMessageEnum::Copy(source_key, destination_key) => {
                     let destination = self.storage.contains_key(&destination_key);
                     if destination {
