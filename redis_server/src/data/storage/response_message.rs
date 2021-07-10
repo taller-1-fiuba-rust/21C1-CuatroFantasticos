@@ -20,7 +20,7 @@ impl StorageResponseMessage {
 pub enum StorageResponseMessageEnum {
     Int(usize),
     String(String),
-    RedisValue(Box<dyn RedisValue>),
+    RedisValue(RedisValue),
     Bool(bool),
     Ok,
     Error(String),
