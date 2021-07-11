@@ -61,6 +61,6 @@ fn test_connection_doesnt_timeout_when_server_doesnt_sleep() {
     let mut con = client
         .get_connection()
         .expect("falló la conexión cliente-servidor");
-    let _is_connect = con.check_connection();
-    //assert!(is_connect);
+    let is_connect = con.check_connection();
+    assert!(is_connect);
 }
