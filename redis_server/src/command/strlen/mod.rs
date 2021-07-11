@@ -1,8 +1,6 @@
 use crate::command::RedisCommand;
 use crate::data::storage::accessor::StorageAccessor;
 use crate::data::storage::request_message::StorageRequestMessageEnum;
-
-use crate::data::redis_value::RedisValue;
 use crate::data::storage::response_message::StorageResponseMessageEnum;
 use crate::protocol_serialization::ProtocolSerializer;
 
@@ -20,14 +18,8 @@ impl RedisCommand for RedisCommandStrlen {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
         let response = accessor.access(StorageRequestMessageEnum::Strlen(self.key.clone()))?;
         let response = match response.get_value() {
-            StorageResponseMessageEnum::RedisValue(RedisValue::String(value)) => {
-                value.length().protocol_serialize_to_int()
-            }
-            StorageResponseMessageEnum::RedisValue(_value) => {
-                StorageResponseMessageEnum::Error(String::from("Value is not a String"))
-                    .protocol_serialize_to_simple_string()
-            }
-            error => error.protocol_serialize_to_simple_string(),
+            StorageResponseMessageEnum::Int(value) => value.protocol_serialize_to_int(),
+            value => value.protocol_serialize_to_simple_string(),
         };
         Ok(response)
     }
