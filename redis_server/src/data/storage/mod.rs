@@ -7,10 +7,12 @@ use crate::data::redis_value::set::RedisValueSet;
 use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
 use crate::data::storage::request_message::{StorageRequestMessage, StorageRequestMessageEnum};
+use crate::data::storage::response_error_enum::ResponseErrorEnum;
 use crate::data::storage::response_message::{StorageResponseMessage, StorageResponseMessageEnum};
 
 pub mod accessor;
 pub mod request_message;
+pub mod response_error_enum;
 pub mod response_message;
 pub mod value;
 
@@ -99,7 +101,7 @@ impl Storage {
                         let _ = message.respond(response);
                     } else {
                         let response = StorageResponseMessage::new(
-                            StorageResponseMessageEnum::Error("The key doesnt exist".to_string()),
+                            StorageResponseMessageEnum::Error(ResponseErrorEnum::NonExistent),
                         );
                         let _ = message.respond(response);
                     }
@@ -128,7 +130,7 @@ impl Storage {
                         }
                         None => {
                             let response = StorageResponseMessage::new(
-                                StorageResponseMessageEnum::Error(String::from("none")),
+                                StorageResponseMessageEnum::Error(ResponseErrorEnum::None),
                             );
                             let _ = message.respond(response);
                         }
@@ -144,10 +146,9 @@ impl Storage {
                             let _ = message.respond(response);
                         }
                         None => {
-                            let response =
-                                StorageResponseMessage::new(StorageResponseMessageEnum::Error(
-                                    String::from("Key does not exist"),
-                                ));
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Error(ResponseErrorEnum::NonExistent),
+                            );
                             let _ = message.respond(response);
                         }
                     }
@@ -155,10 +156,9 @@ impl Storage {
                 StorageRequestMessageEnum::Copy(source_key, destination_key) => {
                     let destination = self.storage.contains_key(&destination_key);
                     if destination {
-                        let response =
-                            StorageResponseMessage::new(StorageResponseMessageEnum::Error(
-                                String::from("The destination key already exists"),
-                            ));
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Error(ResponseErrorEnum::Existent),
+                        );
                         let _ = message.respond(response);
                     } else {
                         let value = self.storage.get(&source_key).cloned();
