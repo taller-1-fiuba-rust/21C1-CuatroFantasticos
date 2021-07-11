@@ -105,12 +105,61 @@ impl Storage {
                         let _ = message.respond(response);
                     }
                 }
+                StorageRequestMessageEnum::Append(key, new_value) => {
+                    match self.storage.get_mut(&key) {
+                        Some(RedisValue::String(value)) => {
+                            let result = value.append(&new_value);
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Int(result.len()),
+                            );
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString),
+                            );
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            self.storage.insert(
+                                key,
+                                RedisValue::String(RedisValueString::new(new_value.clone())),
+                            );
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Int(new_value.len()),
+                            );
+                            let _ = message.respond(response);
+                        }
+                    };
+                }
+
+                StorageRequestMessageEnum::Strlen(key) => match self.storage.get(&key) {
+                    Some(RedisValue::String(value)) => {
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Int(value.length()),
+                        );
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString),
+                        );
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response =
+                            StorageResponseMessage::new(StorageResponseMessageEnum::Int(0));
+                        let _ = message.respond(response);
+                    }
+                },
+
                 StorageRequestMessageEnum::Exists(key) => {
                     let value = self.storage.contains_key(&key);
                     let response =
                         StorageResponseMessage::new(StorageResponseMessageEnum::Bool(value));
                     let _ = message.respond(response);
                 }
+
                 StorageRequestMessageEnum::Del(key) => {
                     let result = self.storage.contains_key(&key);
                     let response =
@@ -118,6 +167,7 @@ impl Storage {
                     self.storage.remove(&key);
                     let _ = message.respond(response);
                 }
+
                 StorageRequestMessageEnum::Type(key) => {
                     let value = self.storage.get(&key).cloned();
                     match value {
@@ -135,6 +185,7 @@ impl Storage {
                         }
                     }
                 }
+
                 StorageRequestMessageEnum::Get(key) => {
                     let value = self.storage.get(&key).cloned();
                     match value {
@@ -152,6 +203,57 @@ impl Storage {
                         }
                     }
                 }
+                StorageRequestMessageEnum::GetSet(key, new_value) => {
+                    match self.storage.get(&key) {
+                        Some(RedisValue::String(value)) => {
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::String(value.get_value()),
+                            );
+                            self.storage
+                                .insert(key, RedisValue::String(RedisValueString::new(new_value)));
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString),
+                            );
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            self.storage
+                                .insert(key, RedisValue::String(RedisValueString::new(new_value)));
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Error(ResponseErrorEnum::Nil),
+                            );
+                            let _ = message.respond(response);
+                        }
+                    };
+                }
+
+                StorageRequestMessageEnum::GetDel(key) => {
+                    match self.storage.get(&key) {
+                        Some(RedisValue::String(value)) => {
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::String(value.get_value()),
+                            );
+                            self.storage.remove(&key);
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString),
+                            );
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Error(ResponseErrorEnum::Nil),
+                            );
+                            let _ = message.respond(response);
+                        }
+                    };
+                }
+
                 StorageRequestMessageEnum::Copy(source_key, destination_key) => {
                     let destination = self.storage.contains_key(&destination_key);
                     if destination {
