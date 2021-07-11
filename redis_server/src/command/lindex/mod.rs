@@ -19,12 +19,15 @@ impl RedisCommand for RedisCommandLindex {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
         let response = accessor.access(StorageRequestMessageEnum::Lindex(self.key.clone(), self.index))?;
         let response = match response.get_value() {
-            StorageResponseMessageEnum::RedisValue(value) => {
-                value.get_index().protocol_serialize_to_bulk_string()
+            StorageResponseMessageEnum::String(value) => {
+                value.protocol_serialize_to_bulk_string()
             }
-            StorageResponseMessageEnum::Error(value) => value.protocol_serialize_to_simple_string(),
-            _ => "Client did not receive a correct response from the database".to_string(),
-        };
+            StorageResponseMessageEnum::Int(_) => {}
+            StorageResponseMessageEnum::RedisValue(_) => {}
+            StorageResponseMessageEnum::Bool(_) => {}
+            StorageResponseMessageEnum::Ok => {}
+            StorageResponseMessageEnum::Error(_) => {}
+        }
         Ok(response)
     }
 }

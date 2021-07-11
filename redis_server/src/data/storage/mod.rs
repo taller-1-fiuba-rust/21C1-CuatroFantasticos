@@ -14,7 +14,7 @@ pub mod request_message;
 pub mod response_message;
 
 pub struct Storage {
-    storage: HashMap<String, Box<dyn RedisValue>>,
+    storage: HashMap<String, RedisValue>,
     receiver: mpsc::Receiver<StorageRequestMessage>,
 }
 
@@ -28,23 +28,23 @@ impl Storage {
         Storage { storage, receiver }
     }
 
-    pub fn deserialize(contents: String) -> HashMap<String, Box<dyn RedisValue>> {
-        let mut storage: HashMap<String, Box<dyn RedisValue>> = HashMap::new();
+    pub fn deserialize(contents: String) -> HashMap<String, RedisValue> {
+        let mut storage: HashMap<String, RedisValue> = HashMap::new();
         for line in contents.lines() {
             let split = line.split(':');
             let parsed_line: Vec<&str> = split.collect();
             match parsed_line[1].trim() {
                 "string" => {
                     let value = RedisValueString::new(parsed_line[2].trim().to_owned());
-                    storage.insert(parsed_line[0].trim().to_owned(), Box::new(value));
+                    storage.insert(parsed_line[0].trim().to_owned(), RedisValue::String(value));
                 }
                 "list" => {
                     let value = RedisValueList::new(parsed_line[2].trim().to_owned());
-                    storage.insert(parsed_line[0].trim().to_owned(), Box::new(value));
+                    storage.insert(parsed_line[0].trim().to_owned(), RedisValue::List(value));
                 }
                 "set" => {
                     let value = RedisValueSet::new(parsed_line[2].trim().to_owned());
-                    storage.insert(parsed_line[0].trim().to_owned(), Box::new(value));
+                    storage.insert(parsed_line[0].trim().to_owned(), RedisValue::Set(value));
                 }
                 _ => println!("Data type not supported in deserialization"),
             }
@@ -52,8 +52,8 @@ impl Storage {
         storage
     }
 
-    pub fn deserialize_empty() -> HashMap<String, Box<dyn RedisValue>> {
-        let storage: HashMap<String, Box<dyn RedisValue>> = HashMap::new();
+    pub fn deserialize_empty() -> HashMap<String, RedisValue> {
+        let storage: HashMap<String, RedisValue> = HashMap::new();
         storage
     }
 
@@ -175,6 +175,26 @@ impl Storage {
                                 );
                                 let _ = message.respond(response);
                             }
+                        }
+                    }
+                }
+                StorageRequestMessageEnum::Lindex(key,index ) => {
+                    match self.storage.get(&key){
+                        Some(RedisValue::List(value)) => {
+                            let result = value.get_index(index);
+                        }
+                        Some(value) => {
+                            let response =
+                                StorageResponseMessage::new(StorageResponseMessageEnum::Error(
+                                    String::from("Key does not store a List")));
+                            let _ = message.respond(response);
+                        }
+                        _ => {
+                            let response =
+                                StorageResponseMessage::new(StorageResponseMessageEnum::Error(
+                                    String::from("Key does not exist"),
+                                ));
+                            let _ = message.respond(response);
                         }
                     }
                 }

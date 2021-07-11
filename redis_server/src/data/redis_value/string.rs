@@ -1,4 +1,3 @@
-use crate::data::redis_value::RedisValue;
 use crate::protocol_serialization::ProtocolSerializer;
 
 #[derive(Clone)]
@@ -6,12 +5,12 @@ pub struct RedisValueString {
     contents: String,
 }
 
-impl RedisValue for RedisValueString {
-    fn serialize(&self) -> String {
+impl RedisValueString {
+    pub fn serialize(&self) -> String {
         self.contents.clone()
     }
 
-    fn get_type(&self) -> String {
+    pub fn get_type(&self) -> String {
         String::from("String")
     }
 }
@@ -39,7 +38,6 @@ impl RedisValueString {
 #[cfg(test)]
 mod tests {
     use crate::data::redis_value::string::RedisValueString;
-    use crate::data::redis_value::RedisValue;
 
     #[test]
     fn test_create_empty_redis_value() {
