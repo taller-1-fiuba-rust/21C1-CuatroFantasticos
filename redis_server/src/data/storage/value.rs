@@ -75,5 +75,9 @@ mod tests {
         value.access();
         let last_access_time_2 = value.last_access_time();
         assert!(last_access_time_2 > last_access_time_1);
+        sleep(Duration::new(0, 4000000));
+        value.access();
+        let last_access_time_3 = value.last_access_time();
+        assert!(last_access_time_3 > last_access_time_2);
     }
 }
