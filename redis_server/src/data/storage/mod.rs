@@ -106,19 +106,31 @@ impl Storage {
                     }
                 }
                 StorageRequestMessageEnum::Append(key, new_value) => {
-                    let result = match self.storage.get_mut(&key) {
-                        Some(RedisValue::String(value)) => value.append(&new_value),
-                        _ => {
+                    match self.storage.get_mut(&key) {
+                        Some(RedisValue::String(value)) => {
+                            let result = value.append(&new_value);
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Int(result.len()),
+                            );
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString),
+                            );
+                            let _ = message.respond(response);
+                        }
+                        None => {
                             self.storage.insert(
                                 key,
                                 RedisValue::String(RedisValueString::new(new_value.clone())),
                             );
-                            new_value
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Int(new_value.len()),
+                            );
+                            let _ = message.respond(response);
                         }
                     };
-                    let response =
-                        StorageResponseMessage::new(StorageResponseMessageEnum::Int(result.len()));
-                    let _ = message.respond(response);
                 }
 
                 StorageRequestMessageEnum::Strlen(key) => {
