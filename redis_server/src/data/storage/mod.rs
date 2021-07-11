@@ -120,6 +120,26 @@ impl Storage {
                 }
 
                 StorageRequestMessageEnum::Strlen(key) => {
+                    match self.storage.get(&key) {
+                        Some(RedisValue::String(value)) => {
+                            let response = StorageResponseMessage::new(
+                                StorageResponseMessageEnum::Int(value.length()),
+                            );
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response =
+                                StorageResponseMessage::new(StorageResponseMessageEnum::Error(
+                                    String::from("Key is not of type String"),
+                                ));
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            let response =
+                                StorageResponseMessage::new(StorageResponseMessageEnum::Int(0));
+                            let _ = message.respond(response);
+                        }
+                    }
                     if let Some(value) = self.storage.get(&key).cloned() {
                         let response = StorageResponseMessage::new(
                             StorageResponseMessageEnum::Int(value.serialize().len()),
