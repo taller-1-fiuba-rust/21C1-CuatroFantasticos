@@ -280,6 +280,27 @@ impl Storage {
                         }
                     }
                 }
+
+                StorageRequestMessageEnum::Llen(key) => match self.storage.get(&key) {
+                    Some(RedisValue::List(value)) => {
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Int(value.length()),
+                        );
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAList),
+                        );
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response =
+                            StorageResponseMessage::new(StorageResponseMessageEnum::Int(0));
+                        let _ = message.respond(response);
+                    }
+                },
+
                 StorageRequestMessageEnum::Terminate => {
                     break;
                 }

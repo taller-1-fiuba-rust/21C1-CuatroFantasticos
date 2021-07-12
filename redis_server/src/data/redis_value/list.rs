@@ -21,6 +21,10 @@ impl RedisValueList {
     pub fn get_type(&self) -> String {
         String::from("List")
     }
+
+    pub fn length(&self) -> usize {
+        self.contents.len()
+    }
 }
 
 impl ProtocolSerializer for RedisValueList {
