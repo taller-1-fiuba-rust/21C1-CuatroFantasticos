@@ -78,15 +78,6 @@ impl Parser {
         let command_part = command_iter.next().ok_or("End of input")?;
         Ok(command_part.to_string())
     }
-
-    fn parse_number(&self, command_iter: &mut Split<&str>) -> Result<i32, String> {
-        let command_part = command_iter.next().ok_or("End of input")?;
-        if &command_part[..1] != ":" {
-            return Err("Not a number token".to_string());
-        }
-        let command_part = command_iter.next().ok_or("End of input")?;
-        Ok(command_part.parse::<i32>().expect("not a number"))
-    }
 }
 
 impl Parser {
@@ -177,7 +168,7 @@ impl Parser {
         command_iter: &mut Split<&str>,
     ) -> Result<Box<dyn RedisCommand>, String> {
         let key = self.parse_string(command_iter)?;
-        let index = self.parse_number(command_iter)?;
+        let index = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandLindex::new(key, index)))
     }
 }
