@@ -9,8 +9,8 @@ use std::thread;
 use logger::log::LogService;
 use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
-use redis_server::data::storage::request_message::StorageRequestMessage;
-use redis_server::data::storage::Storage;
+use redis_server::data::storage_service::operator_service::request_message::StorageRequestMessage;
+use redis_server::data::storage_service::operator_service::StorageOperatorService;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -34,7 +34,7 @@ fn main() {
     conf.set_data_sender(sender);
     let dbfilename = conf.get("dbfilename").unwrap();
     thread::spawn(move || {
-        let storage = Storage::new(&dbfilename, receiver);
+        let storage = StorageOperatorService::new(&dbfilename, receiver);
         //storage.print();
         storage.init();
     });

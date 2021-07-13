@@ -3,7 +3,6 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 pub struct StorageValue {
     redis_value: RedisValue,
-    expiration_time: Option<u128>,
     last_access_time: u128,
 }
 
@@ -19,27 +18,25 @@ impl StorageValue {
         let current_time = current_time_in_millis();
         StorageValue {
             redis_value,
-            expiration_time: None,
             last_access_time: current_time,
         }
-    }
-
-    pub fn set_expiration_time(&mut self, expiration_time: u128) {
-        self.expiration_time = Some(expiration_time);
     }
 
     pub fn last_access_time(&self) -> u128 {
         self.last_access_time
     }
 
-    pub fn access(&mut self) -> Option<RedisValue> {
-        if let Some(expiration_time) = self.expiration_time {
-            if expiration_time < current_time_in_millis() {
-                return None;
-            }
-        }
+    pub fn access(&mut self) -> &RedisValue {
         self.last_access_time = current_time_in_millis();
-        Some(self.redis_value.clone())
+        &self.redis_value
+    }
+
+    pub fn peek(&self) -> &RedisValue {
+        &self.redis_value
+    }
+
+    pub fn extract_value(self) -> RedisValue {
+        self.redis_value
     }
 }
 
@@ -47,7 +44,7 @@ impl StorageValue {
 mod tests {
     use crate::data::redis_value::string::RedisValueString;
     use crate::data::redis_value::RedisValue;
-    use crate::data::storage::value::StorageValue;
+    use crate::data::storage_service::operator_service::storage::value::StorageValue;
     use std::thread::sleep;
     use std::time::Duration;
 
@@ -55,15 +52,7 @@ mod tests {
     fn test_access_value() {
         let redis_value = RedisValue::String(RedisValueString::new("test".to_string()));
         let mut value = StorageValue::new(redis_value);
-        assert_eq!(value.access().unwrap().serialize(), "test".to_string());
-    }
-
-    #[test]
-    fn test_try_access_expirated_value() {
-        let redis_value = RedisValue::String(RedisValueString::new("test".to_string()));
-        let mut value = StorageValue::new(redis_value);
-        value.set_expiration_time(0);
-        assert!(value.access().is_none());
+        assert_eq!(value.access().serialize(), "test".to_string());
     }
 
     #[test]

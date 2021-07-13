@@ -1,5 +1,5 @@
 use crate::command::RedisCommand;
-use crate::data::storage::accessor::StorageAccessor;
+use crate::data::storage_service::operator_service::accessor::StorageAccessor;
 use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandPing {}
