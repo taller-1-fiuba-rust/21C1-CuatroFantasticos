@@ -1,4 +1,5 @@
 use crate::data::redis_value::RedisValue;
+use crate::data::storage::response_error_enum::ResponseErrorEnum;
 use crate::protocol_serialization::ProtocolSerializer;
 use std::borrow::Borrow;
 use std::fmt::Display;
@@ -23,7 +24,7 @@ pub enum StorageResponseMessageEnum {
     RedisValue(RedisValue),
     Bool(bool),
     Ok,
-    Error(String),
+    Error(ResponseErrorEnum),
 }
 
 impl ProtocolSerializer for StorageResponseMessageEnum {
@@ -38,7 +39,7 @@ impl ProtocolSerializer for StorageResponseMessageEnum {
                 format!("+{}\r\n", if *value { "1" } else { "0" })
             }
             StorageResponseMessageEnum::Ok => format!("+{}\r\n", "OK"),
-            StorageResponseMessageEnum::Error(value) => format!("-{}\r\n", value),
+            StorageResponseMessageEnum::Error(value) => value.protocol_serialize_to_simple_string(),
         }
     }
 
@@ -51,7 +52,7 @@ impl ProtocolSerializer for StorageResponseMessageEnum {
                 format!(":{}\r\n", if *value { "1" } else { "0" })
             }
             StorageResponseMessageEnum::Ok => format!(":{}\r\n", "OK"),
-            StorageResponseMessageEnum::Error(value) => format!("-{}\r\n", value),
+            StorageResponseMessageEnum::Error(value) => value.protocol_serialize_to_int(),
         }
     }
 
@@ -71,7 +72,7 @@ impl ProtocolSerializer for StorageResponseMessageEnum {
                 bulk_string_formatter(if *value { "1" } else { "0" })
             }
             StorageResponseMessageEnum::Ok => bulk_string_formatter("OK"),
-            StorageResponseMessageEnum::Error(_) => "$-1\r\n".to_string(),
+            StorageResponseMessageEnum::Error(value) => value.protocol_serialize_to_bulk_string(),
         }
     }
 }
