@@ -4,6 +4,7 @@ pub enum ResponseErrorEnum {
     Nil,
     None,
     NotAString,
+    NotANumber,
     NotAList,
     NotASet,
     NonExistent,
@@ -17,6 +18,9 @@ impl ProtocolSerializer for ResponseErrorEnum {
             ResponseErrorEnum::None => String::from("-NONE\r\n"),
             ResponseErrorEnum::NotAString => {
                 String::from("-WRONGTYPE The key does not store a String\r\n")
+            }
+            ResponseErrorEnum::NotANumber => {
+                String::from("-ERR value is not an integer or out of range\r\n")
             }
             ResponseErrorEnum::NotAList => {
                 String::from("-WRONGTYPE The key does not store a List\r\n")
