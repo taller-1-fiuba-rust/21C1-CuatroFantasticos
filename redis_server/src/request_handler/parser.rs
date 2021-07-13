@@ -13,6 +13,7 @@ use crate::command::rename::RedisCommandRename;
 use crate::command::strlen::RedisCommandStrlen;
 use crate::command::RedisCommand;
 use std::str::Split;
+use crate::command::lindex::RedisCommandLindex;
 
 const TOKEN_SEPARATOR: &str = "\r\n";
 
@@ -54,6 +55,7 @@ impl Parser {
             "GETDEL" => self.parse_command_getdel(&mut command_iter),
             "GETSET" => self.parse_command_getset(&mut command_iter),
             "STRLEN" => self.parse_command_strlen(&mut command_iter),
+            "LINDEX" => self.parse_command_lindex(&mut command_iter),
             c => Err(format!("Command not implemented: {}", c)),
         }
     }
@@ -75,6 +77,15 @@ impl Parser {
         }
         let command_part = command_iter.next().ok_or("End of input")?;
         Ok(command_part.to_string())
+    }
+
+    fn parse_number(&self, command_iter: &mut Split<&str>) -> Result<i32, String> {
+        let command_part = command_iter.next().ok_or("End of input")?;
+        if &command_part[..1] != ":" {
+            return Err("Not a number token".to_string());
+        }
+        let command_part = command_iter.next().ok_or("End of input")?;
+        Ok(command_part.parse::<i32>().expect("not a number"))
     }
 }
 
@@ -159,6 +170,12 @@ impl Parser {
     ) -> Result<Box<dyn RedisCommand>, String> {
         let key = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandGetDel::new(key)))
+    }
+
+    fn parse_command_lindex(&self, command_iter: &mut Split<&str>) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        let index = self.parse_number(command_iter)?;
+        Ok(Box::new(RedisCommandLindex::new(key,index)))
     }
 }
 
