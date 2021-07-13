@@ -22,6 +22,10 @@ impl RedisValueList {
         String::from("List")
     }
 
+    pub fn length(&self) -> usize {
+        self.contents.len()
+    }
+
     pub fn get_index(&self, index: i32) -> Option<String> {
         if index >= 0 {
             self.contents.get(index as usize).cloned()

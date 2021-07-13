@@ -3,19 +3,19 @@ use crate::data::storage::accessor::StorageAccessor;
 use crate::data::storage::request_message::StorageRequestMessageEnum;
 use crate::protocol_serialization::ProtocolSerializer;
 
-pub struct RedisCommandStrlen {
+pub struct RedisCommandLlen {
     key: String,
 }
 
-impl RedisCommandStrlen {
-    pub fn new(key: String) -> RedisCommandStrlen {
-        RedisCommandStrlen { key }
+impl RedisCommandLlen {
+    pub fn new(key: String) -> RedisCommandLlen {
+        RedisCommandLlen { key }
     }
 }
 
-impl RedisCommand for RedisCommandStrlen {
+impl RedisCommand for RedisCommandLlen {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageRequestMessageEnum::Strlen(self.key.clone()))?;
+        let response = accessor.access(StorageRequestMessageEnum::Llen(self.key.clone()))?;
         let response = response.get_value().protocol_serialize_to_int();
         Ok(response)
     }

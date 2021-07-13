@@ -8,6 +8,7 @@ use crate::command::get::RedisCommandGet;
 use crate::command::getdel::RedisCommandGetDel;
 use crate::command::getset::RedisCommandGetSet;
 use crate::command::lindex::RedisCommandLindex;
+use crate::command::llen::RedisCommandLlen;
 use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
@@ -55,6 +56,7 @@ impl Parser {
             "GETDEL" => self.parse_command_getdel(&mut command_iter),
             "GETSET" => self.parse_command_getset(&mut command_iter),
             "STRLEN" => self.parse_command_strlen(&mut command_iter),
+            "LLEN" => self.parse_command_llen(&mut command_iter),
             "LINDEX" => self.parse_command_lindex(&mut command_iter),
             c => Err(format!("Command not implemented: {}", c)),
         }
@@ -161,6 +163,14 @@ impl Parser {
     ) -> Result<Box<dyn RedisCommand>, String> {
         let key = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandGetDel::new(key)))
+    }
+
+    fn parse_command_llen(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandLlen::new(key)))
     }
 
     fn parse_command_lindex(
