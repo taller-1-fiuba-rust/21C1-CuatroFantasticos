@@ -9,6 +9,7 @@ pub mod flushdb;
 pub mod get;
 pub mod getdel;
 pub mod getset;
+pub mod lindex;
 pub mod ping;
 pub mod rename;
 pub mod strlen;

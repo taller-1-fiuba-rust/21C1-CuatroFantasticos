@@ -8,6 +8,7 @@ use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
 use crate::data::storage::request_message::{StorageRequestMessage, StorageRequestMessageEnum};
 use crate::data::storage::response_error_enum::ResponseErrorEnum;
+use crate::data::storage::response_error_enum::ResponseErrorEnum::{Nil, NotAList};
 use crate::data::storage::response_message::{StorageResponseMessage, StorageResponseMessageEnum};
 
 pub mod accessor;
@@ -280,6 +281,36 @@ impl Storage {
                         }
                     }
                 }
+                StorageRequestMessageEnum::Lindex(key, index) => match self.storage.get(&key) {
+                    Some(RedisValue::List(value)) => {
+                        let result = value.get_index(index);
+                        match result {
+                            Some(value) => {
+                                let response = StorageResponseMessage::new(
+                                    StorageResponseMessageEnum::String(value),
+                                );
+                                let _ = message.respond(response);
+                            }
+                            None => {
+                                let response = StorageResponseMessage::new(
+                                    StorageResponseMessageEnum::Error(Nil),
+                                );
+                                let _ = message.respond(response);
+                            }
+                        }
+                    }
+                    Some(_) => {
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Error(NotAList),
+                        );
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response =
+                            StorageResponseMessage::new(StorageResponseMessageEnum::Error(Nil));
+                        let _ = message.respond(response);
+                    }
+                },
                 StorageRequestMessageEnum::Terminate => {
                     break;
                 }
