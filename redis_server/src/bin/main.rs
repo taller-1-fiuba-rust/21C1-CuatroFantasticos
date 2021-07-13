@@ -3,14 +3,11 @@ extern crate redis_server;
 
 use std::env;
 use std::fs::OpenOptions;
-use std::sync::mpsc;
-use std::thread;
 
 use logger::log::LogService;
 use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
-use redis_server::data::storage_service::operator_service::request_message::StorageRequestMessage;
-use redis_server::data::storage_service::operator_service::StorageOperatorService;
+use redis_server::data::storage_service::StorageService;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -26,17 +23,13 @@ fn main() {
     let log_service: LogService = LogService::new(file);
     conf.set_logservice(log_service.create_logger());
 
-    let (sender, receiver): (
-        mpsc::Sender<StorageRequestMessage>,
-        mpsc::Receiver<StorageRequestMessage>,
-    ) = mpsc::channel();
-
-    conf.set_data_sender(sender);
     let dbfilename = conf.get("dbfilename").unwrap();
-    thread::spawn(move || {
-        let storage = StorageOperatorService::new(&dbfilename, receiver);
-        //storage.print();
-        storage.init();
-    });
+    let db_file = OpenOptions::new()
+        .read(true)
+        .open(dbfilename)
+        .expect("No se pudo crear un archivo de logs");
+
+    let storage_service = StorageService::new(db_file);
+    conf.set_data_sender(storage_service.get_storage_sender());
     server::run_server(&conf);
 }
