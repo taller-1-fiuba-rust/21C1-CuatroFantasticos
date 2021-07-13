@@ -25,13 +25,14 @@ impl RedisValueList {
     pub fn get_index(&self, index: i32) -> Option<String> {
         if index >= 0 {
             self.contents.get(index as usize).cloned()
-        }else {
-            let index = index + self.contents.len() as i32 ;
-            if index >= 0{
+        } else {
+            let index = index + self.contents.len() as i32;
+            if index >= 0 {
                 self.contents.get(index as usize).cloned()
-            } else { None }
+            } else {
+                None
+            }
         }
-
     }
 }
 

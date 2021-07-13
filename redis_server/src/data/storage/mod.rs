@@ -178,26 +178,38 @@ impl Storage {
                         }
                     }
                 }
-                StorageRequestMessageEnum::Lindex(key,index ) => {
-                    match self.storage.get(&key){
-                        Some(RedisValue::List(value)) => {
-                            let result = value.get_index(index);
-                        }
-                        Some(value) => {
-                            let response =
-                                StorageResponseMessage::new(StorageResponseMessageEnum::Error(
-                                    String::from("Key does not store a List")));
-                            let _ = message.respond(response);
-                        }
-                        _ => {
-                            let response =
-                                StorageResponseMessage::new(StorageResponseMessageEnum::Error(
-                                    String::from("Key does not exist"),
-                                ));
-                            let _ = message.respond(response);
+                StorageRequestMessageEnum::Lindex(key, index) => match self.storage.get(&key) {
+                    Some(RedisValue::List(value)) => {
+                        let result = value.get_index(index);
+                        match result {
+                            Some(value) => {
+                                let response = StorageResponseMessage::new(
+                                    StorageResponseMessageEnum::String(value),
+                                );
+                                let _ = message.respond(response);
+                            }
+                            None => {
+                                let response = StorageResponseMessage::new(
+                                    StorageResponseMessageEnum::Error(String::from("nil")),
+                                );
+                                let _ = message.respond(response);
+                            }
                         }
                     }
-                }
+                    Some(_) => {
+                        let response =
+                            StorageResponseMessage::new(StorageResponseMessageEnum::Error(
+                                String::from("Key does not store a List"),
+                            ));
+                        let _ = message.respond(response);
+                    }
+                    _ => {
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Error(String::from("Key does not exist")),
+                        );
+                        let _ = message.respond(response);
+                    }
+                },
                 StorageRequestMessageEnum::Terminate => {
                     break;
                 }

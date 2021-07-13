@@ -17,17 +17,14 @@ impl RedisCommandLindex {
 
 impl RedisCommand for RedisCommandLindex {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageRequestMessageEnum::Lindex(self.key.clone(), self.index))?;
+        let response = accessor.access(StorageRequestMessageEnum::Lindex(
+            self.key.clone(),
+            self.index,
+        ))?;
         let response = match response.get_value() {
-            StorageResponseMessageEnum::String(value) => {
-                value.protocol_serialize_to_bulk_string()
-            }
-            StorageResponseMessageEnum::Int(_) => {}
-            StorageResponseMessageEnum::RedisValue(_) => {}
-            StorageResponseMessageEnum::Bool(_) => {}
-            StorageResponseMessageEnum::Ok => {}
-            StorageResponseMessageEnum::Error(_) => {}
-        }
+            StorageResponseMessageEnum::String(value) => value.protocol_serialize_to_bulk_string(),
+            value => value.protocol_serialize_to_bulk_string(),
+        };
         Ok(response)
     }
 }

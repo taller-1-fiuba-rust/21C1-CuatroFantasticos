@@ -6,11 +6,10 @@ pub mod del;
 pub mod exists;
 pub mod flushdb;
 pub mod get;
+pub mod lindex;
 pub mod ping;
 pub mod rename;
 pub mod r#type;
-pub mod lindex;
-
 
 pub trait RedisCommand {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String>;
