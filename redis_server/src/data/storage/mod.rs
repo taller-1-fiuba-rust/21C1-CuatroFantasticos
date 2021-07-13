@@ -8,8 +8,8 @@ use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
 use crate::data::storage::request_message::{StorageRequestMessage, StorageRequestMessageEnum};
 use crate::data::storage::response_error_enum::ResponseErrorEnum;
+use crate::data::storage::response_error_enum::ResponseErrorEnum::{Nil, NotAList};
 use crate::data::storage::response_message::{StorageResponseMessage, StorageResponseMessageEnum};
-use crate::data::storage::response_error_enum::ResponseErrorEnum::{NotAList, Nil};
 
 pub mod accessor;
 pub mod request_message;
@@ -300,14 +300,14 @@ impl Storage {
                         }
                     }
                     Some(_) => {
-                        let response =
-                            StorageResponseMessage::new(StorageResponseMessageEnum::Error(NotAList));
+                        let response = StorageResponseMessage::new(
+                            StorageResponseMessageEnum::Error(NotAList),
+                        );
                         let _ = message.respond(response);
                     }
                     None => {
-                        let response = StorageResponseMessage::new(
-                            StorageResponseMessageEnum::Error(Nil),
-                        );
+                        let response =
+                            StorageResponseMessage::new(StorageResponseMessageEnum::Error(Nil));
                         let _ = message.respond(response);
                     }
                 },

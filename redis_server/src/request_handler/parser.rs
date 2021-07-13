@@ -7,13 +7,13 @@ use crate::command::flushdb::RedisCommandFlushDb;
 use crate::command::get::RedisCommandGet;
 use crate::command::getdel::RedisCommandGetDel;
 use crate::command::getset::RedisCommandGetSet;
+use crate::command::lindex::RedisCommandLindex;
 use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::strlen::RedisCommandStrlen;
 use crate::command::RedisCommand;
 use std::str::Split;
-use crate::command::lindex::RedisCommandLindex;
 
 const TOKEN_SEPARATOR: &str = "\r\n";
 
@@ -172,10 +172,13 @@ impl Parser {
         Ok(Box::new(RedisCommandGetDel::new(key)))
     }
 
-    fn parse_command_lindex(&self, command_iter: &mut Split<&str>) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_lindex(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
         let key = self.parse_string(command_iter)?;
         let index = self.parse_number(command_iter)?;
-        Ok(Box::new(RedisCommandLindex::new(key,index)))
+        Ok(Box::new(RedisCommandLindex::new(key, index)))
     }
 }
 
