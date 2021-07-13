@@ -1,7 +1,6 @@
 use crate::command::RedisCommand;
 use crate::data::storage::accessor::StorageAccessor;
 use crate::data::storage::request_message::StorageRequestMessageEnum;
-use crate::data::storage::response_message::StorageResponseMessageEnum;
 use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandLlen {
@@ -17,10 +16,7 @@ impl RedisCommandLlen {
 impl RedisCommand for RedisCommandLlen {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
         let response = accessor.access(StorageRequestMessageEnum::Llen(self.key.clone()))?;
-        let response = match response.get_value() {
-            StorageResponseMessageEnum::Int(value) => value.protocol_serialize_to_int(),
-            value => value.protocol_serialize_to_simple_string(),
-        };
+        let response = response.get_value().protocol_serialize_to_int();
         Ok(response)
     }
 }
