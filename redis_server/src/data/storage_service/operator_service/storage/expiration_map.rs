@@ -1,9 +1,9 @@
+use crate::utilities::current_time_in_millis;
 use std::collections::HashMap;
-use std::time::{SystemTime, UNIX_EPOCH};
 
+#[derive(Default)]
 pub struct ExpirationMap {
     map: HashMap<String, u128>,
-    vec: Vec<String>,
 }
 
 impl ExpirationMap {
@@ -11,43 +11,31 @@ impl ExpirationMap {
         Default::default()
     }
 
-    pub fn insert(&mut self, key: String, value: u128) {
-        assert_eq!(self.map.len(), self.vec.len());
-        let old_value = self.map.insert(key.clone(), value);
-        if old_value.is_none() {
-            self.vec.push(key);
-        }
+    pub fn expire_at(&mut self, key: String, timestamp: u128) -> Option<u128> {
+        self.map.insert(key, timestamp)
     }
 
-    pub fn contains(&self, key: &str) -> bool {
-        assert_eq!(self.map.len(), self.vec.len());
+    pub fn expire_in(&mut self, key: String, ms: u128) -> Option<u128> {
+        let timestamp = current_time_in_millis() + ms;
+        self.map.insert(key, timestamp)
+    }
+
+    pub fn is_expirable(&self, key: &str) -> bool {
         self.map.contains_key(key)
     }
 
     pub fn is_expired(&self, key: &str) -> bool {
         match self.map.get(key) {
             None => false,
-            Some(value) => {
-                let now = SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap()
-                    .as_millis();
-                now > *value
-            }
+            Some(value) => current_time_in_millis() > *value,
         }
+    }
+
+    pub fn remove(&mut self, key: &str) -> Option<u128> {
+        self.map.remove(key)
     }
 
     pub fn clear(&mut self) {
         self.map.clear();
-        self.vec.clear();
-    }
-}
-
-impl Default for ExpirationMap {
-    fn default() -> Self {
-        ExpirationMap {
-            map: HashMap::new(),
-            vec: Vec::new(),
-        }
     }
 }

@@ -54,7 +54,7 @@ impl StorageOperatorService {
                 }
                 StorageRequestMessageEnum::Rename(key, new_key) => {
                     if let Some(value) = self.storage.remove(&key) {
-                        self.storage.insert(new_key, value);
+                        self.storage.insert(&new_key, value);
                         let response = StorageResponseMessageEnum::Ok;
                         let _ = message.respond(response);
                     } else {
@@ -112,7 +112,7 @@ impl StorageOperatorService {
                         let value = self.storage.access(&source_key).cloned();
                         match value {
                             Some(value) => {
-                                self.storage.insert(destination_key, value);
+                                self.storage.insert(&destination_key, value);
                                 let response = StorageResponseMessageEnum::Bool(true);
                                 let _ = message.respond(response);
                             }
@@ -163,7 +163,7 @@ impl StorageOperatorService {
                         }
                         None => {
                             self.storage.insert(
-                                key,
+                                &key,
                                 RedisValue::String(RedisValueString::new(new_value.clone())),
                             );
                             let response = StorageResponseMessageEnum::Int(new_value.len());
@@ -197,7 +197,7 @@ impl StorageOperatorService {
                         Some(RedisValue::String(value)) => {
                             let response = StorageResponseMessageEnum::String(value.get_value());
                             self.storage
-                                .insert(key, RedisValue::String(RedisValueString::new(new_value)));
+                                .insert(&key, RedisValue::String(RedisValueString::new(new_value)));
                             let _ = message.respond(response);
                         }
                         Some(_) => {
@@ -207,7 +207,7 @@ impl StorageOperatorService {
                         }
                         None => {
                             self.storage
-                                .insert(key, RedisValue::String(RedisValueString::new(new_value)));
+                                .insert(&key, RedisValue::String(RedisValueString::new(new_value)));
                             let response =
                                 StorageResponseMessageEnum::Error(ResponseErrorEnum::Nil);
                             let _ = message.respond(response);

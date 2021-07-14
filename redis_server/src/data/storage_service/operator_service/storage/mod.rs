@@ -22,13 +22,33 @@ impl RedisStorage {
         Default::default()
     }
 
-    pub fn insert(&mut self, key: String, value: RedisValue) -> Option<RedisValue> {
+    fn clean_if_expirated(&mut self, key: &str) {
+        if self.values.contains_key(key) && self.expirations.is_expired(key) {
+            let _ = self.values.remove(key);
+            let _ = self.expirations.remove(key);
+        }
+    }
+
+    pub fn insert(&mut self, key: &str, value: RedisValue) -> Option<RedisValue> {
+        self.clean_if_expirated(key);
         let storage_value = StorageValue::new(value);
-        let old_value = self.values.insert(key, storage_value);
+        let old_value = self.values.insert(key.to_string(), storage_value);
+        let _ = self.expirations.remove(key);
+        old_value.map(|v| v.extract_value())
+    }
+
+    pub fn update(&mut self, key: &str, value: RedisValue) -> Option<RedisValue> {
+        self.clean_if_expirated(key);
+        if !self.values.contains_key(key) {
+            return None;
+        }
+        let storage_value = StorageValue::new(value);
+        let old_value = self.values.insert(key.to_string(), storage_value);
         old_value.map(|v| v.extract_value())
     }
 
     pub fn access(&mut self, key: &str) -> Option<&RedisValue> {
+        self.clean_if_expirated(key);
         let storage_value = self.values.get_mut(key);
         storage_value.map(|v| v.access())
     }
@@ -38,40 +58,29 @@ impl RedisStorage {
     }
 
     pub fn get(&mut self, key: &str) -> Option<&RedisValue> {
+        self.clean_if_expirated(key);
         match self.values.get_mut(key) {
-            Some(value) => {
-                if self.expirations.is_expired(key) {
-                    None
-                } else {
-                    Some(value.access())
-                }
-            }
+            Some(value) => Some(value.access()),
             None => None,
         }
     }
 
     pub fn mut_get(&mut self, key: &str) -> Option<&mut RedisValue> {
+        self.clean_if_expirated(key);
         match self.values.get_mut(key) {
-            Some(value) => {
-                if self.expirations.is_expired(key) {
-                    None
-                } else {
-                    Some(value.access_mut())
-                }
-            }
+            Some(value) => Some(value.access_mut()),
             None => None,
         }
     }
 
-    pub fn contains_key(&self, key: &str) -> bool {
-        match self.values.get(key) {
-            Some(_) => !self.expirations.is_expired(key),
-            None => false,
-        }
+    pub fn contains_key(&mut self, key: &str) -> bool {
+        self.clean_if_expirated(key);
+        self.values.contains_key(key)
     }
 
     pub fn remove(&mut self, key: &str) -> Option<RedisValue> {
-        self.values.remove(key).map(|mut v| v.access().clone())
+        self.clean_if_expirated(key);
+        self.values.remove(key).map(|v| v.extract_value())
     }
 
     pub fn clear(&mut self) {
@@ -105,15 +114,15 @@ impl RedisStorage {
             match parsed_line[1].trim() {
                 "string" => {
                     let value = RedisValueString::new(parsed_line[2].trim().to_owned());
-                    storage.insert(parsed_line[0].trim().to_owned(), RedisValue::String(value));
+                    storage.insert(parsed_line[0].trim(), RedisValue::String(value));
                 }
                 "list" => {
                     let value = RedisValueList::new(parsed_line[2].trim().to_owned());
-                    storage.insert(parsed_line[0].trim().to_owned(), RedisValue::List(value));
+                    storage.insert(parsed_line[0].trim(), RedisValue::List(value));
                 }
                 "set" => {
                     let value = RedisValueSet::new(parsed_line[2].trim().to_owned());
-                    storage.insert(parsed_line[0].trim().to_owned(), RedisValue::Set(value));
+                    storage.insert(parsed_line[0].trim(), RedisValue::Set(value));
                 }
                 _ => println!("Data type not supported in deserialization"),
             }

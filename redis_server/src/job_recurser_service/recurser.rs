@@ -1,7 +1,8 @@
 use crate::job_recurser_service::RecurringJob;
+use crate::utilities::current_time_in_millis;
 use std::sync::mpsc;
 use std::thread::sleep;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::Duration;
 
 const WAIT_TIME: u64 = 100;
 
@@ -14,13 +15,6 @@ pub struct JobRecurser<T: RecurringJob + Send> {
 
 pub enum JobRecurserMessage {
     Terminate,
-}
-
-fn current_time_in_millis() -> u128 {
-    match SystemTime::now().duration_since(UNIX_EPOCH) {
-        Ok(value) => value.as_millis(),
-        Err(_) => 0,
-    }
 }
 
 impl<T: RecurringJob + Send> JobRecurser<T> {
