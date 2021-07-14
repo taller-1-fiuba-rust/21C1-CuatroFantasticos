@@ -25,10 +25,13 @@ impl ExpirationMap {
     }
 
     pub fn is_expired(&self, key: &str) -> bool {
-        match self.map.get(key){
-            None => {false}
+        match self.map.get(key) {
+            None => false,
             Some(value) => {
-                let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
+                let now = SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap()
+                    .as_millis();
                 now > *value
             }
         }

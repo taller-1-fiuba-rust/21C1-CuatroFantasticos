@@ -1,7 +1,7 @@
 use crate::command::RedisCommand;
-use crate::protocol_serialization::ProtocolSerializer;
 use crate::data::storage_service::operator_service::accessor::StorageAccessor;
 use crate::data::storage_service::operator_service::request_message::StorageRequestMessageEnum;
+use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandAppend {
     key: String,

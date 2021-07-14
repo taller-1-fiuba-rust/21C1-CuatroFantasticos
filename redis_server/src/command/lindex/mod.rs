@@ -1,9 +1,9 @@
 use crate::command::RedisCommand;
 use crate::data::storage_service::operator_service::accessor::StorageAccessor;
 use crate::data::storage_service::operator_service::request_message::StorageRequestMessageEnum;
+use crate::data::storage_service::operator_service::response_error_enum::ResponseErrorEnum;
 use crate::data::storage_service::operator_service::response_message::StorageResponseMessageEnum;
 use crate::protocol_serialization::ProtocolSerializer;
-use crate::data::storage_service::operator_service::response_error_enum::ResponseErrorEnum;
 
 pub struct RedisCommandLindex {
     key: String,

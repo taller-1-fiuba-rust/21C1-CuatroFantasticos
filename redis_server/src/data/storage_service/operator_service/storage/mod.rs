@@ -40,47 +40,38 @@ impl RedisStorage {
     pub fn get(&mut self, key: &str) -> Option<&RedisValue> {
         match self.values.get_mut(key) {
             Some(value) => {
-                if self.expirations.is_expired(key){
+                if self.expirations.is_expired(key) {
                     None
-                }else {
+                } else {
                     Some(value.access())
                 }
             }
-            None => {
-                None
-            }
+            None => None,
         }
     }
 
     pub fn mut_get(&mut self, key: &str) -> Option<&mut RedisValue> {
         match self.values.get_mut(key) {
             Some(value) => {
-                if self.expirations.is_expired(key){
+                if self.expirations.is_expired(key) {
                     None
-                }else {
+                } else {
                     Some(value.access_mut())
                 }
             }
-            None => {
-                None
-            }
+            None => None,
         }
     }
 
     pub fn contains_key(&self, key: &str) -> bool {
         match self.values.get(key) {
-            Some(_) => {
-                !self.expirations.is_expired(key)
-            }
-            None => {
-                false
-            }
+            Some(_) => !self.expirations.is_expired(key),
+            None => false,
         }
     }
 
     pub fn remove(&mut self, key: &str) -> Option<RedisValue> {
-        self.expirations.remove(key);
-        self.values.remove(key).map(|mut v|v.access()).cloned()
+        self.values.remove(key).map(|mut v| v.access().clone())
     }
 
     pub fn clear(&mut self) {
