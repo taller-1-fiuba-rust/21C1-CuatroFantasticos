@@ -1,12 +1,18 @@
+use crate::command::append::RedisCommandAppend;
 use crate::command::copy::RedisCommandCopy;
 use crate::command::dbsize::RedisCommandDbSize;
 use crate::command::del::RedisCommandDel;
 use crate::command::exists::RedisCommandExists;
 use crate::command::flushdb::RedisCommandFlushDb;
 use crate::command::get::RedisCommandGet;
+use crate::command::getdel::RedisCommandGetDel;
+use crate::command::getset::RedisCommandGetSet;
+use crate::command::lindex::RedisCommandLindex;
+use crate::command::llen::RedisCommandLlen;
 use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
+use crate::command::strlen::RedisCommandStrlen;
 use crate::command::RedisCommand;
 use std::str::Split;
 
@@ -34,7 +40,7 @@ impl Parser {
         _command_qty: usize,
     ) -> Result<Box<dyn RedisCommand>, String> {
         let command_type = self.parse_string(&mut command_iter)?;
-        match command_type.as_str() {
+        match command_type.to_uppercase().as_str() {
             "COMMAND" => Ok(Box::new(RedisCommandPing::new())),
             "PING" => Ok(Box::new(RedisCommandPing::new())),
             "INFO" => todo!(),
@@ -46,6 +52,12 @@ impl Parser {
             "DEL" => self.parse_command_del(&mut command_iter),
             "COPY" => self.parse_command_copy(&mut command_iter),
             "GET" => self.parse_command_get(&mut command_iter),
+            "APPEND" => self.parse_command_append(&mut command_iter),
+            "GETDEL" => self.parse_command_getdel(&mut command_iter),
+            "GETSET" => self.parse_command_getset(&mut command_iter),
+            "STRLEN" => self.parse_command_strlen(&mut command_iter),
+            "LLEN" => self.parse_command_llen(&mut command_iter),
+            "LINDEX" => self.parse_command_lindex(&mut command_iter),
             c => Err(format!("Command not implemented: {}", c)),
         }
     }
@@ -95,6 +107,14 @@ impl Parser {
         let newkey = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandRename::new(key, newkey)))
     }
+    fn parse_command_append(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        let new_value = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandAppend::new(key, new_value)))
+    }
 
     fn parse_command_type(
         &self,
@@ -119,6 +139,47 @@ impl Parser {
     ) -> Result<Box<dyn RedisCommand>, String> {
         let key = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandGet::new(key)))
+    }
+    fn parse_command_strlen(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandStrlen::new(key)))
+    }
+
+    fn parse_command_getset(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        let new_value = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandGetSet::new(key, new_value)))
+    }
+
+    fn parse_command_getdel(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandGetDel::new(key)))
+    }
+
+    fn parse_command_llen(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandLlen::new(key)))
+    }
+
+    fn parse_command_lindex(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        let index = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandLindex::new(key, index)))
     }
 }
 

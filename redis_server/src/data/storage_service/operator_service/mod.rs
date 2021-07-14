@@ -7,6 +7,9 @@ use crate::data::storage_service::operator_service::response_error_enum::Respons
 use crate::data::storage_service::operator_service::response_message::StorageResponseMessageEnum;
 use crate::data::storage_service::operator_service::storage::RedisStorage;
 use std::io::Read;
+use crate::data::redis_value::RedisValue;
+use crate::data::redis_value::string::RedisValueString;
+
 
 pub mod accessor;
 pub mod request_message;
@@ -41,7 +44,7 @@ impl StorageOperatorService {
         for message in self.receiver {
             match message.get_message() {
                 StorageRequestMessageEnum::GetDbsize => {
-                    let value = self.storage.len();
+                    let value = self.storage.length();
                     let response = StorageResponseMessageEnum::Int(value);
                     let _ = message.respond(response);
                 }
@@ -121,6 +124,71 @@ impl StorageOperatorService {
                         }
                     }
                 }
+                StorageRequestMessageEnum::Lindex(key, index) => match self.storage.get(&key) {
+                    Some(RedisValue::List(value)) => {
+                        let result = value.get_index(index);
+                        match result {
+                            Some(value) => {
+                                let response = StorageResponseMessageEnum::String(value);
+                                let _ = message.respond(response);
+                            }
+                            None => {
+                                let response = StorageResponseMessageEnum::Error(ResponseErrorEnum::Nil);
+                                let _ = message.respond(response);
+                            }
+                        }
+                    }
+                    Some(_) => {
+                        let response = StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAList);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response = StorageResponseMessageEnum::Error(ResponseErrorEnum::Nil);
+                        let _ = message.respond(response);
+                    }
+                }
+
+                StorageRequestMessageEnum::Append(key, new_value) => {
+                    match self.storage.mut_get(&key) {
+                        Some(RedisValue::String(value)) => {
+                            let result = value.append(&new_value);
+                            let response = StorageResponseMessageEnum::Int(result.len());
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response = StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString);
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            self.storage.insert(
+                                key,
+                                RedisValue::String(RedisValueString::new(new_value.clone())),
+                            );
+                            let response = StorageResponseMessageEnum::Int(new_value.len());
+                            let _ = message.respond(response);
+                        }
+                    };
+                }
+
+                StorageRequestMessageEnum::GetDel(key) => {
+                    match self.storage.get(&key) {
+                        Some(RedisValue::String(value)) => {
+                            let response = StorageResponseMessageEnum::String(value.get_value());
+                            self.storage.remove(&key);
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response = StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString);
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            let response = StorageResponseMessageEnum::Error(ResponseErrorEnum::Nil);
+                            let _ = message.respond(response);
+                        }
+                    };
+                }
+
+
                 StorageRequestMessageEnum::ExpirationRound => {
                     todo!()
                 }

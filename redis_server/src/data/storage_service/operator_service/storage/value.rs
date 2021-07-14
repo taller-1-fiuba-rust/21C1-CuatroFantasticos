@@ -31,6 +31,11 @@ impl StorageValue {
         &self.redis_value
     }
 
+    pub fn access_mut(&mut self) -> &mut RedisValue {
+        self.last_access_time = current_time_in_millis();
+        &mut self.redis_value
+    }
+
     pub fn peek(&self) -> &RedisValue {
         &self.redis_value
     }

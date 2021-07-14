@@ -17,8 +17,8 @@ mod persistence_job;
 pub struct StorageService {
     operator_request_sender: mpsc::Sender<StorageRequestMessage>,
     operator_thread_handler: Option<thread::JoinHandle<()>>,
-    expiration_service: JobRecurserService,
-    persistence_service: JobRecurserService,
+    _expiration_service: JobRecurserService,
+    _persistence_service: JobRecurserService,
 }
 
 impl StorageService {
@@ -34,18 +34,18 @@ impl StorageService {
         });
 
         let expiration_accessor = StorageAccessor::new(operator_tx.clone());
-        let expiration_service =
+        let _expiration_service =
             JobRecurserService::new(ExpirationJob::new(expiration_accessor), 250);
 
         let persistence_accessor = StorageAccessor::new(operator_tx.clone());
-        let persistence_service =
+        let _persistence_service =
             JobRecurserService::new(PersistenceJob::new(persistence_accessor), 300 * 1000);
 
         StorageService {
             operator_request_sender: operator_tx,
             operator_thread_handler: Some(operator_th),
-            expiration_service,
-            persistence_service,
+            _expiration_service,
+            _persistence_service,
         }
     }
 

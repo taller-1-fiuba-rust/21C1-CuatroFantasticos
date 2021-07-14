@@ -33,24 +33,59 @@ impl RedisStorage {
         storage_value.map(|v| v.access())
     }
 
-    pub fn len(&self) -> usize {
-        todo!()
+    pub fn length(&self) -> usize {
+        self.values.len()
     }
 
-    pub fn is_empty(&self) -> bool {
-        todo!()
+    pub fn get(&mut self, key: &str) -> Option<&RedisValue> {
+        match self.values.get_mut(key) {
+            Some(value) => {
+                if self.expirations.is_expired(key){
+                    None
+                }else {
+                    Some(value.access())
+                }
+            }
+            None => {
+                None
+            }
+        }
     }
 
-    pub fn contains_key(&self, _key: &str) -> bool {
-        todo!()
+    pub fn mut_get(&mut self, key: &str) -> Option<&mut RedisValue> {
+        match self.values.get_mut(key) {
+            Some(value) => {
+                if self.expirations.is_expired(key){
+                    None
+                }else {
+                    Some(value.access_mut())
+                }
+            }
+            None => {
+                None
+            }
+        }
     }
 
-    pub fn remove(&mut self, _key: &str) -> Option<RedisValue> {
-        todo!()
+    pub fn contains_key(&self, key: &str) -> bool {
+        match self.values.get(key) {
+            Some(_) => {
+                !self.expirations.is_expired(key)
+            }
+            None => {
+                false
+            }
+        }
+    }
+
+    pub fn remove(&mut self, key: &str) -> Option<RedisValue> {
+        self.expirations.remove(key);
+        self.values.remove(key).map(|mut v|v.access()).cloned()
     }
 
     pub fn clear(&mut self) {
-        todo!()
+        self.values.clear();
+        self.expirations.clear();
     }
 
     pub fn serialize(&self) -> Vec<String> {

@@ -6,12 +6,25 @@ pub struct RedisValueString {
 }
 
 impl RedisValueString {
+    pub fn get_value(&self) -> String {
+        self.contents.clone()
+    }
+
     pub fn serialize(&self) -> String {
         self.contents.clone()
     }
 
     pub fn get_type(&self) -> String {
         String::from("String")
+    }
+
+    pub fn length(&self) -> usize {
+        self.contents.len()
+    }
+
+    pub fn append(&mut self, new_value: &str) -> String {
+        self.contents.push_str(new_value);
+        self.contents.clone()
     }
 }
 

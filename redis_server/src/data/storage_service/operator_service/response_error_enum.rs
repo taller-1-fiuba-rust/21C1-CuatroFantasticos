@@ -4,6 +4,7 @@ pub enum ResponseErrorEnum {
     Nil,
     None,
     NotAString,
+    NotANumber,
     NotAList,
     NotASet,
     NonExistent,
@@ -16,12 +17,21 @@ impl ProtocolSerializer for ResponseErrorEnum {
             ResponseErrorEnum::Nil => String::from("$-1\r\n"),
             ResponseErrorEnum::None => String::from("-NONE\r\n"),
             ResponseErrorEnum::NotAString => {
-                String::from("-WRONGTYPE The key does not store a String")
+                String::from("-WRONGTYPE The key does not store a String\r\n")
             }
-            ResponseErrorEnum::NotAList => String::from("-WRONGTYPE The key does not store a List"),
-            ResponseErrorEnum::NotASet => String::from("-WRONGTYPE The key does not store a Set"),
-            ResponseErrorEnum::NonExistent => String::from("-NONEXISTENT The key does not exist"),
-            ResponseErrorEnum::Existent => String::from("-EXISTENT The key already exists"),
+            ResponseErrorEnum::NotANumber => {
+                String::from("-ERR value is not an integer or out of range\r\n")
+            }
+            ResponseErrorEnum::NotAList => {
+                String::from("-WRONGTYPE The key does not store a List\r\n")
+            }
+            ResponseErrorEnum::NotASet => {
+                String::from("-WRONGTYPE The key does not store a Set\r\n")
+            }
+            ResponseErrorEnum::NonExistent => {
+                String::from("-NONEXISTENT The key does not exist\r\n")
+            }
+            ResponseErrorEnum::Existent => String::from("-EXISTENT The key already exists\r\n"),
         }
     }
 

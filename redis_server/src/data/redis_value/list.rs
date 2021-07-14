@@ -21,6 +21,23 @@ impl RedisValueList {
     pub fn get_type(&self) -> String {
         String::from("List")
     }
+
+    pub fn length(&self) -> usize {
+        self.contents.len()
+    }
+
+    pub fn get_index(&self, index: i32) -> Option<String> {
+        if index >= 0 {
+            self.contents.get(index as usize).cloned()
+        } else {
+            let index = index + self.contents.len() as i32;
+            if index >= 0 {
+                self.contents.get(index as usize).cloned()
+            } else {
+                None
+            }
+        }
+    }
 }
 
 impl ProtocolSerializer for RedisValueList {

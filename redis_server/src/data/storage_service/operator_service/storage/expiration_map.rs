@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 pub struct ExpirationMap {
     map: HashMap<String, u128>,
@@ -18,9 +19,24 @@ impl ExpirationMap {
         }
     }
 
-    pub fn contains(&self, key: &str) {
+    pub fn contains(&self, key: &str) -> bool {
         assert_eq!(self.map.len(), self.vec.len());
-        self.map.contains_key(key);
+        self.map.contains_key(key)
+    }
+
+    pub fn is_expired(&self, key: &str) -> bool {
+        match self.map.get(key){
+            None => {false}
+            Some(value) => {
+                let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
+                now > *value
+            }
+        }
+    }
+
+    pub fn clear(&mut self) {
+        self.map.clear();
+        self.vec.clear();
     }
 }
 
