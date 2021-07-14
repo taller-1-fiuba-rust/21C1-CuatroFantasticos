@@ -1,6 +1,6 @@
 use crate::protocol_serialization::ProtocolSerializer;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct RedisValueList {
     contents: Vec<String>,
 }

@@ -1,7 +1,7 @@
 use crate::utilities::current_time_in_millis;
 use std::collections::HashMap;
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct ExpirationMap {
     map: HashMap<String, u128>,
 }

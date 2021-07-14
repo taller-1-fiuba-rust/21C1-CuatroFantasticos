@@ -1,6 +1,8 @@
 use crate::data::redis_value::RedisValue;
 use crate::utilities::current_time_in_millis;
+use std::fmt::{Debug, Formatter};
 
+#[derive(Debug)]
 pub struct StorageValue {
     redis_value: RedisValue,
     last_access_time: u128,

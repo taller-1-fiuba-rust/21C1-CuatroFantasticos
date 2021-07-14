@@ -7,11 +7,12 @@ use crate::data::redis_value::set::RedisValueSet;
 use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
 use crate::data::storage_service::operator_service::storage::expiration_map::ExpirationMap;
+use std::fmt::{Debug, Formatter};
 
 pub mod expiration_map;
 pub mod value;
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct RedisStorage {
     values: HashMap<String, StorageValue>,
     expirations: ExpirationMap,
@@ -129,13 +130,4 @@ impl RedisStorage {
         }
         storage
     }
-
-    /*
-    pub fn print(&self) {
-        for (key, value) in &self.storage {
-            println!("{:?}", key);
-            println!("{:?}", value.serialize());
-        }
-    }
-    */
 }

@@ -1,7 +1,7 @@
 use crate::protocol_serialization::ProtocolSerializer;
 use std::collections::HashSet;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct RedisValueSet {
     contents: HashSet<String>,
 }
