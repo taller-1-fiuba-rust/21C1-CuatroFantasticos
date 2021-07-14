@@ -121,6 +121,12 @@ impl StorageOperatorService {
                         }
                     }
                 }
+                StorageRequestMessageEnum::ExpirationRound => {
+                    todo!()
+                }
+                StorageRequestMessageEnum::Persist => {
+                    todo!()
+                }
                 StorageRequestMessageEnum::Terminate => {
                     break;
                 }
