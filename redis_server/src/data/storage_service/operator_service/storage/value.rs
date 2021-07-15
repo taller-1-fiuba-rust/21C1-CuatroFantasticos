@@ -1,6 +1,6 @@
 use crate::data::redis_value::RedisValue;
 use crate::utilities::current_time_in_millis;
-use std::fmt::{Debug, Formatter};
+use std::fmt::Debug;
 
 #[derive(Debug)]
 pub struct StorageValue {

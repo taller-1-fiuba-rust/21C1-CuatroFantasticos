@@ -7,7 +7,7 @@ use crate::data::redis_value::set::RedisValueSet;
 use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
 use crate::data::storage_service::operator_service::storage::expiration_map::ExpirationMap;
-use std::fmt::{Debug, Formatter};
+use std::fmt::Debug;
 
 pub mod expiration_map;
 pub mod value;
@@ -60,18 +60,12 @@ impl RedisStorage {
 
     pub fn get(&mut self, key: &str) -> Option<&RedisValue> {
         self.clean_if_expirated(key);
-        match self.values.get_mut(key) {
-            Some(value) => Some(value.access()),
-            None => None,
-        }
+        self.values.get_mut(key).map(|value| value.access())
     }
 
     pub fn mut_get(&mut self, key: &str) -> Option<&mut RedisValue> {
         self.clean_if_expirated(key);
-        match self.values.get_mut(key) {
-            Some(value) => Some(value.access_mut()),
-            None => None,
-        }
+        self.values.get_mut(key).map(|value| value.access_mut())
     }
 
     pub fn contains_key(&mut self, key: &str) -> bool {
