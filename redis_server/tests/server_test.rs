@@ -64,4 +64,4 @@ fn test_connection_doesnt_timeout_when_server_doesnt_sleep() {
     let is_connect = con.check_connection();
     assert!(is_connect);
 }
-*/ 
+*/
