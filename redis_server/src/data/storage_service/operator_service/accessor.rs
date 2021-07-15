@@ -1,5 +1,7 @@
-use crate::data::storage::request_message::{StorageRequestMessage, StorageRequestMessageEnum};
-use crate::data::storage::response_message::StorageResponseMessage;
+use crate::data::storage_service::operator_service::request_message::{
+    StorageRequestMessage, StorageRequestMessageEnum,
+};
+use crate::data::storage_service::operator_service::response_message::StorageResponseMessage;
 use std::sync::mpsc;
 
 pub struct StorageAccessor {
@@ -23,14 +25,11 @@ impl StorageAccessor {
         &self,
         message: StorageRequestMessageEnum,
     ) -> Result<StorageResponseMessage, String> {
-        let storage_message = StorageRequestMessage::new(message, self.sender_for_storage.clone());
-        match self
-            .sender
-            .send(storage_message)
-            .map_err(|_| "Error sending message to storage".to_string())
-        {
+        let storage_message =
+            StorageRequestMessage::new(message, Some(self.sender_for_storage.clone()));
+        match self.sender.send(storage_message) {
             Ok(_) => Ok(self.receiver.recv().unwrap()),
-            Err(e) => Err(e),
+            Err(_) => Err("Error sending message to storage".to_string()),
         }
     }
 }

@@ -1,5 +1,5 @@
 use crate::configuration::verbose::Verbose;
-use crate::data::storage::request_message::StorageRequestMessage;
+use crate::data::storage_service::operator_service::request_message::StorageRequestMessage;
 use logger::log::logger::Logger;
 use std::collections::HashMap;
 use std::fs;

@@ -7,7 +7,7 @@ pub mod list;
 pub mod set;
 pub mod string;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum RedisValue {
     List(RedisValueList),
     Set(RedisValueSet),

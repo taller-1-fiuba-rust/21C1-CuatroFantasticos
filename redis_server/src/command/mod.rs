@@ -1,4 +1,4 @@
-use crate::data::storage::accessor::StorageAccessor;
+use crate::data::storage_service::operator_service::accessor::StorageAccessor;
 
 pub mod append;
 pub mod copy;

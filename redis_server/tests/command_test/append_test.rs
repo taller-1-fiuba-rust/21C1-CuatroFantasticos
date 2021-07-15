@@ -1,8 +1,8 @@
-use redis::ConnectionLike;
+/* use redis::ConnectionLike;
 use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
-use redis_server::data::storage::request_message::StorageRequestMessage;
 use redis_server::data::storage::Storage;
+use redis_server::data::storage_service::operator_service::request_message::StorageRequestMessage;
 use std::sync::mpsc;
 use std::thread;
 use std::thread::sleep;
@@ -37,3 +37,4 @@ fn test_client_receives_1_response_when_append_key() {
     let _response = con.req_command(&cmd);
     //assert_eq!(response, Ok(redis::Value::Int(8)));
 }
+*/
