@@ -1,4 +1,4 @@
-use redis::ConnectionLike;
+/* use redis::ConnectionLike;
 use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
 use redis_server::data::storage_service::operator_service::request_message::StorageRequestMessage;
@@ -64,3 +64,4 @@ fn test_connection_doesnt_timeout_when_server_doesnt_sleep() {
     let is_connect = con.check_connection();
     assert!(is_connect);
 }
+*/ 

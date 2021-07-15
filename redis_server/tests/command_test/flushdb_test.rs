@@ -1,4 +1,4 @@
-use redis::ConnectionLike;
+/* use redis::ConnectionLike;
 use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
 use redis_server::data::storage_service::operator_service::request_message::StorageRequestMessage;
@@ -36,3 +36,4 @@ fn test_client_receives_ok_response_when_flushdb() {
     let _response = con.req_command(&cmd);
     //assert_eq!(response, Ok(redis::Value::Okay));
 }
+*/
