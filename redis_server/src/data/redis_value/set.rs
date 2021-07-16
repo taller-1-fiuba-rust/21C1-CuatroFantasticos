@@ -1,3 +1,4 @@
+use crate::data::storage_service::operator_service::response_error_enum::RedisErrorEnum;
 use crate::protocol_serialization::ProtocolSerializer;
 use std::collections::HashSet;
 
@@ -21,6 +22,18 @@ impl RedisValueSet {
 
     pub fn get_type(&self) -> String {
         String::from("Set")
+    }
+
+    pub fn sort(&self) -> Result<Vec<String>, RedisErrorEnum> {
+        let mut contents: Vec<String> = vec![];
+        for x in &self.contents {
+            match x.parse().map_err(|_| RedisErrorEnum::NotASetOfNumbers) {
+                Err(value) => return Err(value),
+                Ok(value) => contents.push(value),
+            }
+        }
+        contents.sort();
+        Ok(contents)
     }
 }
 
