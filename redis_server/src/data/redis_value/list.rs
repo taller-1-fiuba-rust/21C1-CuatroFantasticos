@@ -1,3 +1,4 @@
+use crate::data::storage_service::operator_service::response_error_enum::RedisErrorEnum;
 use crate::protocol_serialization::ProtocolSerializer;
 
 #[derive(Debug, Clone)]
@@ -37,6 +38,19 @@ impl RedisValueList {
                 None
             }
         }
+    }
+
+    pub fn sort(&self) -> Result<Vec<String>, RedisErrorEnum> {
+        let mut contents: Vec<String> = vec![];
+        for x in &self.contents {
+            match x.parse().map_err(|_| RedisErrorEnum::NotAListOfNumbers) {
+                Err(value) => return Err(value),
+                Ok(value) => contents.push(value),
+            }
+            contents.push(x.clone());
+        }
+        contents.sort();
+        Ok(contents)
     }
 }
 
