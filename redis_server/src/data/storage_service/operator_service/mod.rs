@@ -242,10 +242,6 @@ impl StorageOperatorService {
                 },
 
                 StorageRequestMessageEnum::Sort(key) => match self.storage.access(&key).cloned() {
-                    None => {
-                        let response = StorageResponseMessageEnum::Error(RedisErrorEnum::NilArray);
-                        let _ = message.respond(response);
-                    }
                     Some(RedisValue::String(_)) => {
                         let response =
                             StorageResponseMessageEnum::Error(RedisErrorEnum::NotAListNorSet);
@@ -253,6 +249,10 @@ impl StorageOperatorService {
                     }
                     Some(value) => {
                         let response = StorageResponseMessageEnum::RedisValue(value);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response = StorageResponseMessageEnum::Error(RedisErrorEnum::NilArray);
                         let _ = message.respond(response);
                     }
                 },

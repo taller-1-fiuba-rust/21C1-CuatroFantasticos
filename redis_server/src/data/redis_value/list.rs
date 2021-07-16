@@ -47,7 +47,6 @@ impl RedisValueList {
                 Err(value) => return Err(value),
                 Ok(value) => contents.push(value),
             }
-            contents.push(x.clone());
         }
         contents.sort();
         Ok(contents)

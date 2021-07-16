@@ -24,6 +24,10 @@ impl RedisCommand for RedisCommandSort {
                 Ok(value) => value.protocol_serialize_to_bulk_string(),
                 Err(value) => value.protocol_serialize_to_bulk_string(),
             },
+            StorageResponseMessageEnum::RedisValue(RedisValue::List(value)) => match value.sort() {
+                Ok(value) => value.protocol_serialize_to_bulk_string(),
+                Err(value) => value.protocol_serialize_to_bulk_string(),
+            },
             StorageResponseMessageEnum::Error(value) => value.protocol_serialize_to_bulk_string(),
             _ => StorageResponseMessageEnum::Error(RedisErrorEnum::Unknown)
                 .protocol_serialize_to_bulk_string(),
