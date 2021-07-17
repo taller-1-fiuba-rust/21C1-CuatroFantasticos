@@ -19,7 +19,7 @@ impl StorageResponseMessage {
 }
 
 pub enum StorageResponseMessageEnum {
-    Int(usize),
+    Int(i32),
     String(String),
     RedisValue(RedisValue),
     Bool(bool),

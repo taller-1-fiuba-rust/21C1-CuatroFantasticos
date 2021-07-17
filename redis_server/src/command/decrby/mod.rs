@@ -17,20 +17,15 @@ impl RedisCommandDecrBy {
 
 impl RedisCommand for RedisCommandDecrBy {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let value = new_value.parse::<i32>();
-        match value {
+        let value = self.new_value.parse::<i32>();
+        let response = match value {
             Ok(value) => {
-                let response = accessor.access(StorageRequestMessageEnum::DecrBy(
-                    self.key.clone(),
-                    value.clone(),
-                ))?;
-                let response = response.get_value().protocol_serialize_to_bulk_string();
-                Ok(response)
+                let response =
+                    accessor.access(StorageRequestMessageEnum::DecrBy(self.key.clone(), value))?;
+                response.get_value().protocol_serialize_to_int()
             }
-            None => {
-                let response = StorageResponseMessageEnum::Error(ResponseErrorEnum::None);
-                let _ = message.respond(response);
-            }
-        }
+            Err(_) => ResponseErrorEnum::NotANumber.protocol_serialize_to_bulk_string(),
+        };
+        Ok(response)
     }
 }
