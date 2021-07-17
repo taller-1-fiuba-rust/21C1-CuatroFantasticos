@@ -8,13 +8,13 @@ use crate::command::flushdb::RedisCommandFlushDb;
 use crate::command::get::RedisCommandGet;
 use crate::command::getdel::RedisCommandGetDel;
 use crate::command::getset::RedisCommandGetSet;
+use crate::command::incrby::RedisCommandIncrBy;
 use crate::command::lindex::RedisCommandLindex;
 use crate::command::llen::RedisCommandLlen;
 use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::strlen::RedisCommandStrlen;
-use crate::command::incrby::RedisCommandIncrBy;
 use crate::command::RedisCommand;
 use std::str::Split;
 
