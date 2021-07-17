@@ -49,7 +49,6 @@ pub enum StorageRequestMessageEnum {
     GetSet(String, String),
     Strlen(String),
     Llen(String),
-    Sort(String),
     ExpirationRound,
     Persist,
     Terminate,

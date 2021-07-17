@@ -18,7 +18,7 @@ impl RedisCommandSort {
 
 impl RedisCommand for RedisCommandSort {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageRequestMessageEnum::Sort(self.key.clone()))?;
+        let response = accessor.access(StorageRequestMessageEnum::Get(self.key.clone()))?;
         let response = match response.get_value() {
             StorageResponseMessageEnum::RedisValue(RedisValue::Set(value)) => match value.sort() {
                 Ok(value) => value.protocol_serialize_to_bulk_string(),
@@ -28,6 +28,12 @@ impl RedisCommand for RedisCommandSort {
                 Ok(value) => value.protocol_serialize_to_bulk_string(),
                 Err(value) => value.protocol_serialize_to_bulk_string(),
             },
+            StorageResponseMessageEnum::RedisValue(RedisValue::String(_)) => {
+                RedisErrorEnum::NotAListNorSet.protocol_serialize_to_bulk_string()
+            }
+            StorageResponseMessageEnum::Error(RedisErrorEnum::NonExistent) => {
+                RedisErrorEnum::NilArray.protocol_serialize_to_bulk_string()
+            }
             StorageResponseMessageEnum::Error(value) => value.protocol_serialize_to_bulk_string(),
             _ => StorageResponseMessageEnum::Error(RedisErrorEnum::Unknown)
                 .protocol_serialize_to_bulk_string(),
