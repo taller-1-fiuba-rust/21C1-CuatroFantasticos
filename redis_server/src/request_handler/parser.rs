@@ -1,6 +1,7 @@
 use crate::command::append::RedisCommandAppend;
 use crate::command::copy::RedisCommandCopy;
 use crate::command::dbsize::RedisCommandDbSize;
+use crate::command::decrby::RedisCommandDecrBy;
 use crate::command::del::RedisCommandDel;
 use crate::command::exists::RedisCommandExists;
 use crate::command::flushdb::RedisCommandFlushDb;
@@ -58,6 +59,7 @@ impl Parser {
             "STRLEN" => self.parse_command_strlen(&mut command_iter),
             "LLEN" => self.parse_command_llen(&mut command_iter),
             "LINDEX" => self.parse_command_lindex(&mut command_iter),
+            "DECRBY" => self.parse_command_decrby(&mut command_iter),
             c => Err(format!("Command not implemented: {}", c)),
         }
     }
@@ -180,6 +182,15 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         let index = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandLindex::new(key, index)))
+    }
+
+    fn parse_command_decrby(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        let value = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandDecrBy::new(key, value)))
     }
 }
 
