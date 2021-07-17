@@ -53,4 +53,5 @@ pub enum StorageRequestMessageEnum {
     Persist,
     Terminate,
     DecrBy(String, i32),
+    IncrBy(String, i32),
 }
