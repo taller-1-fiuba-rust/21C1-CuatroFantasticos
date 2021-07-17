@@ -52,4 +52,5 @@ pub enum StorageRequestMessageEnum {
     ExpirationRound,
     Persist,
     Terminate,
+    DecrBy(String, i32),
 }

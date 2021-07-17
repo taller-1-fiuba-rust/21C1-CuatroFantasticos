@@ -15,6 +15,7 @@ pub mod ping;
 pub mod rename;
 pub mod strlen;
 pub mod r#type;
+pub mod decrby;
 
 pub trait RedisCommand {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String>;

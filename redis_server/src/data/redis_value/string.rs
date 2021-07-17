@@ -1,4 +1,5 @@
 use crate::protocol_serialization::ProtocolSerializer;
+use term::terminfo::parser::compiled::parse;
 
 #[derive(Debug, Clone)]
 pub struct RedisValueString {
@@ -9,7 +10,6 @@ impl RedisValueString {
     pub fn get_value(&self) -> String {
         self.contents.clone()
     }
-
     pub fn serialize(&self) -> String {
         self.contents.clone()
     }
