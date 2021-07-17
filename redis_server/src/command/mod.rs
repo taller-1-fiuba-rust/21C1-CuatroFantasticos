@@ -10,6 +10,7 @@ pub mod flushdb;
 pub mod get;
 pub mod getdel;
 pub mod getset;
+pub mod incrby;
 pub mod lindex;
 pub mod llen;
 pub mod ping;

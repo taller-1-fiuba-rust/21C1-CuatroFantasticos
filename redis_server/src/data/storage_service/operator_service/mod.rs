@@ -249,6 +249,40 @@ impl StorageOperatorService {
                         }
                     };
                 }
+                StorageRequestMessageEnum::IncrBy(key, incr_value) => {
+                    match self.storage.mut_get(&key) {
+                        Some(RedisValue::String(old_value)) => {
+                            match old_value.get_value().parse::<i32>() {
+                                Ok(value) => {
+                                    let new_value = value + incr_value;
+                                    old_value.set_value(new_value.to_string());
+                                    let reponse = StorageResponseMessageEnum::Int(new_value);
+                                    let _ = message.respond(reponse);
+                                }
+                                Err(_) => {
+                                    let response = StorageResponseMessageEnum::Error(
+                                        ResponseErrorEnum::NotANumber,
+                                    );
+                                    let _ = message.respond(response);
+                                }
+                            }
+                        }
+                        Some(_) => {
+                            let response =
+                                StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString);
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            let incr_value = incr_value;
+                            self.storage.insert(
+                                &key,
+                                RedisValue::String(RedisValueString::new(incr_value.to_string())),
+                            );
+                            let reponse = StorageResponseMessageEnum::Int(incr_value);
+                            let _ = message.respond(reponse);
+                        }
+                    };
+                }
                 StorageRequestMessageEnum::Strlen(key) => match self.storage.get(&key) {
                     Some(RedisValue::String(value)) => {
                         let response = StorageResponseMessageEnum::Int(value.length() as i32);
