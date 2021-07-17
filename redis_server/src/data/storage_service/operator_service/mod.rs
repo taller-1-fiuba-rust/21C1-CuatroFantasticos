@@ -215,12 +215,12 @@ impl StorageOperatorService {
                     };
                 }
 
-                StorageRequestMessageEnum::DecrBy(key, decr_value) => {
+                StorageRequestMessageEnum::IncrBy(key, incr_value) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(old_value)) => {
                             match old_value.get_value().parse::<i32>() {
                                 Ok(value) => {
-                                    let new_value = value - decr_value;
+                                    let new_value = value + incr_value;
                                     old_value.set_value(new_value.to_string());
                                     let reponse = StorageResponseMessageEnum::Int(new_value);
                                     let _ = message.respond(reponse);
@@ -239,12 +239,12 @@ impl StorageOperatorService {
                             let _ = message.respond(response);
                         }
                         None => {
-                            let decr_value = -decr_value;
+                            let incr_value = incr_value;
                             self.storage.insert(
                                 &key,
-                                RedisValue::String(RedisValueString::new(decr_value.to_string())),
+                                RedisValue::String(RedisValueString::new(incr_value.to_string())),
                             );
-                            let reponse = StorageResponseMessageEnum::Int(decr_value);
+                            let reponse = StorageResponseMessageEnum::Int(incr_value);
                             let _ = message.respond(reponse);
                         }
                     };
