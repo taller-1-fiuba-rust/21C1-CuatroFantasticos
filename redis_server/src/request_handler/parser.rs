@@ -1,13 +1,13 @@
 use crate::command::append::RedisCommandAppend;
 use crate::command::copy::RedisCommandCopy;
 use crate::command::dbsize::RedisCommandDbSize;
-use crate::command::decrby::RedisCommandIncrBy;
 use crate::command::del::RedisCommandDel;
 use crate::command::exists::RedisCommandExists;
 use crate::command::flushdb::RedisCommandFlushDb;
 use crate::command::get::RedisCommandGet;
 use crate::command::getdel::RedisCommandGetDel;
 use crate::command::getset::RedisCommandGetSet;
+use crate::command::incrby::RedisCommandIncrBy;
 use crate::command::lindex::RedisCommandLindex;
 use crate::command::llen::RedisCommandLlen;
 use crate::command::ping::RedisCommandPing;
