@@ -1,6 +1,6 @@
 use crate::command::RedisCommand;
 use crate::data::storage_service::operator_service::accessor::StorageAccessor;
-use crate::data::storage_service::operator_service::request_message::StorageRequestMessageEnum;
+use crate::data::storage_service::operator_service::request_message::StorageAction;
 use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandAppend {
@@ -16,7 +16,7 @@ impl RedisCommandAppend {
 
 impl RedisCommand for RedisCommandAppend {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageRequestMessageEnum::Append(
+        let response = accessor.access(StorageAction::Append(
             self.key.clone(),
             self.new_value.clone(),
         ))?;

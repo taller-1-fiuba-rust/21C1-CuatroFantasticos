@@ -1,5 +1,5 @@
 use crate::data::storage_service::operator_service::request_message::{
-    StorageRequestMessage, StorageRequestMessageEnum,
+    StorageAction, StorageRequestMessage,
 };
 use crate::data::storage_service::operator_service::response_message::StorageResponseMessage;
 use std::sync::mpsc;
@@ -21,10 +21,7 @@ impl StorageAccessor {
         }
     }
 
-    pub fn access(
-        &self,
-        message: StorageRequestMessageEnum,
-    ) -> Result<StorageResponseMessage, String> {
+    pub fn access(&self, message: StorageAction) -> Result<StorageResponseMessage, String> {
         let storage_message =
             StorageRequestMessage::new(message, Some(self.sender_for_storage.clone()));
         match self.sender.send(storage_message) {

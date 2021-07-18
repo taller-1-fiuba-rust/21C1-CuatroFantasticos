@@ -1,6 +1,6 @@
 use crate::protocol_serialization::ProtocolSerializer;
 
-pub enum RedisErrorEnum {
+pub enum RedisError {
     Nil,
     NilArray,
     None,
@@ -16,34 +16,32 @@ pub enum RedisErrorEnum {
     Existent,
 }
 
-impl ProtocolSerializer for RedisErrorEnum {
+impl ProtocolSerializer for RedisError {
     fn protocol_serialize_to_simple_string(&self) -> String {
         match self {
-            RedisErrorEnum::Nil => String::from("$-1\r\n"),
-            RedisErrorEnum::NilArray => String::from("*-1\r\n"),
-            RedisErrorEnum::None => String::from("-NONE\r\n"),
-            RedisErrorEnum::NotAString => {
+            RedisError::Nil => String::from("$-1\r\n"),
+            RedisError::NilArray => String::from("*-1\r\n"),
+            RedisError::None => String::from("-NONE\r\n"),
+            RedisError::NotAString => {
                 String::from("-WRONGTYPE The key does not store a String\r\n")
             }
-            RedisErrorEnum::NotANumber => {
+            RedisError::NotANumber => {
                 String::from("-ERR value is not an integer or out of range\r\n")
             }
-            RedisErrorEnum::NotAList => {
-                String::from("-WRONGTYPE The key does not store a List\r\n")
-            }
-            RedisErrorEnum::NotASet => String::from("-WRONGTYPE The key does not store a Set\r\n"),
-            RedisErrorEnum::NotAListNorSet => {
+            RedisError::NotAList => String::from("-WRONGTYPE The key does not store a List\r\n"),
+            RedisError::NotASet => String::from("-WRONGTYPE The key does not store a Set\r\n"),
+            RedisError::NotAListNorSet => {
                 String::from("-WRONGTYPE The key does not store a List nor a Set\r\n")
             }
-            RedisErrorEnum::NotASetOfNumbers => {
+            RedisError::NotASetOfNumbers => {
                 String::from("-WRONGTYPE The key does not store a Set of numbers\r\n")
             }
-            RedisErrorEnum::NotAListOfNumbers => {
+            RedisError::NotAListOfNumbers => {
                 String::from("-WRONGTYPE The key does not store a List of numbers\r\n")
             }
-            RedisErrorEnum::Unknown => String::from("-UNKNOWN something went wrong\r\n"),
-            RedisErrorEnum::NonExistent => String::from("-NONEXISTENT The key does not exist\r\n"),
-            RedisErrorEnum::Existent => String::from("-EXISTENT The key already exists\r\n"),
+            RedisError::Unknown => String::from("-UNKNOWN something went wrong\r\n"),
+            RedisError::NonExistent => String::from("-NONEXISTENT The key does not exist\r\n"),
+            RedisError::Existent => String::from("-EXISTENT The key already exists\r\n"),
         }
     }
 

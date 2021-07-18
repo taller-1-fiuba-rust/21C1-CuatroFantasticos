@@ -1,6 +1,6 @@
 use crate::command::RedisCommand;
 use crate::data::storage_service::operator_service::accessor::StorageAccessor;
-use crate::data::storage_service::operator_service::request_message::StorageRequestMessageEnum;
+use crate::data::storage_service::operator_service::request_message::StorageAction;
 use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandRename {
@@ -16,7 +16,7 @@ impl RedisCommandRename {
 
 impl RedisCommand for RedisCommandRename {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let rename = accessor.access(StorageRequestMessageEnum::Rename(
+        let rename = accessor.access(StorageAction::Rename(
             self.key.clone(),
             self.new_key.clone(),
         ))?;

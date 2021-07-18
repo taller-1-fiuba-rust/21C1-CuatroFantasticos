@@ -1,6 +1,6 @@
 use crate::command::RedisCommand;
 use crate::data::storage_service::operator_service::accessor::StorageAccessor;
-use crate::data::storage_service::operator_service::request_message::StorageRequestMessageEnum;
+use crate::data::storage_service::operator_service::request_message::StorageAction;
 use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandCopy {
@@ -19,7 +19,7 @@ impl RedisCommandCopy {
 
 impl RedisCommand for RedisCommandCopy {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let copy = accessor.access(StorageRequestMessageEnum::Copy(
+        let copy = accessor.access(StorageAction::Copy(
             self.source_key.clone(),
             self.destination_key.clone(),
         ))?;
