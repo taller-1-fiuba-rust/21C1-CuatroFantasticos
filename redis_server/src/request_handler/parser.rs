@@ -14,6 +14,7 @@ use crate::command::llen::RedisCommandLlen;
 use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
+use crate::command::sort::RedisCommandSort;
 use crate::command::strlen::RedisCommandStrlen;
 use crate::command::RedisCommand;
 use std::str::Split;
@@ -60,6 +61,7 @@ impl Parser {
             "STRLEN" => self.parse_command_strlen(&mut command_iter),
             "LLEN" => self.parse_command_llen(&mut command_iter),
             "LINDEX" => self.parse_command_lindex(&mut command_iter),
+            "SORT" => self.parse_command_sort(&mut command_iter),
             "DECRBY" => self.parse_command_decrby(&mut command_iter),
             "INCRBY" => self.parse_command_incrby(&mut command_iter),
             c => Err(format!("Command not implemented: {}", c)),
@@ -184,6 +186,14 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         let index = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandLindex::new(key, index)))
+    }
+
+    fn parse_command_sort(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandSort::new(key)))
     }
 
     fn parse_command_decrby(
