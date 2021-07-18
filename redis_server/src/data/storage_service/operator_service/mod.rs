@@ -343,6 +343,8 @@ impl StorageOperatorService {
                     for line in self.storage.serialize() {
                         let _ = file.write(&line.as_bytes());
                     }
+                    let response = StorageResult::Ok;
+                    let _ = message.respond(response);
                 }
                 StorageAction::Terminate => {
                     break;

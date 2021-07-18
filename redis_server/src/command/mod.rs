@@ -17,6 +17,7 @@ pub mod persist;
 pub mod ping;
 pub mod rename;
 pub mod sadd;
+pub mod save;
 pub mod sort;
 pub mod strlen;
 pub mod touch;

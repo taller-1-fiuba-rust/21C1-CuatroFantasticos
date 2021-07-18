@@ -16,6 +16,7 @@ use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::sadd::RedisCommandSAdd;
+use crate::command::save::RedisCommandSave;
 use crate::command::sort::RedisCommandSort;
 use crate::command::strlen::RedisCommandStrlen;
 use crate::command::touch::RedisCommandTouch;
@@ -70,6 +71,7 @@ impl Parser {
             "TOUCH" => self.parse_command_touch(&mut command_iter),
             "SADD" => self.parse_command_sadd(&mut command_iter, command_qty),
             "PERSIST" => self.parse_command_persist(&mut command_iter),
+            "SAVE" => Ok(Box::new(RedisCommandSave::new())),
             c => Err(format!("Command not implemented: {}", c)),
         }
     }
