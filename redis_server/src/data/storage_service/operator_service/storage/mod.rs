@@ -74,6 +74,10 @@ impl RedisStorage {
         storage_value.map(|v| v.access())
     }
 
+    pub fn touch(&mut self, key: &str) {
+        self.values.get_mut(key).unwrap().access();
+    }
+
     pub fn length(&self) -> usize {
         self.values.len()
     }
