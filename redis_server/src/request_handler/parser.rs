@@ -17,6 +17,7 @@ use crate::command::rename::RedisCommandRename;
 use crate::command::sadd::RedisCommandSAdd;
 use crate::command::sort::RedisCommandSort;
 use crate::command::strlen::RedisCommandStrlen;
+use crate::command::touch::RedisCommandTouch;
 use crate::command::RedisCommand;
 use std::str::Split;
 
@@ -65,6 +66,7 @@ impl Parser {
             "SORT" => self.parse_command_sort(&mut command_iter),
             "DECRBY" => self.parse_command_decrby(&mut command_iter),
             "INCRBY" => self.parse_command_incrby(&mut command_iter),
+            "TOUCH" => self.parse_command_touch(&mut command_iter),
             "SADD" => self.parse_command_sadd(&mut command_iter, command_qty),
             c => Err(format!("Command not implemented: {}", c)),
         }
@@ -148,6 +150,7 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandGet::new(key)))
     }
+
     fn parse_command_strlen(
         &self,
         command_iter: &mut Split<&str>,
@@ -214,6 +217,14 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandIncrBy::new(key, value)))
+    }
+
+    fn parse_command_touch(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandTouch::new(key)))
     }
     fn parse_command_sadd(
         &self,
