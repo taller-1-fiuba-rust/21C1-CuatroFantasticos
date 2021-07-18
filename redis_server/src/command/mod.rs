@@ -13,6 +13,7 @@ pub mod getset;
 pub mod incrby;
 pub mod lindex;
 pub mod llen;
+pub mod persist;
 pub mod ping;
 pub mod rename;
 pub mod sadd;

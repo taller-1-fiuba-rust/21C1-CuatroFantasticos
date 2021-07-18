@@ -93,6 +93,11 @@ impl StorageOperatorService {
                     let response = StorageResult::Bool(value);
                     let _ = message.respond(response);
                 }
+                StorageAction::Persist(key) => {
+                    let value = self.storage.persist(&key).is_some();
+                    let response = StorageResult::Bool(value);
+                    let _ = message.respond(response);
+                }
                 StorageAction::Get(key) => {
                     let value = self.storage.access(&key).cloned();
                     match value {
@@ -333,7 +338,7 @@ impl StorageOperatorService {
                 StorageAction::ExpirationRound => {
                     todo!()
                 }
-                StorageAction::Persist => {
+                StorageAction::Save => {
                     let mut file = File::create("./dump.rdb").expect("could not create file");
                     for line in self.storage.serialize() {
                         let _ = file.write(&line.as_bytes());

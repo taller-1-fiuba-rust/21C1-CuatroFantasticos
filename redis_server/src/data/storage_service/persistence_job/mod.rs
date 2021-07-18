@@ -14,7 +14,7 @@ impl PersistenceJob {
 
 impl RecurringJob for PersistenceJob {
     fn execute_job(&self) -> Result<(), RecurringJobError> {
-        match self.accessor.access(StorageAction::Persist) {
+        match self.accessor.access(StorageAction::Save) {
             Ok(_) => Ok(()),
             Err(_) => Err(RecurringJobError {}),
         }
