@@ -88,10 +88,7 @@ impl StorageOperatorService {
                     }
                 }
                 StorageAction::Touch(key) => {
-                    let value = self.storage.contains_key(&key);
-                    if value {
-                        self.storage.touch(&key);
-                    }
+                    let value = self.storage.access(&key).is_some();
                     let response = StorageResult::Bool(value);
                     let _ = message.respond(response);
                 }
