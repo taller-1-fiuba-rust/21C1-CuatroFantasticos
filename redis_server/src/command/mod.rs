@@ -15,6 +15,7 @@ pub mod lindex;
 pub mod llen;
 pub mod ping;
 pub mod rename;
+pub mod sadd;
 pub mod sort;
 pub mod strlen;
 pub mod r#type;

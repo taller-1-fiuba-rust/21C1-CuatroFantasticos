@@ -14,6 +14,7 @@ use crate::command::llen::RedisCommandLlen;
 use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
+use crate::command::sadd::RedisCommandSAdd;
 use crate::command::sort::RedisCommandSort;
 use crate::command::strlen::RedisCommandStrlen;
 use crate::command::RedisCommand;
@@ -40,7 +41,7 @@ impl Parser {
     fn parse_command(
         &self,
         mut command_iter: Split<&str>,
-        _command_qty: usize,
+        command_qty: usize,
     ) -> Result<Box<dyn RedisCommand>, String> {
         let command_type = self.parse_string(&mut command_iter)?;
         match command_type.to_uppercase().as_str() {
@@ -64,6 +65,7 @@ impl Parser {
             "SORT" => self.parse_command_sort(&mut command_iter),
             "DECRBY" => self.parse_command_decrby(&mut command_iter),
             "INCRBY" => self.parse_command_incrby(&mut command_iter),
+            "SADD" => self.parse_command_sadd(&mut command_iter, command_qty),
             c => Err(format!("Command not implemented: {}", c)),
         }
     }
@@ -212,6 +214,19 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandIncrBy::new(key, value)))
+    }
+    fn parse_command_sadd(
+        &self,
+        command_iter: &mut Split<&str>,
+        command_qty: usize,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        let mut members = Vec::<String>::new();
+        for _ in 1..(command_qty - 1) {
+            let new_member = self.parse_string(command_iter)?;
+            members.push(new_member);
+        }
+        Ok(Box::new(RedisCommandSAdd::new(key, members)))
     }
 }
 
