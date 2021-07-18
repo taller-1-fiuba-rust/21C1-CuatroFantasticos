@@ -13,7 +13,7 @@ impl RedisCommandDbSize {
 
 impl RedisCommand for RedisCommandDbSize {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageRequestMessageEnum::GetDbsize)?;
+        let response = accessor.access(StorageRequestMessageEnum::Dbsize)?;
         let response = response.get_value().protocol_serialize_to_int();
         Ok(response)
     }

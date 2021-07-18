@@ -35,7 +35,7 @@ impl StorageRequestMessage {
 
 #[derive(Clone)]
 pub enum StorageRequestMessageEnum {
-    GetDbsize,
+    Dbsize,
     FlushDb,
     Get(String),
     Lindex(String, i32),

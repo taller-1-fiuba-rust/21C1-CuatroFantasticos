@@ -12,6 +12,12 @@ use std::fmt::Debug;
 pub mod expiration_map;
 pub mod value;
 
+const KEY: usize = 0;
+const EXPIRATION: usize = 1;
+const LAST_ACCESS_TIME: usize = 2;
+const TYPE: usize = 3;
+const VALUE: usize = 4;
+
 #[derive(Debug, Default)]
 pub struct RedisStorage {
     values: HashMap<String, StorageValue>,
@@ -33,6 +39,20 @@ impl RedisStorage {
     pub fn insert(&mut self, key: &str, value: RedisValue) -> Option<RedisValue> {
         self.clean_if_expirated(key);
         let storage_value = StorageValue::new(value);
+        let old_value = self.values.insert(key.to_string(), storage_value);
+        let _ = self.expirations.remove(key);
+        old_value.map(|v| v.extract_value())
+    }
+
+    pub fn insert_with_last_access_time(
+        &mut self,
+        key: &str,
+        value: RedisValue,
+        last_access_time: u128,
+    ) -> Option<RedisValue> {
+        self.clean_if_expirated(key);
+        let mut storage_value = StorageValue::new(value);
+        storage_value.set_last_access_time(last_access_time);
         let old_value = self.values.insert(key.to_string(), storage_value);
         let _ = self.expirations.remove(key);
         old_value.map(|v| v.extract_value())
@@ -84,21 +104,21 @@ impl RedisStorage {
     }
 
     pub fn serialize(&self) -> Vec<String> {
-        todo!()
-        /*
         let mut contents = Vec::new();
         for (key, value) in &self.values {
-            let value = value.peek();
-            match value {
-                Some(value) => {
-                    let line = format!("{}: {}", key, value.serialize());
-                    contents.push(line);
-                }
-                None => continue,
-            }
+            let actual_value = value.peek();
+            let expiration = self.expirations.get(key).unwrap_or(0);
+            let line = format!(
+                "{}: {}: {}: {}: {}\n",
+                key,
+                expiration,
+                value.last_access_time(),
+                actual_value.get_type(),
+                actual_value.serialize()
+            );
+            contents.push(line);
         }
         contents
-         */
     }
 
     pub fn deserialize(contents: String) -> RedisStorage {
@@ -106,20 +126,43 @@ impl RedisStorage {
         for line in contents.lines() {
             let split = line.split(':');
             let parsed_line: Vec<&str> = split.collect();
-            match parsed_line[1].trim() {
-                "string" => {
-                    let value = RedisValueString::new(parsed_line[2].trim().to_owned());
-                    storage.insert(parsed_line[0].trim(), RedisValue::String(value));
+            let key = parsed_line[KEY].trim();
+            let last_access_time = parsed_line[LAST_ACCESS_TIME]
+                .trim()
+                .parse::<u128>()
+                .unwrap();
+            match parsed_line[TYPE].trim() {
+                "String" => {
+                    let value = RedisValueString::new(parsed_line[VALUE].trim().to_owned());
+                    storage.insert_with_last_access_time(
+                        key,
+                        RedisValue::String(value),
+                        last_access_time,
+                    );
                 }
-                "list" => {
-                    let value = RedisValueList::new(parsed_line[2].trim().to_owned());
-                    storage.insert(parsed_line[0].trim(), RedisValue::List(value));
+                "List" => {
+                    let value = RedisValueList::new(parsed_line[VALUE].trim().to_owned());
+                    storage.insert_with_last_access_time(
+                        key,
+                        RedisValue::List(value),
+                        last_access_time,
+                    );
                 }
-                "set" => {
-                    let value = RedisValueSet::new(parsed_line[2].trim().to_owned());
-                    storage.insert(parsed_line[0].trim(), RedisValue::Set(value));
+                "Set" => {
+                    let value = RedisValueSet::new(parsed_line[VALUE].trim().to_owned());
+                    storage.insert_with_last_access_time(
+                        key.trim(),
+                        RedisValue::Set(value),
+                        last_access_time,
+                    );
                 }
                 _ => println!("Data type not supported in deserialization"),
+            }
+            let expiration = parsed_line[EXPIRATION].trim().parse::<u128>().unwrap();
+            if expiration == !0 {
+                let _ = storage
+                    .expirations
+                    .expire_at(key.parse().unwrap(), expiration);
             }
         }
         storage

@@ -1,5 +1,4 @@
-key: type: value
-hola: string: chau anda?
-messi: string: rve
-list: list: loque, quieras, !
-hash: set: asd, dsa
+hola: 0: 0: String: chau anda?
+messi: 0: 0: String: rve
+list: 0: 0: List: loque, quieras, !
+hash: 0: 0: Set: asd, dsa
