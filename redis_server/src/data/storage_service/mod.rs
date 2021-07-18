@@ -1,7 +1,7 @@
 use crate::data::storage_service::expiration_job::ExpirationJob;
 use crate::data::storage_service::operator_service::accessor::StorageAccessor;
 use crate::data::storage_service::operator_service::request_message::{
-    StorageRequestMessage, StorageRequestMessageEnum,
+    StorageAction, StorageRequestMessage,
 };
 use crate::data::storage_service::operator_service::StorageOperatorService;
 use crate::data::storage_service::persistence_job::PersistenceJob;
@@ -58,10 +58,7 @@ impl Drop for StorageService {
     fn drop(&mut self) {
         let _ = self
             .operator_request_sender
-            .send(StorageRequestMessage::new(
-                StorageRequestMessageEnum::Terminate,
-                None,
-            ));
+            .send(StorageRequestMessage::new(StorageAction::Terminate, None));
         if let Some(th) = self.operator_thread_handler.take() {
             th.join().unwrap();
         }

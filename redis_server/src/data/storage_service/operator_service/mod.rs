@@ -3,18 +3,18 @@ use std::sync::mpsc;
 use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
 use crate::data::storage_service::operator_service::request_message::{
-    StorageRequestMessage, StorageRequestMessageEnum,
+    StorageAction, StorageRequestMessage,
 };
-use crate::data::storage_service::operator_service::response_error_enum::RedisErrorEnum;
-use crate::data::storage_service::operator_service::response_message::StorageResponseMessageEnum;
+use crate::data::storage_service::operator_service::response_message::StorageResult;
+use crate::data::storage_service::operator_service::result_error::RedisError;
 use crate::data::storage_service::operator_service::storage::RedisStorage;
 use std::fs::File;
 use std::io::{Read, Write};
 
 pub mod accessor;
 pub mod request_message;
-pub mod response_error_enum;
 pub mod response_message;
+pub mod result_error;
 pub mod storage;
 
 pub struct StorageOperatorService {
@@ -43,120 +43,116 @@ impl StorageOperatorService {
     pub fn init(mut self) {
         for message in self.receiver {
             match message.get_message() {
-                StorageRequestMessageEnum::Dbsize => {
+                StorageAction::Dbsize => {
                     let value = self.storage.length();
-                    let response = StorageResponseMessageEnum::Int(value as i32);
+                    let response = StorageResult::Int(value as i32);
                     let _ = message.respond(response);
                 }
-                StorageRequestMessageEnum::FlushDb => {
+                StorageAction::FlushDb => {
                     self.storage.clear();
-                    let response = StorageResponseMessageEnum::Ok;
+                    let response = StorageResult::Ok;
                     let _ = message.respond(response);
                 }
-                StorageRequestMessageEnum::Rename(key, new_key) => {
+                StorageAction::Rename(key, new_key) => {
                     if let Some(value) = self.storage.remove(&key) {
                         self.storage.insert(&new_key, value);
-                        let response = StorageResponseMessageEnum::Ok;
+                        let response = StorageResult::Ok;
                         let _ = message.respond(response);
                     } else {
-                        let response =
-                            StorageResponseMessageEnum::Error(RedisErrorEnum::NonExistent);
+                        let response = StorageResult::Error(RedisError::NonExistent);
                         let _ = message.respond(response);
                     }
                 }
-                StorageRequestMessageEnum::Exists(key) => {
+                StorageAction::Exists(key) => {
                     let value = self.storage.contains_key(&key);
-                    let response = StorageResponseMessageEnum::Bool(value);
+                    let response = StorageResult::Bool(value);
                     let _ = message.respond(response);
                 }
-                StorageRequestMessageEnum::Del(key) => {
+                StorageAction::Del(key) => {
                     let result = self.storage.contains_key(&key);
-                    let response = StorageResponseMessageEnum::Bool(result);
+                    let response = StorageResult::Bool(result);
                     self.storage.remove(&key);
                     let _ = message.respond(response);
                 }
-                StorageRequestMessageEnum::Type(key) => {
+                StorageAction::Type(key) => {
                     let value = self.storage.access(&key).cloned();
                     match value {
                         Some(value) => {
-                            let response = StorageResponseMessageEnum::RedisValue(value);
+                            let response = StorageResult::RedisValue(value);
                             let _ = message.respond(response);
                         }
                         None => {
-                            let response = StorageResponseMessageEnum::Error(RedisErrorEnum::None);
+                            let response = StorageResult::Error(RedisError::None);
                             let _ = message.respond(response);
                         }
                     }
                 }
-                StorageRequestMessageEnum::Get(key) => {
+                StorageAction::Get(key) => {
                     let value = self.storage.access(&key).cloned();
                     match value {
                         Some(value) => {
-                            let response = StorageResponseMessageEnum::RedisValue(value);
+                            let response = StorageResult::RedisValue(value);
                             let _ = message.respond(response);
                         }
                         None => {
-                            let response =
-                                StorageResponseMessageEnum::Error(RedisErrorEnum::NonExistent);
+                            let response = StorageResult::Error(RedisError::NonExistent);
                             let _ = message.respond(response);
                         }
                     }
                 }
-                StorageRequestMessageEnum::Copy(source_key, destination_key) => {
+                StorageAction::Copy(source_key, destination_key) => {
                     let destination = self.storage.contains_key(&destination_key);
                     if destination {
-                        let response = StorageResponseMessageEnum::Error(RedisErrorEnum::Existent);
+                        let response = StorageResult::Error(RedisError::Existent);
                         let _ = message.respond(response);
                     } else {
                         let value = self.storage.access(&source_key).cloned();
                         match value {
                             Some(value) => {
                                 self.storage.insert(&destination_key, value);
-                                let response = StorageResponseMessageEnum::Bool(true);
+                                let response = StorageResult::Bool(true);
                                 let _ = message.respond(response);
                             }
                             None => {
-                                let response = StorageResponseMessageEnum::Bool(false);
+                                let response = StorageResult::Bool(false);
                                 let _ = message.respond(response);
                             }
                         }
                     }
                 }
-                StorageRequestMessageEnum::Lindex(key, index) => match self.storage.get(&key) {
+                StorageAction::Lindex(key, index) => match self.storage.get(&key) {
                     Some(RedisValue::List(value)) => {
                         let result = value.get_index(index);
                         match result {
                             Some(value) => {
-                                let response = StorageResponseMessageEnum::String(value);
+                                let response = StorageResult::String(value);
                                 let _ = message.respond(response);
                             }
                             None => {
-                                let response =
-                                    StorageResponseMessageEnum::Error(RedisErrorEnum::Nil);
+                                let response = StorageResult::Error(RedisError::Nil);
                                 let _ = message.respond(response);
                             }
                         }
                     }
                     Some(_) => {
-                        let response = StorageResponseMessageEnum::Error(RedisErrorEnum::NotAList);
+                        let response = StorageResult::Error(RedisError::NotAList);
                         let _ = message.respond(response);
                     }
                     None => {
-                        let response = StorageResponseMessageEnum::Error(RedisErrorEnum::Nil);
+                        let response = StorageResult::Error(RedisError::Nil);
                         let _ = message.respond(response);
                     }
                 },
 
-                StorageRequestMessageEnum::Append(key, new_value) => {
+                StorageAction::Append(key, new_value) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(value)) => {
                             let result = value.append(&new_value);
-                            let response = StorageResponseMessageEnum::Int(result.len() as i32);
+                            let response = StorageResult::Int(result.len() as i32);
                             let _ = message.respond(response);
                         }
                         Some(_) => {
-                            let response =
-                                StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
+                            let response = StorageResult::Error(RedisError::NotAString);
                             let _ = message.respond(response);
                         }
                         None => {
@@ -164,74 +160,69 @@ impl StorageOperatorService {
                                 &key,
                                 RedisValue::String(RedisValueString::new(new_value.clone())),
                             );
-                            let response = StorageResponseMessageEnum::Int(new_value.len() as i32);
+                            let response = StorageResult::Int(new_value.len() as i32);
                             let _ = message.respond(response);
                         }
                     };
                 }
 
-                StorageRequestMessageEnum::GetDel(key) => {
+                StorageAction::GetDel(key) => {
                     match self.storage.get(&key) {
                         Some(RedisValue::String(value)) => {
-                            let response = StorageResponseMessageEnum::String(value.get_value());
+                            let response = StorageResult::String(value.get_value());
                             self.storage.remove(&key);
                             let _ = message.respond(response);
                         }
                         Some(_) => {
-                            let response =
-                                StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
+                            let response = StorageResult::Error(RedisError::NotAString);
                             let _ = message.respond(response);
                         }
                         None => {
-                            let response = StorageResponseMessageEnum::Error(RedisErrorEnum::Nil);
+                            let response = StorageResult::Error(RedisError::Nil);
                             let _ = message.respond(response);
                         }
                     };
                 }
 
-                StorageRequestMessageEnum::GetSet(key, new_value) => {
+                StorageAction::GetSet(key, new_value) => {
                     match self.storage.get(&key) {
                         Some(RedisValue::String(value)) => {
-                            let response = StorageResponseMessageEnum::String(value.get_value());
+                            let response = StorageResult::String(value.get_value());
                             self.storage
                                 .insert(&key, RedisValue::String(RedisValueString::new(new_value)));
                             let _ = message.respond(response);
                         }
                         Some(_) => {
-                            let response =
-                                StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
+                            let response = StorageResult::Error(RedisError::NotAString);
                             let _ = message.respond(response);
                         }
                         None => {
                             self.storage
                                 .insert(&key, RedisValue::String(RedisValueString::new(new_value)));
-                            let response = StorageResponseMessageEnum::Error(RedisErrorEnum::Nil);
+                            let response = StorageResult::Error(RedisError::Nil);
                             let _ = message.respond(response);
                         }
                     };
                 }
 
-                StorageRequestMessageEnum::DecrBy(key, decr_value) => {
+                StorageAction::DecrBy(key, decr_value) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(old_value)) => {
                             match old_value.get_value().parse::<i32>() {
                                 Ok(value) => {
                                     let new_value = value - decr_value;
                                     old_value.set_value(new_value.to_string());
-                                    let reponse = StorageResponseMessageEnum::Int(new_value);
+                                    let reponse = StorageResult::Int(new_value);
                                     let _ = message.respond(reponse);
                                 }
                                 Err(_) => {
-                                    let response = StorageResponseMessageEnum::Error(
-                                        RedisErrorEnum::NotANumber,
-                                    );
+                                    let response = StorageResult::Error(RedisError::NotANumber);
                                     let _ = message.respond(response);
                                 }
                             }
                         }
                         Some(_) => {
-                            let response =
-                                StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
+                            let response = StorageResult::Error(RedisError::NotAString);
                             let _ = message.respond(response);
                         }
                         None => {
@@ -240,32 +231,29 @@ impl StorageOperatorService {
                                 &key,
                                 RedisValue::String(RedisValueString::new(decr_value.to_string())),
                             );
-                            let reponse = StorageResponseMessageEnum::Int(decr_value);
+                            let reponse = StorageResult::Int(decr_value);
                             let _ = message.respond(reponse);
                         }
                     };
                 }
-                StorageRequestMessageEnum::IncrBy(key, incr_value) => {
+                StorageAction::IncrBy(key, incr_value) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(old_value)) => {
                             match old_value.get_value().parse::<i32>() {
                                 Ok(value) => {
                                     let new_value = value + incr_value;
                                     old_value.set_value(new_value.to_string());
-                                    let reponse = StorageResponseMessageEnum::Int(new_value);
+                                    let reponse = StorageResult::Int(new_value);
                                     let _ = message.respond(reponse);
                                 }
                                 Err(_) => {
-                                    let response = StorageResponseMessageEnum::Error(
-                                        RedisErrorEnum::NotANumber,
-                                    );
+                                    let response = StorageResult::Error(RedisError::NotANumber);
                                     let _ = message.respond(response);
                                 }
                             }
                         }
                         Some(_) => {
-                            let response =
-                                StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
+                            let response = StorageResult::Error(RedisError::NotAString);
                             let _ = message.respond(response);
                         }
                         None => {
@@ -274,51 +262,50 @@ impl StorageOperatorService {
                                 &key,
                                 RedisValue::String(RedisValueString::new(incr_value.to_string())),
                             );
-                            let reponse = StorageResponseMessageEnum::Int(incr_value);
+                            let reponse = StorageResult::Int(incr_value);
                             let _ = message.respond(reponse);
                         }
                     };
                 }
-                StorageRequestMessageEnum::Strlen(key) => match self.storage.get(&key) {
+                StorageAction::Strlen(key) => match self.storage.get(&key) {
                     Some(RedisValue::String(value)) => {
-                        let response = StorageResponseMessageEnum::Int(value.length() as i32);
+                        let response = StorageResult::Int(value.length() as i32);
                         let _ = message.respond(response);
                     }
                     Some(_) => {
-                        let response =
-                            StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
+                        let response = StorageResult::Error(RedisError::NotAString);
                         let _ = message.respond(response);
                     }
                     None => {
-                        let response = StorageResponseMessageEnum::Int(0);
+                        let response = StorageResult::Int(0);
                         let _ = message.respond(response);
                     }
                 },
 
-                StorageRequestMessageEnum::Llen(key) => match self.storage.access(&key) {
+                StorageAction::Llen(key) => match self.storage.access(&key) {
                     Some(RedisValue::List(value)) => {
-                        let response = StorageResponseMessageEnum::Int(value.length() as i32);
+                        let response = StorageResult::Int(value.length() as i32);
                         let _ = message.respond(response);
                     }
                     Some(_) => {
-                        let response = StorageResponseMessageEnum::Error(RedisErrorEnum::NotAList);
+                        let response = StorageResult::Error(RedisError::NotAList);
                         let _ = message.respond(response);
                     }
                     None => {
-                        let response = StorageResponseMessageEnum::Int(0);
+                        let response = StorageResult::Int(0);
                         let _ = message.respond(response);
                     }
                 },
-                StorageRequestMessageEnum::ExpirationRound => {
+                StorageAction::ExpirationRound => {
                     todo!()
                 }
-                StorageRequestMessageEnum::Persist => {
+                StorageAction::Persist => {
                     let mut file = File::create("./dump.rdb").expect("could not create file");
                     for line in self.storage.serialize() {
                         let _ = file.write(&line.as_bytes());
                     }
                 }
-                StorageRequestMessageEnum::Terminate => {
+                StorageAction::Terminate => {
                     break;
                 }
             }

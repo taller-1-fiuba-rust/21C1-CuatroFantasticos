@@ -1,7 +1,7 @@
 use crate::command::RedisCommand;
 use crate::data::storage_service::operator_service::accessor::StorageAccessor;
-use crate::data::storage_service::operator_service::request_message::StorageRequestMessageEnum;
-use crate::data::storage_service::operator_service::response_message::StorageResponseMessageEnum;
+use crate::data::storage_service::operator_service::request_message::StorageAction;
+use crate::data::storage_service::operator_service::response_message::StorageResult;
 use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandType {
@@ -16,9 +16,9 @@ impl RedisCommandType {
 
 impl RedisCommand for RedisCommandType {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageRequestMessageEnum::Type(self.key.clone()))?;
+        let response = accessor.access(StorageAction::Type(self.key.clone()))?;
         let response = match response.get_value() {
-            StorageResponseMessageEnum::RedisValue(value) => {
+            StorageResult::RedisValue(value) => {
                 value.get_type().protocol_serialize_to_simple_string()
             }
             value => value.protocol_serialize_to_simple_string(),

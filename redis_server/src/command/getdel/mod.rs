@@ -1,6 +1,6 @@
 use crate::command::RedisCommand;
 use crate::data::storage_service::operator_service::accessor::StorageAccessor;
-use crate::data::storage_service::operator_service::request_message::StorageRequestMessageEnum;
+use crate::data::storage_service::operator_service::request_message::StorageAction;
 use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandGetDel {
@@ -15,7 +15,7 @@ impl RedisCommandGetDel {
 
 impl RedisCommand for RedisCommandGetDel {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageRequestMessageEnum::GetDel(self.key.clone()))?;
+        let response = accessor.access(StorageAction::GetDel(self.key.clone()))?;
         let response = response.get_value().protocol_serialize_to_bulk_string();
         Ok(response)
     }
