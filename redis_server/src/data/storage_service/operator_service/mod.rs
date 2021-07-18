@@ -8,7 +8,8 @@ use crate::data::storage_service::operator_service::request_message::{
 use crate::data::storage_service::operator_service::response_error_enum::RedisErrorEnum;
 use crate::data::storage_service::operator_service::response_message::StorageResponseMessageEnum;
 use crate::data::storage_service::operator_service::storage::RedisStorage;
-use std::io::Read;
+use std::fs::File;
+use std::io::{Read, Write};
 
 pub mod accessor;
 pub mod request_message;
@@ -42,7 +43,7 @@ impl StorageOperatorService {
     pub fn init(mut self) {
         for message in self.receiver {
             match message.get_message() {
-                StorageRequestMessageEnum::GetDbsize => {
+                StorageRequestMessageEnum::Dbsize => {
                     let value = self.storage.length();
                     let response = StorageResponseMessageEnum::Int(value as i32);
                     let _ = message.respond(response);
@@ -312,7 +313,10 @@ impl StorageOperatorService {
                     todo!()
                 }
                 StorageRequestMessageEnum::Persist => {
-                    todo!()
+                    let mut file = File::create("./dump.rdb").expect("could not create file");
+                    for line in self.storage.serialize() {
+                        let _ = file.write(&line.as_bytes());
+                    }
                 }
                 StorageRequestMessageEnum::Terminate => {
                     break;

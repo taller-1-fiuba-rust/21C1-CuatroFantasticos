@@ -38,4 +38,8 @@ impl ExpirationMap {
     pub fn clear(&mut self) {
         self.map.clear();
     }
+
+    pub fn get(&self, key: &str) -> Option<u128> {
+        self.map.get(key).cloned()
+    }
 }

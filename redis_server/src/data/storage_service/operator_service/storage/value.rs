@@ -38,6 +38,10 @@ impl StorageValue {
     pub fn extract_value(self) -> RedisValue {
         self.redis_value
     }
+
+    pub fn set_last_access_time(&mut self, value: u128) {
+        self.last_access_time = value;
+    }
 }
 
 #[cfg(test)]
