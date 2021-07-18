@@ -10,6 +10,10 @@ impl RedisValueString {
         self.contents.clone()
     }
 
+    pub fn set_value(&mut self, value: String) {
+        self.contents = value
+    }
+
     pub fn serialize(&self) -> String {
         self.contents.clone()
     }

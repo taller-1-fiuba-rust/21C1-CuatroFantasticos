@@ -44,7 +44,7 @@ impl StorageOperatorService {
             match message.get_message() {
                 StorageRequestMessageEnum::GetDbsize => {
                     let value = self.storage.length();
-                    let response = StorageResponseMessageEnum::Int(value);
+                    let response = StorageResponseMessageEnum::Int(value as i32);
                     let _ = message.respond(response);
                 }
                 StorageRequestMessageEnum::FlushDb => {
@@ -150,7 +150,7 @@ impl StorageOperatorService {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(value)) => {
                             let result = value.append(&new_value);
-                            let response = StorageResponseMessageEnum::Int(result.len());
+                            let response = StorageResponseMessageEnum::Int(result.len() as i32);
                             let _ = message.respond(response);
                         }
                         Some(_) => {
@@ -163,7 +163,7 @@ impl StorageOperatorService {
                                 &key,
                                 RedisValue::String(RedisValueString::new(new_value.clone())),
                             );
-                            let response = StorageResponseMessageEnum::Int(new_value.len());
+                            let response = StorageResponseMessageEnum::Int(new_value.len() as i32);
                             let _ = message.respond(response);
                         }
                     };
@@ -210,9 +210,77 @@ impl StorageOperatorService {
                     };
                 }
 
+                StorageRequestMessageEnum::DecrBy(key, decr_value) => {
+                    match self.storage.mut_get(&key) {
+                        Some(RedisValue::String(old_value)) => {
+                            match old_value.get_value().parse::<i32>() {
+                                Ok(value) => {
+                                    let new_value = value - decr_value;
+                                    old_value.set_value(new_value.to_string());
+                                    let reponse = StorageResponseMessageEnum::Int(new_value);
+                                    let _ = message.respond(reponse);
+                                }
+                                Err(_) => {
+                                    let response = StorageResponseMessageEnum::Error(
+                                        RedisErrorEnum::NotANumber,
+                                    );
+                                    let _ = message.respond(response);
+                                }
+                            }
+                        }
+                        Some(_) => {
+                            let response =
+                                StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            let decr_value = -decr_value;
+                            self.storage.insert(
+                                &key,
+                                RedisValue::String(RedisValueString::new(decr_value.to_string())),
+                            );
+                            let reponse = StorageResponseMessageEnum::Int(decr_value);
+                            let _ = message.respond(reponse);
+                        }
+                    };
+                }
+                StorageRequestMessageEnum::IncrBy(key, incr_value) => {
+                    match self.storage.mut_get(&key) {
+                        Some(RedisValue::String(old_value)) => {
+                            match old_value.get_value().parse::<i32>() {
+                                Ok(value) => {
+                                    let new_value = value + incr_value;
+                                    old_value.set_value(new_value.to_string());
+                                    let reponse = StorageResponseMessageEnum::Int(new_value);
+                                    let _ = message.respond(reponse);
+                                }
+                                Err(_) => {
+                                    let response = StorageResponseMessageEnum::Error(
+                                        RedisErrorEnum::NotANumber,
+                                    );
+                                    let _ = message.respond(response);
+                                }
+                            }
+                        }
+                        Some(_) => {
+                            let response =
+                                StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            let incr_value = incr_value;
+                            self.storage.insert(
+                                &key,
+                                RedisValue::String(RedisValueString::new(incr_value.to_string())),
+                            );
+                            let reponse = StorageResponseMessageEnum::Int(incr_value);
+                            let _ = message.respond(reponse);
+                        }
+                    };
+                }
                 StorageRequestMessageEnum::Strlen(key) => match self.storage.get(&key) {
                     Some(RedisValue::String(value)) => {
-                        let response = StorageResponseMessageEnum::Int(value.length());
+                        let response = StorageResponseMessageEnum::Int(value.length() as i32);
                         let _ = message.respond(response);
                     }
                     Some(_) => {
@@ -228,7 +296,7 @@ impl StorageOperatorService {
 
                 StorageRequestMessageEnum::Llen(key) => match self.storage.access(&key) {
                     Some(RedisValue::List(value)) => {
-                        let response = StorageResponseMessageEnum::Int(value.length());
+                        let response = StorageResponseMessageEnum::Int(value.length() as i32);
                         let _ = message.respond(response);
                     }
                     Some(_) => {
