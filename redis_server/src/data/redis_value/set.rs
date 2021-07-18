@@ -24,6 +24,15 @@ impl RedisValueSet {
         String::from("Set")
     }
 
+    pub fn add(&mut self, member: String) -> i32 {
+        let added = self.contents.insert(member);
+        if added {
+            1
+        } else {
+            0
+        }
+    }
+
     pub fn sort(&self) -> Result<Vec<String>, RedisError> {
         let mut contents: Vec<i32> = vec![];
         for x in &self.contents {
@@ -53,14 +62,24 @@ impl ProtocolSerializer for RedisValueSet {
 }
 
 impl RedisValueSet {
-    pub fn new(contents_string: String) -> RedisValueSet {
+    pub fn new_with_contents(contents_string: String) -> RedisValueSet {
         let mut contents = HashSet::new();
         let split = contents_string.split(',');
-        let parsed_line: Vec<&str> = split.collect();
-        for value in parsed_line {
-            contents.insert(value.trim().to_owned());
+        for value in split {
+            contents.insert(value.to_string());
         }
         RedisValueSet { contents }
+    }
+
+    pub fn new() -> RedisValueSet {
+        let contents = HashSet::<String>::new();
+        RedisValueSet { contents }
+    }
+}
+
+impl Default for RedisValueSet {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -71,14 +90,14 @@ mod tests {
     #[test]
     fn test_create_empty_redis_value() {
         let string = String::from("");
-        let redis_value_set = RedisValueSet::new(string.clone());
+        let redis_value_set = RedisValueSet::new_with_contents(string.clone());
         assert_eq!(redis_value_set.serialize(), string);
     }
 
     #[test]
     fn test_create_redis_value() {
         let string = String::from("hola");
-        let redis_value_set = RedisValueSet::new(string.clone());
+        let redis_value_set = RedisValueSet::new_with_contents(string.clone());
         assert_eq!(redis_value_set.serialize(), string);
     }
 }

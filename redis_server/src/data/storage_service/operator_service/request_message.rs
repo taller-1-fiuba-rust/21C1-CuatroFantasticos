@@ -51,6 +51,7 @@ pub enum StorageAction {
     Llen(String),
     ExpirationRound,
     Persist,
+    SAdd(String, Vec<String>),
     Terminate,
     DecrBy(String, i32),
     IncrBy(String, i32),

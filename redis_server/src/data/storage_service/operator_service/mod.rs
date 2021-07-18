@@ -1,5 +1,6 @@
 use std::sync::mpsc;
 
+use crate::data::redis_value::set::RedisValueSet;
 use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
 use crate::data::storage_service::operator_service::request_message::{
@@ -241,6 +242,7 @@ impl StorageOperatorService {
                         }
                     };
                 }
+
                 StorageAction::IncrBy(key, incr_value) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(old_value)) => {
@@ -272,6 +274,7 @@ impl StorageOperatorService {
                         }
                     };
                 }
+
                 StorageAction::Strlen(key) => match self.storage.get(&key) {
                     Some(RedisValue::String(value)) => {
                         let response = StorageResult::Int(value.length() as i32);
@@ -301,6 +304,32 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 },
+
+                StorageAction::SAdd(key, members) => match self.storage.mut_get(&key) {
+                    Some(RedisValue::Set(value)) => {
+                        let mut members_added = 0;
+                        for member in members {
+                            members_added += value.add(member);
+                        }
+                        let response = StorageResult::Int(members_added);
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotASet);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let mut new_set = RedisValueSet::new();
+                        let mut members_added = 0;
+                        for member in members {
+                            members_added += new_set.add(member);
+                        }
+                        self.storage.insert(&key, RedisValue::Set(new_set));
+                        let response = StorageResult::Int(members_added);
+                        let _ = message.respond(response);
+                    }
+                },
+
                 StorageAction::ExpirationRound => {
                     todo!()
                 }
