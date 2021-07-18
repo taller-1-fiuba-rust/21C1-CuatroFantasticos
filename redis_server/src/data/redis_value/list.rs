@@ -41,15 +41,16 @@ impl RedisValueList {
     }
 
     pub fn sort(&self) -> Result<Vec<String>, RedisErrorEnum> {
-        let mut contents: Vec<String> = vec![];
+        let mut contents: Vec<i32> = vec![];
         for x in &self.contents {
-            match x.parse().map_err(|_| RedisErrorEnum::NotAListOfNumbers) {
-                Err(value) => return Err(value),
+            match x.parse::<i32>() {
+                Err(_) => return Err(RedisErrorEnum::NotASetOfNumbers),
                 Ok(value) => contents.push(value),
             }
         }
-        contents.sort();
-        Ok(contents)
+        contents.sort_unstable();
+        let sorted = contents.iter().map(|v| v.to_string()).collect();
+        Ok(sorted)
     }
 }
 
