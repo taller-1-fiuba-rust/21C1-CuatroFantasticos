@@ -18,7 +18,7 @@ impl RedisCommand for RedisCommandSAdd {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
         let response =
             accessor.access(StorageAction::SAdd(self.key.clone(), self.members.clone()))?;
-        let response = response.get_value().protocol_serialize_to_bulk_string();
+        let response = response.get_value().protocol_serialize_to_int();
         Ok(response)
     }
 }
