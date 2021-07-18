@@ -17,6 +17,7 @@ pub mod ping;
 pub mod rename;
 pub mod sort;
 pub mod strlen;
+pub mod touch;
 pub mod r#type;
 
 pub trait RedisCommand {
