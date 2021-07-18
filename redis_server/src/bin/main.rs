@@ -27,7 +27,7 @@ fn main() {
     let db_file = OpenOptions::new()
         .read(true)
         .open(dbfilename)
-        .expect("No se pudo crear un archivo de logs");
+        .expect("No se pudo crear un archivo de database");
 
     let storage_service = StorageService::new(db_file);
     conf.set_data_sender(storage_service.get_storage_sender());

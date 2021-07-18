@@ -5,7 +5,7 @@ use crate::data::redis_value::RedisValue;
 use crate::data::storage_service::operator_service::request_message::{
     StorageRequestMessage, StorageRequestMessageEnum,
 };
-use crate::data::storage_service::operator_service::response_error_enum::ResponseErrorEnum;
+use crate::data::storage_service::operator_service::response_error_enum::RedisErrorEnum;
 use crate::data::storage_service::operator_service::response_message::StorageResponseMessageEnum;
 use crate::data::storage_service::operator_service::storage::RedisStorage;
 use std::io::Read;
@@ -59,7 +59,7 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     } else {
                         let response =
-                            StorageResponseMessageEnum::Error(ResponseErrorEnum::NonExistent);
+                            StorageResponseMessageEnum::Error(RedisErrorEnum::NonExistent);
                         let _ = message.respond(response);
                     }
                 }
@@ -82,8 +82,7 @@ impl StorageOperatorService {
                             let _ = message.respond(response);
                         }
                         None => {
-                            let response =
-                                StorageResponseMessageEnum::Error(ResponseErrorEnum::None);
+                            let response = StorageResponseMessageEnum::Error(RedisErrorEnum::None);
                             let _ = message.respond(response);
                         }
                     }
@@ -97,7 +96,7 @@ impl StorageOperatorService {
                         }
                         None => {
                             let response =
-                                StorageResponseMessageEnum::Error(ResponseErrorEnum::NonExistent);
+                                StorageResponseMessageEnum::Error(RedisErrorEnum::NonExistent);
                             let _ = message.respond(response);
                         }
                     }
@@ -105,8 +104,7 @@ impl StorageOperatorService {
                 StorageRequestMessageEnum::Copy(source_key, destination_key) => {
                     let destination = self.storage.contains_key(&destination_key);
                     if destination {
-                        let response =
-                            StorageResponseMessageEnum::Error(ResponseErrorEnum::Existent);
+                        let response = StorageResponseMessageEnum::Error(RedisErrorEnum::Existent);
                         let _ = message.respond(response);
                     } else {
                         let value = self.storage.access(&source_key).cloned();
@@ -133,18 +131,17 @@ impl StorageOperatorService {
                             }
                             None => {
                                 let response =
-                                    StorageResponseMessageEnum::Error(ResponseErrorEnum::Nil);
+                                    StorageResponseMessageEnum::Error(RedisErrorEnum::Nil);
                                 let _ = message.respond(response);
                             }
                         }
                     }
                     Some(_) => {
-                        let response =
-                            StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAList);
+                        let response = StorageResponseMessageEnum::Error(RedisErrorEnum::NotAList);
                         let _ = message.respond(response);
                     }
                     None => {
-                        let response = StorageResponseMessageEnum::Error(ResponseErrorEnum::Nil);
+                        let response = StorageResponseMessageEnum::Error(RedisErrorEnum::Nil);
                         let _ = message.respond(response);
                     }
                 },
@@ -158,7 +155,7 @@ impl StorageOperatorService {
                         }
                         Some(_) => {
                             let response =
-                                StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString);
+                                StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
                             let _ = message.respond(response);
                         }
                         None => {
@@ -181,12 +178,11 @@ impl StorageOperatorService {
                         }
                         Some(_) => {
                             let response =
-                                StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString);
+                                StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
                             let _ = message.respond(response);
                         }
                         None => {
-                            let response =
-                                StorageResponseMessageEnum::Error(ResponseErrorEnum::Nil);
+                            let response = StorageResponseMessageEnum::Error(RedisErrorEnum::Nil);
                             let _ = message.respond(response);
                         }
                     };
@@ -202,14 +198,13 @@ impl StorageOperatorService {
                         }
                         Some(_) => {
                             let response =
-                                StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString);
+                                StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
                             let _ = message.respond(response);
                         }
                         None => {
                             self.storage
                                 .insert(&key, RedisValue::String(RedisValueString::new(new_value)));
-                            let response =
-                                StorageResponseMessageEnum::Error(ResponseErrorEnum::Nil);
+                            let response = StorageResponseMessageEnum::Error(RedisErrorEnum::Nil);
                             let _ = message.respond(response);
                         }
                     };
@@ -227,7 +222,7 @@ impl StorageOperatorService {
                                 }
                                 Err(_) => {
                                     let response = StorageResponseMessageEnum::Error(
-                                        ResponseErrorEnum::NotANumber,
+                                        RedisErrorEnum::NotANumber,
                                     );
                                     let _ = message.respond(response);
                                 }
@@ -235,7 +230,7 @@ impl StorageOperatorService {
                         }
                         Some(_) => {
                             let response =
-                                StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString);
+                                StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
                             let _ = message.respond(response);
                         }
                         None => {
@@ -261,7 +256,7 @@ impl StorageOperatorService {
                                 }
                                 Err(_) => {
                                     let response = StorageResponseMessageEnum::Error(
-                                        ResponseErrorEnum::NotANumber,
+                                        RedisErrorEnum::NotANumber,
                                     );
                                     let _ = message.respond(response);
                                 }
@@ -269,7 +264,7 @@ impl StorageOperatorService {
                         }
                         Some(_) => {
                             let response =
-                                StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString);
+                                StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
                             let _ = message.respond(response);
                         }
                         None => {
@@ -290,7 +285,7 @@ impl StorageOperatorService {
                     }
                     Some(_) => {
                         let response =
-                            StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAString);
+                            StorageResponseMessageEnum::Error(RedisErrorEnum::NotAString);
                         let _ = message.respond(response);
                     }
                     None => {
@@ -299,14 +294,13 @@ impl StorageOperatorService {
                     }
                 },
 
-                StorageRequestMessageEnum::Llen(key) => match self.storage.get(&key) {
+                StorageRequestMessageEnum::Llen(key) => match self.storage.access(&key) {
                     Some(RedisValue::List(value)) => {
                         let response = StorageResponseMessageEnum::Int(value.length() as i32);
                         let _ = message.respond(response);
                     }
                     Some(_) => {
-                        let response =
-                            StorageResponseMessageEnum::Error(ResponseErrorEnum::NotAList);
+                        let response = StorageResponseMessageEnum::Error(RedisErrorEnum::NotAList);
                         let _ = message.respond(response);
                     }
                     None => {
@@ -314,7 +308,6 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 },
-
                 StorageRequestMessageEnum::ExpirationRound => {
                     todo!()
                 }
