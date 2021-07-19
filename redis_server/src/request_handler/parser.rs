@@ -4,6 +4,7 @@ use crate::command::dbsize::RedisCommandDbSize;
 use crate::command::decrby::RedisCommandDecrBy;
 use crate::command::del::RedisCommandDel;
 use crate::command::exists::RedisCommandExists;
+use crate::command::expire::RedisCommandExpire;
 use crate::command::flushdb::RedisCommandFlushDb;
 use crate::command::get::RedisCommandGet;
 use crate::command::getdel::RedisCommandGetDel;
@@ -72,6 +73,7 @@ impl Parser {
             "SADD" => self.parse_command_sadd(&mut command_iter, command_qty),
             "PERSIST" => self.parse_command_persist(&mut command_iter),
             "SAVE" => Ok(Box::new(RedisCommandSave::new())),
+            "EXPIRE" => self.parse_command_expire(&mut command_iter),
             c => Err(format!("Command not implemented: {}", c)),
         }
     }
@@ -251,6 +253,15 @@ impl Parser {
             members.push(new_member);
         }
         Ok(Box::new(RedisCommandSAdd::new(key, members)))
+    }
+
+    fn parse_command_expire(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        let value = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandExpire::new(key, value)))
     }
 }
 

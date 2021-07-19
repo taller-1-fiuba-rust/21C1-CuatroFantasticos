@@ -248,6 +248,17 @@ impl StorageOperatorService {
                     };
                 }
 
+                StorageAction::Expire(key, expiration) => {
+                    if self.storage.contains_key(&key) {
+                        self.storage.expire(&key, expiration);
+                        let response = StorageResult::Bool(true);
+                        let _ = message.respond(response);
+                    } else {
+                        let response = StorageResult::Bool(false);
+                        let _ = message.respond(response);
+                    }
+                }
+
                 StorageAction::IncrBy(key, incr_value) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(old_value)) => {
