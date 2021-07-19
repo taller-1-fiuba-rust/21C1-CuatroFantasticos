@@ -98,6 +98,11 @@ impl RedisStorage {
         self.values.remove(key).map(|v| v.extract_value())
     }
 
+    pub fn persist(&mut self, key: &str) -> Option<u128> {
+        self.clean_if_expirated(key);
+        self.expirations.remove(key)
+    }
+
     pub fn clear(&mut self) {
         self.values.clear();
         self.expirations.clear();
@@ -165,10 +170,8 @@ impl RedisStorage {
                 _ => println!("Data type not supported in deserialization"),
             }
             let expiration = parsed_line[EXPIRATION].trim().parse::<u128>().unwrap();
-            if expiration == !0 {
-                let _ = storage
-                    .expirations
-                    .expire_at(key.parse().unwrap(), expiration);
+            if expiration > 0 {
+                let _ = storage.expirations.expire_at(key.to_owned(), expiration);
             }
         }
         storage

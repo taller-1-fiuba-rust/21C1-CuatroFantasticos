@@ -12,10 +12,12 @@ use crate::command::getset::RedisCommandGetSet;
 use crate::command::incrby::RedisCommandIncrBy;
 use crate::command::lindex::RedisCommandLindex;
 use crate::command::llen::RedisCommandLlen;
+use crate::command::persist::RedisCommandPersist;
 use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::sadd::RedisCommandSAdd;
+use crate::command::save::RedisCommandSave;
 use crate::command::sort::RedisCommandSort;
 use crate::command::strlen::RedisCommandStrlen;
 use crate::command::touch::RedisCommandTouch;
@@ -69,6 +71,8 @@ impl Parser {
             "INCRBY" => self.parse_command_incrby(&mut command_iter),
             "TOUCH" => self.parse_command_touch(&mut command_iter),
             "SADD" => self.parse_command_sadd(&mut command_iter, command_qty),
+            "PERSIST" => self.parse_command_persist(&mut command_iter),
+            "SAVE" => Ok(Box::new(RedisCommandSave::new())),
             "EXPIRE" => self.parse_command_expire(&mut command_iter),
             c => Err(format!("Command not implemented: {}", c)),
         }
@@ -228,6 +232,15 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandTouch::new(key)))
     }
+
+    fn parse_command_persist(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandPersist::new(key)))
+    }
+
     fn parse_command_sadd(
         &self,
         command_iter: &mut Split<&str>,
