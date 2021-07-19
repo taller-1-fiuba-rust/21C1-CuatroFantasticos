@@ -93,6 +93,11 @@ impl StorageOperatorService {
                     let response = StorageResult::Bool(value);
                     let _ = message.respond(response);
                 }
+                StorageAction::Persist(key) => {
+                    let value = self.storage.persist(&key).is_some();
+                    let response = StorageResult::Bool(value);
+                    let _ = message.respond(response);
+                }
                 StorageAction::Get(key) => {
                     let value = self.storage.access(&key).cloned();
                     match value {
@@ -243,6 +248,17 @@ impl StorageOperatorService {
                     };
                 }
 
+                StorageAction::Expire(key, expiration) => {
+                    if self.storage.contains_key(&key) {
+                        self.storage.expire(&key, expiration);
+                        let response = StorageResult::Bool(true);
+                        let _ = message.respond(response);
+                    } else {
+                        let response = StorageResult::Bool(false);
+                        let _ = message.respond(response);
+                    }
+                }
+
                 StorageAction::IncrBy(key, incr_value) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(old_value)) => {
@@ -335,19 +351,22 @@ impl StorageOperatorService {
                         self.storage.expire_at(&key, expiration);
                         let response = StorageResult::Bool(true);
                         let _ = message.respond(response);
+                    } else {
+                        let response = StorageResult::Bool(false);
+                        let _ = message.respond(response);
                     }
-                    let response = StorageResult::Bool(false);
-                    let _ = message.respond(response);
                 }
 
                 StorageAction::ExpirationRound => {
                     todo!()
                 }
-                StorageAction::Persist => {
+                StorageAction::Save => {
                     let mut file = File::create("./dump.rdb").expect("could not create file");
                     for line in self.storage.serialize() {
                         let _ = file.write(&line.as_bytes());
                     }
+                    let response = StorageResult::Ok;
+                    let _ = message.respond(response);
                 }
                 StorageAction::Terminate => {
                     break;
