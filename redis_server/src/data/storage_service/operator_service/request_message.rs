@@ -56,4 +56,5 @@ pub enum StorageAction {
     DecrBy(String, i32),
     IncrBy(String, i32),
     Touch(String),
+    Expire(String, i32),
 }

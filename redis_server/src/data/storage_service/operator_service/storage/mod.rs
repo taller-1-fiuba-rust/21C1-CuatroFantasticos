@@ -103,6 +103,11 @@ impl RedisStorage {
         self.expirations.clear();
     }
 
+    pub fn expire(&mut self, key: &str, ms: u128) {
+        self.clean_if_expirated(key);
+        self.expirations.expire_in(key.to_string(), ms);
+    }
+
     pub fn serialize(&self) -> Vec<String> {
         let mut contents = Vec::new();
         for (key, value) in &self.values {
