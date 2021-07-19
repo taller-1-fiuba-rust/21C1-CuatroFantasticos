@@ -330,6 +330,16 @@ impl StorageOperatorService {
                     }
                 },
 
+                StorageAction::ExpireAt(key, expiration) => {
+                    if self.storage.contains_key(&key) {
+                        self.storage.expire_at(&key, expiration);
+                        let response = StorageResult::Bool(true);
+                        let _ = message.respond(response);
+                    }
+                    let response = StorageResult::Bool(false);
+                    let _ = message.respond(response);
+                }
+
                 StorageAction::ExpirationRound => {
                     todo!()
                 }
