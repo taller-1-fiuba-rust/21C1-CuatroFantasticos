@@ -7,6 +7,7 @@ use crate::data::redis_value::set::RedisValueSet;
 use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
 use crate::data::storage_service::operator_service::storage::expiration_map::ExpirationMap;
+use crate::utilities::current_time_in_millis;
 use std::fmt::Debug;
 
 pub mod expiration_map;
@@ -101,6 +102,14 @@ impl RedisStorage {
     pub fn clear(&mut self) {
         self.values.clear();
         self.expirations.clear();
+    }
+
+    pub fn ttl(&mut self, key: &str) -> Option<u128> {
+        self.clean_if_expirated(key);
+        match self.expirations.get(key) {
+            Some(value) => Some(value - current_time_in_millis()),
+            None => None,
+        }
     }
 
     pub fn serialize(&self) -> Vec<String> {

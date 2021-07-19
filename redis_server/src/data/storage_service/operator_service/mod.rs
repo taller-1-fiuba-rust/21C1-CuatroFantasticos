@@ -330,6 +330,18 @@ impl StorageOperatorService {
                     }
                 },
 
+                StorageAction::Ttl(key) => {
+                    if self.storage.contains_key(&key) {
+                        let response = match self.storage.ttl(&key) {
+                            Some(value) => StorageResult::Int(value as i32),
+                            None => StorageResult::Int(-1),
+                        };
+                        let _ = message.respond(response);
+                    }
+                    let response = StorageResult::Int(-2);
+                    let _ = message.respond(response);
+                }
+
                 StorageAction::ExpirationRound => {
                     todo!()
                 }
