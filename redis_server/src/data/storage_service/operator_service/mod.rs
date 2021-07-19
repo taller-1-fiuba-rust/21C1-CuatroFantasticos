@@ -245,7 +245,7 @@ impl StorageOperatorService {
 
                 StorageAction::Expire(key, expiration) => {
                     if self.storage.contains_key(&key) {
-                        self.storage.expire(&key, expiration as u128);
+                        self.storage.expire(&key, expiration);
                         let response = StorageResult::Bool(true);
                         let _ = message.respond(response);
                     }

@@ -17,7 +17,7 @@ impl RedisCommandExpire {
 
 impl RedisCommand for RedisCommandExpire {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let value = self.new_value.parse::<i32>();
+        let value = self.new_value.parse::<u128>();
         let response = match value {
             Ok(value) => {
                 let response = accessor.access(StorageAction::Expire(self.key.clone(), value))?;
