@@ -50,10 +50,11 @@ pub enum StorageAction {
     Strlen(String),
     Llen(String),
     ExpirationRound,
-    Persist,
+    Save,
     SAdd(String, Vec<String>),
     Terminate,
     DecrBy(String, i32),
     IncrBy(String, i32),
     Touch(String),
+    Persist(String),
 }
