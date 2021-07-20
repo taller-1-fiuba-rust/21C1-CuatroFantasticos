@@ -111,10 +111,9 @@ impl RedisStorage {
 
     pub fn ttl(&mut self, key: &str) -> Option<u128> {
         self.clean_if_expirated(key);
-        match self.expirations.get(key) {
-            Some(value) => Some(value - current_time_in_millis()),
-            None => None,
-        }
+        self.expirations
+            .get(key)
+            .map(|value| value - current_time_in_millis())
     }
 
     pub fn expire(&mut self, key: &str, ms: u128) {
