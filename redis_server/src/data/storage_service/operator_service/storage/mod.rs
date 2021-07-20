@@ -117,6 +117,7 @@ impl RedisStorage {
     }
 
     pub fn expire(&mut self, key: &str, ms: u128) {
+        self.clean_if_expirated(key);
         self.expirations.expire_in(key.to_string(), ms);
     }
 
