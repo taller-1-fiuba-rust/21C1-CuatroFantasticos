@@ -250,7 +250,7 @@ impl StorageOperatorService {
 
                 StorageAction::Expire(key, expiration) => {
                     if self.storage.contains_key(&key) {
-                        self.storage.expire(&key, expiration);
+                        self.storage.expire(&key, expiration * 1000);
                         let response = StorageResult::Bool(true);
                         let _ = message.respond(response);
                     } else {
