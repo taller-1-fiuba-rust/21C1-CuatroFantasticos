@@ -361,7 +361,7 @@ impl StorageOperatorService {
                     if self.storage.contains_key(&key) {
                         let response = match self.storage.ttl(&key) {
                             Some(value) => StorageResult::Int((value / 1000) as i32),
-                            None => StorageResult::Error(RedisError::NotVolatil),
+                            None => StorageResult::Error(RedisError::NotVolatile),
                         };
                         let _ = message.respond(response);
                     } else {

@@ -20,7 +20,7 @@ impl RedisCommand for RedisCommandTtl {
         let response = accessor.access(StorageAction::Ttl(self.key.clone()))?;
         let response = match response.get_value() {
             StorageResult::Int(_) => response.get_value().protocol_serialize_to_int(),
-            StorageResult::Error(RedisError::NotVolatil) => "-1".protocol_serialize_to_int(),
+            StorageResult::Error(RedisError::NotVolatile) => "-1".protocol_serialize_to_int(),
             StorageResult::Error(RedisError::NonExistent) => "-2".protocol_serialize_to_int(),
             _ => RedisError::Unknown.protocol_serialize_to_bulk_string(),
         };

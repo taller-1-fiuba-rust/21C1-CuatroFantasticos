@@ -14,7 +14,7 @@ pub enum RedisError {
     NotAListOfNumbers,
     Unknown,
     Existent,
-    NotVolatil,
+    NotVolatile,
 }
 
 impl ProtocolSerializer for RedisError {
@@ -43,7 +43,7 @@ impl ProtocolSerializer for RedisError {
             RedisError::Unknown => String::from("-UNKNOWN something went wrong\r\n"),
             RedisError::NonExistent => String::from("-NONEXISTENT The key does not exist\r\n"),
             RedisError::Existent => String::from("-EXISTENT The key already exists\r\n"),
-            RedisError::NotVolatil => String::from("-NOTVOLATIL The key is not volatil\r\n"),
+            RedisError::NotVolatile => String::from("-NOTVOLATILE The key is not volatil\r\n"),
         }
     }
 
