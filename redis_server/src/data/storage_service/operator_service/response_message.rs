@@ -23,6 +23,7 @@ pub enum StorageResult {
     String(String),
     RedisValue(RedisValue),
     Bool(bool),
+    Vector(Vec<String>),
     Ok,
     Error(RedisError),
 }
@@ -36,6 +37,7 @@ impl ProtocolSerializer for StorageResult {
             StorageResult::Bool(value) => {
                 format!("+{}\r\n", if *value { "1" } else { "0" })
             }
+            StorageResult::Vector(vec) => vec.protocol_serialize_to_simple_string(),
             StorageResult::Ok => format!("+{}\r\n", "OK"),
             StorageResult::Error(value) => value.protocol_serialize_to_simple_string(),
         }
@@ -49,6 +51,7 @@ impl ProtocolSerializer for StorageResult {
             StorageResult::Bool(value) => {
                 format!(":{}\r\n", if *value { "1" } else { "0" })
             }
+            StorageResult::Vector(vec) => vec.protocol_serialize_to_int(),
             StorageResult::Ok => format!(":{}\r\n", "OK"),
             StorageResult::Error(value) => value.protocol_serialize_to_int(),
         }
@@ -65,6 +68,7 @@ impl ProtocolSerializer for StorageResult {
             StorageResult::String(value) => bulk_string_formatter(value),
             StorageResult::RedisValue(value) => value.protocol_serialize_to_bulk_string(),
             StorageResult::Bool(value) => bulk_string_formatter(if *value { "1" } else { "0" }),
+            StorageResult::Vector(vec) => vec.protocol_serialize_to_bulk_string(),
             StorageResult::Ok => bulk_string_formatter("OK"),
             StorageResult::Error(value) => value.protocol_serialize_to_bulk_string(),
         }
