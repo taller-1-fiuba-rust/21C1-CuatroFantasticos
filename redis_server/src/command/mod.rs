@@ -13,6 +13,7 @@ pub mod get;
 pub mod getdel;
 pub mod getset;
 pub mod incrby;
+pub mod keys;
 pub mod lindex;
 pub mod llen;
 pub mod persist;

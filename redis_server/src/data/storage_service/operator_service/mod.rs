@@ -54,6 +54,13 @@ impl StorageOperatorService {
                     let response = StorageResult::Ok;
                     let _ = message.respond(response);
                 }
+
+                StorageAction::Keys(pattern) => {
+                    let keys = self.storage.keys_by_pattern(&pattern);
+                    let response = StorageResult::Vector(keys);
+                    let _ = message.respond(response);
+                }
+
                 StorageAction::Rename(key, new_key) => {
                     if let Some(value) = self.storage.remove(&key) {
                         self.storage.insert(&new_key, value);

@@ -11,6 +11,7 @@ use crate::command::get::RedisCommandGet;
 use crate::command::getdel::RedisCommandGetDel;
 use crate::command::getset::RedisCommandGetSet;
 use crate::command::incrby::RedisCommandIncrBy;
+use crate::command::keys::RedisCommandKeys;
 use crate::command::lindex::RedisCommandLindex;
 use crate::command::llen::RedisCommandLlen;
 use crate::command::persist::RedisCommandPersist;
@@ -54,6 +55,7 @@ impl Parser {
             "COMMAND" => Ok(Box::new(RedisCommandPing::new())),
             "PING" => Ok(Box::new(RedisCommandPing::new())),
             "INFO" => todo!(),
+            "KEYS" => self.parse_command_keys(&mut command_iter),
             "DBSIZE" => Ok(Box::new(RedisCommandDbSize::new())),
             "FLUSHDB" => Ok(Box::new(RedisCommandFlushDb::new())),
             "TYPE" => self.parse_command_type(&mut command_iter),
@@ -109,6 +111,14 @@ impl Parser {
     ) -> Result<Box<dyn RedisCommand>, String> {
         let key = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandExists::new(key)))
+    }
+
+    fn parse_command_keys(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandKeys::new(key)))
     }
 
     fn parse_command_del(

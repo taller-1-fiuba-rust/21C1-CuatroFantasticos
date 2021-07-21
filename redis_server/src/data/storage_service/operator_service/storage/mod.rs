@@ -10,6 +10,8 @@ use crate::data::storage_service::operator_service::storage::expiration_map::Exp
 use crate::utilities::current_time_in_millis;
 use std::fmt::Debug;
 
+use regex::Regex;
+
 pub mod expiration_map;
 pub mod value;
 
@@ -124,6 +126,22 @@ impl RedisStorage {
     pub fn expire_at(&mut self, key: &str, ms: u128) {
         self.clean_if_expirated(key);
         self.expirations.expire_at(key.to_string(), ms);
+    }
+
+    pub fn keys_by_pattern(&mut self, pattern: &str) -> Vec<String> {
+        let mut matching_keys = Vec::new();
+        let pattern = pattern.replace("?", ".?").replace("*", ".*");
+        let pattern = format!("^{}$", pattern);
+        let regex = match Regex::new(&pattern) {
+            Ok(v) => v,
+            Err(_) => return matching_keys,
+        };
+        for key in self.values.keys() {
+            if regex.is_match(key) {
+                matching_keys.push(key.clone());
+            }
+        }
+        matching_keys
     }
 
     pub fn serialize(&self) -> Vec<String> {
