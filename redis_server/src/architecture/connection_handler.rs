@@ -4,6 +4,12 @@ use crate::request_handler::parser::Parser;
 use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};
 
+/// handle_connection function, reads data from the TCP stream
+/// parses the command and gives the response
+/// # Arguments
+/// stream - TCP Stream
+/// conf - Configuration
+
 pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
     let mut buffer = [0; 1024];
 

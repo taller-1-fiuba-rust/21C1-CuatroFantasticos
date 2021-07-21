@@ -29,13 +29,14 @@ impl RedisStorage {
         Default::default()
     }
 
+    /// this function is in charge of removing a key if ir expires
     fn clean_if_expirated(&mut self, key: &str) {
         if self.values.contains_key(key) && self.expirations.is_expired(key) {
             let _ = self.values.remove(key);
             let _ = self.expirations.remove(key);
         }
     }
-
+    /// this function is in charge of inserting a new value to an existing key, if the key does not exists it creates it
     pub fn insert(&mut self, key: &str, value: RedisValue) -> Option<RedisValue> {
         self.clean_if_expirated(key);
         let storage_value = StorageValue::new(value);
@@ -43,7 +44,7 @@ impl RedisStorage {
         let _ = self.expirations.remove(key);
         old_value.map(|v| v.extract_value())
     }
-
+    /// this function is in charge of inserting a value with last acces time
     pub fn insert_with_last_access_time(
         &mut self,
         key: &str,
@@ -57,7 +58,7 @@ impl RedisStorage {
         let _ = self.expirations.remove(key);
         old_value.map(|v| v.extract_value())
     }
-
+    /// this function is in charge of updating the value of a key
     pub fn update(&mut self, key: &str, value: RedisValue) -> Option<RedisValue> {
         self.clean_if_expirated(key);
         if !self.values.contains_key(key) {
@@ -67,17 +68,18 @@ impl RedisStorage {
         let old_value = self.values.insert(key.to_string(), storage_value);
         old_value.map(|v| v.extract_value())
     }
-
+    /// this function is in charge of accessing the storage
     pub fn access(&mut self, key: &str) -> Option<&RedisValue> {
         self.clean_if_expirated(key);
         let storage_value = self.values.get_mut(key);
         storage_value.map(|v| v.access())
     }
-
+    /// this function is in charge of returning the total lenght of the storage
     pub fn length(&self) -> usize {
         self.values.len()
     }
 
+    /// this function is in charge of geting the key's value
     pub fn get(&mut self, key: &str) -> Option<&RedisValue> {
         self.clean_if_expirated(key);
         self.values.get_mut(key).map(|value| value.access())
@@ -87,36 +89,37 @@ impl RedisStorage {
         self.clean_if_expirated(key);
         self.values.get_mut(key).map(|value| value.access_mut())
     }
-
+    /// this function returns if the storage contains the key or not
     pub fn contains_key(&mut self, key: &str) -> bool {
         self.clean_if_expirated(key);
         self.values.contains_key(key)
     }
-
+    /// this function is in charge of removing the key from storage
     pub fn remove(&mut self, key: &str) -> Option<RedisValue> {
         self.clean_if_expirated(key);
         self.values.remove(key).map(|v| v.extract_value())
     }
-
+    /// this function is in charge of persisting the value of a key
     pub fn persist(&mut self, key: &str) -> Option<u128> {
         self.clean_if_expirated(key);
         self.expirations.remove(key)
     }
-
+    /// this function is in charge of clearing the experation of the values
     pub fn clear(&mut self) {
         self.values.clear();
         self.expirations.clear();
     }
+    /// this function is in charge of setting the expire time of a key
 
     pub fn expire(&mut self, key: &str, ms: u128) {
         self.expirations.expire_in(key.to_string(), ms);
     }
-
+    /// this function is in charge of setting the expire time of a key
     pub fn expire_at(&mut self, key: &str, ms: u128) {
         self.clean_if_expirated(key);
         self.expirations.expire_at(key.to_string(), ms);
     }
-
+    /// this function is in charge of serializing values
     pub fn serialize(&self) -> Vec<String> {
         let mut contents = Vec::new();
         for (key, value) in &self.values {
@@ -134,7 +137,7 @@ impl RedisStorage {
         }
         contents
     }
-
+    /// this function is in charge of deserializing values
     pub fn deserialize(contents: String) -> RedisStorage {
         let mut storage = RedisStorage::new();
         for line in contents.lines() {

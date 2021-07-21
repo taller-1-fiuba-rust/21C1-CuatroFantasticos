@@ -42,7 +42,7 @@ impl Parser {
         let argc = self.parse_bulk_len(bulk_len_token)?;
         self.parse_command(command_iter, argc)
     }
-
+    /// this function is in charge of parsing the commands
     fn parse_command(
         &self,
         mut command_iter: Split<&str>,

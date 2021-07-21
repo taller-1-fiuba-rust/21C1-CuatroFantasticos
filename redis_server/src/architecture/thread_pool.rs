@@ -3,6 +3,8 @@ use crate::architecture::worker::Worker;
 use crate::configuration::Configuration;
 use std::sync::{mpsc, Arc, Mutex};
 
+///A thread pool used to execute functions in parallel.
+/// Spawns a specified number of worker threads and replenishes the pool if any worker threads panic.
 pub struct ThreadPool<'a> {
     workers: Vec<Worker>,
     sender: mpsc::Sender<Message>,

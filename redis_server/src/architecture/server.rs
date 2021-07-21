@@ -5,6 +5,10 @@ use std::net::TcpListener;
 use std::time::Duration;
 
 const THREAD_MAX_QUANTITY: usize = 1000;
+/// Run Server Sets the port the server will use,
+/// Starts a server for webhook
+/// # Arguments
+/// conf - Configuration
 
 pub fn run_server(conf: &Configuration) {
     conf.verbose(&format!(

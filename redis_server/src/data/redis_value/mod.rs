@@ -15,6 +15,7 @@ pub enum RedisValue {
 }
 
 impl RedisValue {
+    /// converts to String
     pub fn serialize(&self) -> String {
         match self {
             RedisValue::List(list) => list.serialize(),
@@ -22,6 +23,7 @@ impl RedisValue {
             RedisValue::String(string) => string.serialize(),
         }
     }
+    /// returns the value type of the element given
     pub fn get_type(&self) -> String {
         match self {
             RedisValue::List(list) => list.get_type(),
@@ -32,6 +34,7 @@ impl RedisValue {
 }
 
 impl ProtocolSerializer for RedisValue {
+    ///serializes to simple string redis Values
     fn protocol_serialize_to_simple_string(&self) -> String {
         match self {
             RedisValue::List(list) => list.protocol_serialize_to_simple_string(),
@@ -39,7 +42,7 @@ impl ProtocolSerializer for RedisValue {
             RedisValue::String(string) => string.protocol_serialize_to_simple_string(),
         }
     }
-
+    ///serializes to int redis Values
     fn protocol_serialize_to_int(&self) -> String {
         match self {
             RedisValue::List(list) => list.protocol_serialize_to_int(),
@@ -47,7 +50,7 @@ impl ProtocolSerializer for RedisValue {
             RedisValue::String(string) => string.protocol_serialize_to_int(),
         }
     }
-
+    ///serializes from bulk to string string redis Values
     fn protocol_serialize_to_bulk_string(&self) -> String {
         match self {
             RedisValue::List(list) => list.protocol_serialize_to_bulk_string(),

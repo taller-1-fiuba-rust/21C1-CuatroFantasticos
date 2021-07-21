@@ -3,6 +3,8 @@ use crate::data::storage_service::operator_service::accessor::StorageAccessor;
 use crate::data::storage_service::operator_service::request_message::StorageAction;
 use crate::protocol_serialization::ProtocolSerializer;
 
+/// Saves an element in Storage
+
 pub struct RedisCommandSave {}
 
 impl RedisCommandSave {

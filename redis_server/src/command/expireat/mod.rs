@@ -3,7 +3,19 @@ use crate::data::storage_service::operator_service::accessor::StorageAccessor;
 use crate::data::storage_service::operator_service::request_message::StorageAction;
 use crate::data::storage_service::operator_service::result_error::RedisError;
 use crate::protocol_serialization::ProtocolSerializer;
-
+///EXPIREAT has the same effect and semantic as EXPIRE,
+/// but instead of specifying the number of seconds representing the TTL
+/// (time to live), it takes an absolute Unix timestamp (seconds since January 1, 1970)
+/// . A timestamp in the past will delete the key immediately.
+///
+/// # Arguments
+///  key - String,
+///  new_value - String,
+///
+///# Return value
+///Integer reply, specifically:
+///1 if the timeout was set.
+///0 if key does not exist.
 pub struct RedisCommandExpireAt {
     key: String,
     new_value: String,

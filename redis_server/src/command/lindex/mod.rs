@@ -5,6 +5,19 @@ use crate::data::storage_service::operator_service::response_message::StorageRes
 use crate::data::storage_service::operator_service::result_error::RedisError;
 use crate::protocol_serialization::ProtocolSerializer;
 
+///Returns the element at index index in the list stored at key.
+/// The index is zero-based, so 0 means the first element,
+/// 1 the second element and so on. Negative indices can be used to designate
+/// elements starting at the tail of the list. Here,
+/// -1 means the last element, -2 means the penultimate and so forth.
+///When the value at key is not a list, an error is returned.
+///
+/// # Arguments
+/// key - String
+/// index - String
+///
+/// # Return value
+///Bulk string reply: the requested element, or nil when index is out of range.
 pub struct RedisCommandLindex {
     key: String,
     index: String,

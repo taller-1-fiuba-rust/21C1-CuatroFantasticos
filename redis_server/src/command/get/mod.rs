@@ -5,6 +5,14 @@ use crate::data::storage_service::operator_service::request_message::StorageActi
 use crate::data::storage_service::operator_service::response_message::StorageResult;
 use crate::data::storage_service::operator_service::result_error::RedisError;
 use crate::protocol_serialization::ProtocolSerializer;
+///Get the value of key. If the key does not exist the special value nil is returned.
+/// An error is returned if the value stored at key is not a string, because GET only handles string values.
+///
+/// # Arguments
+///  key - String
+///
+/// # Return value
+///Bulk string reply: the value of key, or nil when key does not exist.
 
 pub struct RedisCommandGet {
     key: String,
