@@ -23,6 +23,7 @@ use crate::command::save::RedisCommandSave;
 use crate::command::sort::RedisCommandSort;
 use crate::command::strlen::RedisCommandStrlen;
 use crate::command::touch::RedisCommandTouch;
+use crate::command::ttl::RedisCommandTtl;
 use crate::command::RedisCommand;
 use std::str::Split;
 
@@ -74,6 +75,7 @@ impl Parser {
             "INCRBY" => self.parse_command_incrby(&mut command_iter),
             "TOUCH" => self.parse_command_touch(&mut command_iter),
             "SADD" => self.parse_command_sadd(&mut command_iter, command_qty),
+            "TTL" => self.parse_command_ttl(&mut command_iter),
             "PERSIST" => self.parse_command_persist(&mut command_iter),
             "SAVE" => Ok(Box::new(RedisCommandSave::new())),
             "EXPIRE" => self.parse_command_expire(&mut command_iter),
@@ -283,6 +285,14 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandExpireAt::new(key, value)))
+    }
+
+    fn parse_command_ttl(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandTtl::new(key)))
     }
 }
 

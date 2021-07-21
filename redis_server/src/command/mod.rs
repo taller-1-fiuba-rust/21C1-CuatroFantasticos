@@ -24,6 +24,7 @@ pub mod save;
 pub mod sort;
 pub mod strlen;
 pub mod touch;
+pub mod ttl;
 pub mod r#type;
 
 pub trait RedisCommand {

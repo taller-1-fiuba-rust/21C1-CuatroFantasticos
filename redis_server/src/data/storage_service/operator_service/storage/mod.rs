@@ -7,6 +7,7 @@ use crate::data::redis_value::set::RedisValueSet;
 use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
 use crate::data::storage_service::operator_service::storage::expiration_map::ExpirationMap;
+use crate::utilities::current_time_in_millis;
 use std::fmt::Debug;
 
 use regex::Regex;
@@ -110,7 +111,15 @@ impl RedisStorage {
         self.expirations.clear();
     }
 
+    pub fn ttl(&mut self, key: &str) -> Option<u128> {
+        self.clean_if_expirated(key);
+        self.expirations
+            .get(key)
+            .map(|value| value - current_time_in_millis())
+    }
+
     pub fn expire(&mut self, key: &str, ms: u128) {
+        self.clean_if_expirated(key);
         self.expirations.expire_in(key.to_string(), ms);
     }
 
