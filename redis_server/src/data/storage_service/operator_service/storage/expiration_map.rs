@@ -17,7 +17,6 @@ impl ExpirationMap {
 
     pub fn expire_in(&mut self, key: String, ms: u128) -> Option<u128> {
         let timestamp = current_time_in_millis() + ms;
-        println!("{:?}", self.map);
         self.map.insert(key, timestamp)
     }
 

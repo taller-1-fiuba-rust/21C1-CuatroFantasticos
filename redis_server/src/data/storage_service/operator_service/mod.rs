@@ -250,7 +250,7 @@ impl StorageOperatorService {
 
                 StorageAction::Expire(key, expiration) => {
                     if self.storage.contains_key(&key) {
-                        self.storage.expire(&key, expiration);
+                        self.storage.expire(&key, expiration * 1000);
                         let response = StorageResult::Bool(true);
                         let _ = message.respond(response);
                     } else {
@@ -353,6 +353,19 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     } else {
                         let response = StorageResult::Bool(false);
+                        let _ = message.respond(response);
+                    }
+                }
+
+                StorageAction::Ttl(key) => {
+                    if self.storage.contains_key(&key) {
+                        let response = match self.storage.ttl(&key) {
+                            Some(value) => StorageResult::Int((value / 1000) as i32),
+                            None => StorageResult::Error(RedisError::NotVolatile),
+                        };
+                        let _ = message.respond(response);
+                    } else {
+                        let response = StorageResult::Error(RedisError::NonExistent);
                         let _ = message.respond(response);
                     }
                 }
