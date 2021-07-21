@@ -361,11 +361,11 @@ impl StorageOperatorService {
                     if self.storage.contains_key(&key) {
                         let response = match self.storage.ttl(&key) {
                             Some(value) => StorageResult::Int((value / 1000) as i32),
-                            None => StorageResult::Int(-1),
+                            None => StorageResult::Error(RedisError::NotVolatil),
                         };
                         let _ = message.respond(response);
                     } else {
-                        let response = StorageResult::Int(-2);
+                        let response = StorageResult::Error(RedisError::NonExistent);
                         let _ = message.respond(response);
                     }
                 }
