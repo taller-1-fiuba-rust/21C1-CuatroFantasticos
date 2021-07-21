@@ -122,6 +122,7 @@ impl RedisStorage {
     pub fn keys_by_pattern(&mut self, pattern: &str) -> Vec<String> {
         let mut matching_keys = Vec::new();
         let pattern = pattern.replace("?", ".?").replace("*", ".*");
+        let pattern = format!("^{}$", pattern);
         let regex = match Regex::new(&pattern) {
             Ok(v) => v,
             Err(_) => return matching_keys,
