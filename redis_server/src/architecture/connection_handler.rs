@@ -13,6 +13,7 @@ pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
 
         match read_size {
             Ok(0) => {
+                conf.verbose("handle_connection: Read 0 bytes");
                 break;
             }
             Ok(_) => {
