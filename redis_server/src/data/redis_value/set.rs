@@ -45,6 +45,10 @@ impl RedisValueSet {
         let sorted = contents.iter().map(|v| v.to_string()).collect();
         Ok(sorted)
     }
+
+    pub fn length(&self) -> usize {
+        self.contents.len()
+    }
 }
 
 impl ProtocolSerializer for RedisValueSet {
