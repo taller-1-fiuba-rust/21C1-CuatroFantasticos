@@ -80,7 +80,10 @@ impl Parser {
             "SAVE" => Ok(Box::new(RedisCommandSave::new())),
             "EXPIRE" => self.parse_command_expire(&mut command_iter),
             "EXPIREAT" => self.parse_command_expireat(&mut command_iter),
-            c => Err(format!("Command not implemented: {}", c)),
+            _ => Err(format!(
+                "-Unknown or disabled command '{}'\r\n",
+                command_type
+            )),
         }
     }
 
