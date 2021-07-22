@@ -1,10 +1,8 @@
 use crate::architecture::connection_handler;
-use crate::architecture::thread_pool::ThreadPool;
 use crate::configuration::Configuration;
 use std::net::TcpListener;
+use std::thread;
 use std::time::Duration;
-
-const THREAD_MAX_QUANTITY: usize = 1000;
 
 pub fn run_server(conf: &Configuration) {
     conf.verbose(&format!(
@@ -17,7 +15,6 @@ pub fn run_server(conf: &Configuration) {
     conf.verbose(&format!("run_server: connecting to {}", addr));
 
     let listener = TcpListener::bind(addr).expect("Server was not able to connect");
-    let pool = ThreadPool::new(THREAD_MAX_QUANTITY, conf);
     conf.verbose("run_server: Succesfully connected");
 
     for stream in listener.incoming() {
@@ -27,7 +24,7 @@ pub fn run_server(conf: &Configuration) {
         let _result = stream.set_read_timeout(Some(Duration::new(timeout, 0)));
         let conf_thread = conf.clone();
 
-        pool.execute(|| {
+        thread::spawn(move || {
             connection_handler::handle_connection(stream, conf_thread);
         });
     }
