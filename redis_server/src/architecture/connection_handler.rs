@@ -24,11 +24,12 @@ pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
 
                 let accessor = StorageAccessor::new(conf.get_data_sender().clone());
                 let parser = Parser::new();
-                let command = parser
-                    .parse(s.as_ref())
-                    .expect("error al parsear el comando");
-                let message = match command.execute(accessor) {
-                    Ok(s) => s,
+                let command = parser.parse(s.as_ref());
+                let message = match command {
+                    Ok(s) => match s.execute(accessor) {
+                        Ok(v) => v,
+                        Err(e) => e,
+                    },
                     Err(e) => e,
                 };
 
