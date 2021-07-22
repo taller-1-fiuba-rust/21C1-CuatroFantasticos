@@ -183,6 +183,20 @@ impl StorageOperatorService {
                         }
                     };
                 }
+                StorageAction::Scard(key) => match self.storage.get(&key) {
+                    Some(RedisValue::Set(value)) => {
+                        let response = StorageResult::Int(value.length() as i32);
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotASet);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response = StorageResult::Int(0);
+                        let _ = message.respond(response);
+                    }
+                },
 
                 StorageAction::GetDel(key) => {
                     match self.storage.get(&key) {

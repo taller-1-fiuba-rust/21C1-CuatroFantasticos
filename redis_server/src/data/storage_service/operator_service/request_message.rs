@@ -61,4 +61,5 @@ pub enum StorageAction {
     Expire(String, u128),
     Keys(String),
     Ttl(String),
+    Scard(String),
 }

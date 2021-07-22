@@ -20,6 +20,7 @@ use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::sadd::RedisCommandSAdd;
 use crate::command::save::RedisCommandSave;
+use crate::command::scard::RedisCommandScard;
 use crate::command::sort::RedisCommandSort;
 use crate::command::strlen::RedisCommandStrlen;
 use crate::command::touch::RedisCommandTouch;
@@ -80,6 +81,7 @@ impl Parser {
             "SAVE" => Ok(Box::new(RedisCommandSave::new())),
             "EXPIRE" => self.parse_command_expire(&mut command_iter),
             "EXPIREAT" => self.parse_command_expireat(&mut command_iter),
+            "SCARD" => self.parse_command_scard(&mut command_iter),
             _ => Err(format!(
                 "-Unknown or disabled command '{}'\r\n",
                 command_type
@@ -180,6 +182,14 @@ impl Parser {
     ) -> Result<Box<dyn RedisCommand>, String> {
         let key = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandStrlen::new(key)))
+    }
+
+    fn parse_command_scard(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandScard::new(key)))
     }
 
     fn parse_command_getset(
