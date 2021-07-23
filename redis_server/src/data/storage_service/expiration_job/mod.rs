@@ -13,7 +13,7 @@ impl ExpirationJob {
 }
 
 impl RecurringJob for ExpirationJob {
-    fn execute_job(&self) -> Result<(), RecurringJobError> {
+    fn execute_job(&mut self) -> Result<(), RecurringJobError> {
         match self.accessor.access(StorageAction::ExpirationRound) {
             Ok(_) => Ok(()),
             Err(_) => Err(RecurringJobError {}),
