@@ -1,4 +1,4 @@
-use crate::log::logger::Logger;
+use crate::log_service::log_interface::LogInterface;
 use message::LogMessage;
 use std::io::Write;
 use std::sync::mpsc;
@@ -6,6 +6,7 @@ use std::thread;
 use std::thread::JoinHandle;
 use writer::LogWriter;
 
+pub mod log_interface;
 pub mod logger;
 
 pub mod message;
@@ -15,13 +16,13 @@ mod writer;
 mod test_resources;
 
 #[derive(Debug)]
-pub struct LogService {
-    log_sender: mpsc::Sender<LogMessage>,
+pub struct LogService<T: Write + Send + 'static> {
+    log_sender: mpsc::Sender<LogMessage<T>>,
     log_writer_thread_handler: Option<JoinHandle<()>>,
 }
 
-impl LogService {
-    pub fn new<T: Write + Send + 'static>(output_buffer: T) -> Self {
+impl<T: Write + Send + 'static> LogService<T> {
+    pub fn new(output_buffer: T) -> Self {
         let (log_sender, log_receiver) = mpsc::channel();
         let log_writer_thread_handler = thread::spawn(move || {
             let log_writer = LogWriter::new(log_receiver, output_buffer);
@@ -33,12 +34,12 @@ impl LogService {
         }
     }
 
-    pub fn create_logger(&self) -> Logger {
-        Logger::new(self.log_sender.clone())
+    pub fn get_log_interface(&self) -> LogInterface<T> {
+        LogInterface::new(self.log_sender.clone())
     }
 }
 
-impl Drop for LogService {
+impl<T: Write + Send + 'static> Drop for LogService<T> {
     fn drop(&mut self) {
         let _ = self.log_sender.send(LogMessage::Terminate);
         if let Some(log_writer_thread_handler) = self.log_writer_thread_handler.take() {
@@ -49,8 +50,8 @@ impl Drop for LogService {
 
 #[cfg(test)]
 mod tests {
-    use crate::log::test_resources::VectorWriter;
-    use crate::log::LogService;
+    use crate::log_service::test_resources::VectorWriter;
+    use crate::log_service::LogService;
 
     #[test]
     fn log_service_create() {
@@ -62,7 +63,7 @@ mod tests {
     fn log_logger_create() {
         let log_output = VectorWriter::new();
         let log_service = LogService::new(log_output);
-        let _ = log_service.create_logger();
+        let _ = log_service.get_log_interface().build_logger();
     }
 
     #[test]
@@ -71,7 +72,7 @@ mod tests {
         let vector_logs = log_output.get_vector_copy();
         {
             let log_service = LogService::new(log_output);
-            let logger = log_service.create_logger();
+            let logger = log_service.get_log_interface().build_logger();
             logger.log("first_log").expect("Error in first log");
             logger.log("second_log").expect("Error in second log");
             logger.log("third_log").expect("Error in third log");
