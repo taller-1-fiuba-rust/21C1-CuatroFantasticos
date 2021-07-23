@@ -49,6 +49,10 @@ impl RedisValueSet {
     pub fn length(&self) -> usize {
         self.contents.len()
     }
+
+    pub fn contains(&self, member: String) -> bool {
+        self.contents.contains(&member)
+    }
 }
 
 impl ProtocolSerializer for RedisValueSet {
@@ -70,7 +74,7 @@ impl RedisValueSet {
         let mut contents = HashSet::new();
         let split = contents_string.split(',');
         for value in split {
-            contents.insert(value.to_string());
+            contents.insert(value.trim().to_string());
         }
         RedisValueSet { contents }
     }
