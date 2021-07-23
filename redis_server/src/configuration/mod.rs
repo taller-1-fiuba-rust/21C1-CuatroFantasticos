@@ -9,12 +9,12 @@ use logger::log_service::logger::Logger;
 use crate::configuration::verbose::Verbose;
 use crate::data::storage_service::operator_service::request_message::StorageRequestMessage;
 
-pub mod verbose;
-mod conf_worker;
 pub mod conf_accesor;
 pub mod conf_request_message;
 pub mod conf_response_message;
 pub mod conf_service;
+mod conf_worker;
+pub mod verbose;
 
 #[derive(Debug, Clone)]
 pub struct Configuration {
@@ -53,7 +53,7 @@ impl Configuration {
     }
 
     pub fn set(&mut self, key: String, value: String) {
-        self.conf.insert(key,value);
+        self.conf.insert(key, value);
     }
 
     pub fn default_values() -> HashMap<String, String> {

@@ -18,7 +18,7 @@ mod test_resources;
 
 #[derive(Debug)]
 pub struct LogService<T: Write + Send + 'static> {
-        log_sender: mpsc::Sender<LogMessage<T>>,
+    log_sender: mpsc::Sender<LogMessage<T>>,
     log_writer_thread_handler: Option<JoinHandle<()>>,
 }
 

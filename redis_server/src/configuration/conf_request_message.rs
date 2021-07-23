@@ -1,5 +1,5 @@
-use std::sync::mpsc;
 use crate::configuration::conf_response_message::ConfResult;
+use std::sync::mpsc;
 
 pub struct ConfRequestMessage {
     message: ConfMessage,
@@ -20,11 +20,9 @@ impl ConfRequestMessage {
 
     pub fn respond(&self, response: ConfResult) -> Result<(), String> {
         match &self.sender {
-            Some(sender) => {
-                sender
-                    .send(response)
-                    .map_err(|_| "Conf accessor is not listening to conf response".to_string())
-            }
+            Some(sender) => sender
+                .send(response)
+                .map_err(|_| "Conf accessor is not listening to conf response".to_string()),
             None => Err("There is no sender present to respond".to_string()),
         }
     }
@@ -32,7 +30,6 @@ impl ConfRequestMessage {
 #[derive(Clone)]
 pub enum ConfMessage {
     Terminate,
-    Get(String),
-    Set(String,String),
+    Get,
+    Set(String, String),
 }
-

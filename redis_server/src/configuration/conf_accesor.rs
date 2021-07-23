@@ -1,7 +1,7 @@
-use std::sync::mpsc;
-use std::fmt::{Debug, Formatter};
 use crate::configuration::conf_request_message::{ConfMessage, ConfRequestMessage};
 use crate::configuration::conf_response_message::ConfResult;
+use std::fmt::{Debug, Formatter};
+use std::sync::mpsc;
 
 pub struct ConfAccessor {
     sender: mpsc::Sender<ConfRequestMessage>,
@@ -43,10 +43,7 @@ impl ConfAccessor {
         }
     }
 
-    pub fn access(
-        &self,
-        message: ConfMessage,
-    ) -> Result<ConfResult, ConfAccessorError> {
+    pub fn access(&self, message: ConfMessage) -> Result<ConfResult, ConfAccessorError> {
         let storage_message =
             ConfRequestMessage::new(message, Some(self.sender_for_worker.clone()));
         match self.sender.send(storage_message) {

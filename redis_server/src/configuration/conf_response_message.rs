@@ -1,3 +1,5 @@
+use crate::configuration::Configuration;
+
 pub struct ConfResponseMessage {
     value_response: ConfResult,
 }
@@ -14,7 +16,7 @@ impl ConfResponseMessage {
 
 pub enum ConfResult {
     Ok,
-    OkString(String),
+    OkConf(Configuration),
     Error(ConfError),
 }
 

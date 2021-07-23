@@ -1,10 +1,12 @@
-use crate::configuration::Configuration;
-use crate::data::storage_service::operator_service::accessor::StorageAccessor;
+use crate::global_conf::GlobalConf;
 use crate::request_handler::parser::Parser;
 use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};
 
-pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
+pub fn handle_connection(mut stream: TcpStream, global_conf: GlobalConf) {
+    let conf = global_conf
+        .get_conf()
+        .expect("could not get a configuration");
     loop {
         let mut buffer = [0; 1024];
 
@@ -23,11 +25,11 @@ pub fn handle_connection(mut stream: TcpStream, mut conf: Configuration) {
                 };
                 conf.verbose(&format!("handle_connection: {}", s));
 
-                let accessor = StorageAccessor::new(conf.get_data_sender().clone());
+                let storage_accessor = global_conf.get_storage_accessor();
                 let parser = Parser::new();
                 let command = parser.parse(s.as_ref());
                 let message = match command {
-                    Ok(s) => match s.execute(accessor) {
+                    Ok(s) => match s.execute(storage_accessor) {
                         Ok(v) => v,
                         Err(e) => e,
                     },

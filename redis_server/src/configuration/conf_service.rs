@@ -1,8 +1,10 @@
-use std::sync::mpsc;
-use crate::configuration::conf_request_message::{ConfRequestMessage, ConfMessage};
-use std::thread;
-use crate::configuration::Configuration;
+use crate::configuration::conf_accesor::ConfAccessor;
+use crate::configuration::conf_request_message::{ConfMessage, ConfRequestMessage};
+use crate::configuration::conf_response_message::ConfResult;
 use crate::configuration::conf_worker::ConfWorker;
+use crate::configuration::Configuration;
+use std::sync::mpsc;
+use std::thread;
 
 pub struct ConfService {
     conf_request_sender: mpsc::Sender<ConfRequestMessage>,
@@ -13,7 +15,6 @@ impl ConfService {
     pub fn new(conf_filename: String) -> Self {
         let configuration = Configuration::new(&conf_filename);
         let (conf_tx, conf_rx) = mpsc::channel::<ConfRequestMessage>();
-
 
         let conf_th = thread::spawn(move || {
             let conf = ConfWorker::new(conf_rx, configuration);
@@ -28,6 +29,14 @@ impl ConfService {
 
     pub fn get_conf_sender(&self) -> mpsc::Sender<ConfRequestMessage> {
         self.conf_request_sender.clone()
+    }
+
+    pub fn get_conf(&self) -> Result<Configuration, String> {
+        let accessor = ConfAccessor::new(self.conf_request_sender.clone());
+        match accessor.access(ConfMessage::Get).unwrap() {
+            ConfResult::OkConf(value) => Ok(value),
+            _ => Err(String::from("Couldn't get a configuration")),
+        }
     }
 }
 
