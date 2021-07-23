@@ -39,7 +39,7 @@ impl StorageService {
 
         let persistence_accessor = StorageAccessor::new(operator_tx.clone());
         let _persistence_service =
-            JobRecurserService::new(PersistenceJob::new(persistence_accessor), 300 * 1000);
+            JobRecurserService::new(PersistenceJob::new(persistence_accessor), 1000);
 
         StorageService {
             operator_request_sender: operator_tx,

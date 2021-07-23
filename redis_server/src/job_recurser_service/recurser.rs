@@ -6,11 +6,13 @@ use std::time::Duration;
 
 const WAIT_TIME: u64 = 100;
 
+#[derive(Debug)]
 pub struct JobRecurser<T: RecurringJob + Send> {
     job: T,
     receiver: mpsc::Receiver<JobRecurserMessage>,
     period: u128,
     next_ts: u128,
+    wait_time: u64,
 }
 
 pub enum JobRecurserMessage {
@@ -29,6 +31,24 @@ impl<T: RecurringJob + Send> JobRecurser<T> {
             receiver,
             period,
             next_ts,
+            wait_time: WAIT_TIME,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn new_with_wait_time(
+        job: T,
+        receiver: mpsc::Receiver<JobRecurserMessage>,
+        period: u128,
+        wait_time: u64,
+    ) -> JobRecurser<T> {
+        let next_ts = current_time_in_millis() + period;
+        JobRecurser {
+            job,
+            receiver,
+            period,
+            next_ts,
+            wait_time,
         }
     }
 
@@ -36,8 +56,7 @@ impl<T: RecurringJob + Send> JobRecurser<T> {
         self.next_ts += self.period;
     }
 
-    fn wait(&self) {
-        let current_time = current_time_in_millis();
+    fn wait(&self, current_time: u128) {
         if current_time + (WAIT_TIME as u128) < self.next_ts {
             sleep(Duration::from_millis(WAIT_TIME));
         } else if current_time < self.next_ts {
@@ -51,11 +70,18 @@ impl<T: RecurringJob + Send> JobRecurser<T> {
             if let Ok(JobRecurserMessage::Terminate) = message {
                 break;
             }
-            if self.next_ts <= current_time_in_millis() && self.job.execute_job().is_err() {
-                break;
+            let current_time = current_time_in_millis();
+            if self.next_ts <= current_time {
+                match self.job.execute_job() {
+                    Ok(_) => {
+                        self.update_next_ts();
+                    }
+                    Err(_) => {
+                        break;
+                    }
+                }
             }
-            self.update_next_ts();
-            self.wait();
+            self.wait(current_time);
         }
     }
 }
@@ -94,11 +120,23 @@ mod tests {
     }
 
     #[test]
-    pub fn job_recurser_does_the_job() {
+    pub fn job_recurser_does_the_job_when_period_is_less_than_wait_time() {
         let (tx, rx) = mpsc::channel();
         let mut qty = 0;
         let job = Job1::new(&mut qty, tx);
         let mut recurser = JobRecurser::new(job, rx, 2);
+        let start = Instant::now();
+        recurser.init();
+        assert_eq!(qty, 5);
+        assert!(start.elapsed().as_millis() < 100);
+    }
+
+    #[test]
+    pub fn job_recurser_does_the_job_when_period_is_greater_than_wait_time() {
+        let (tx, rx) = mpsc::channel();
+        let mut qty = 0;
+        let job = Job1::new(&mut qty, tx);
+        let mut recurser = JobRecurser::new_with_wait_time(job, rx, 4, 1);
         let start = Instant::now();
         recurser.init();
         assert_eq!(qty, 5);
