@@ -378,13 +378,11 @@ impl StorageOperatorService {
                 }
 
                 StorageAction::ExpirationRound => {
-                    println!("StorageAction::ExpirationRound");
                     self.storage.clean_partial_expiration();
                     let _ = message.respond(StorageResult::Ok);
                 }
 
                 StorageAction::Save => {
-                    println!("StorageAction::Save");
                     let mut file = File::create("./dump.rdb").expect("could not create file");
                     for line in self.storage.serialize() {
                         let _ = file.write(&line.as_bytes());
