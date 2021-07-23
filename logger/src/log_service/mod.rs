@@ -1,5 +1,6 @@
 use crate::log_service::log_interface::LogInterface;
 use message::LogMessage;
+use std::fs::{File, OpenOptions};
 use std::io::Write;
 use std::sync::mpsc;
 use std::thread;
@@ -36,6 +37,26 @@ impl<T: Write + Send + 'static> LogService<T> {
 
     pub fn get_log_interface(&self) -> LogInterface<T> {
         LogInterface::new(self.log_sender.clone())
+    }
+}
+
+impl LogService<File> {
+    pub fn new_with_path(path: &str) -> Self {
+        let file = OpenOptions::new()
+            .write(true)
+            .append(true)
+            .create(true)
+            .open(path)
+            .expect("Log service: Could not open log file");
+        let (log_sender, log_receiver) = mpsc::channel();
+        let log_writer_thread_handler = thread::spawn(move || {
+            let log_writer = LogWriter::new(log_receiver, file);
+            log_writer.init();
+        });
+        LogService {
+            log_sender,
+            log_writer_thread_handler: Some(log_writer_thread_handler),
+        }
     }
 }
 

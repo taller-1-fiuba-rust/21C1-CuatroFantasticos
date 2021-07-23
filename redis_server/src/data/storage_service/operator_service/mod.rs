@@ -280,6 +280,21 @@ impl StorageOperatorService {
                     }
                 }
 
+                StorageAction::Sismember(key, member) => match self.storage.get(&key) {
+                    Some(RedisValue::Set(value)) => {
+                        let response = StorageResult::Bool(value.contains(member));
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotASet);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response = StorageResult::Bool(false);
+                        let _ = message.respond(response);
+                    }
+                },
+
                 StorageAction::IncrBy(key, incr_value) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(old_value)) => {
