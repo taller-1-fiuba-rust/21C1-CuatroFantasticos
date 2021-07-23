@@ -407,17 +407,11 @@ impl StorageOperatorService {
                 }
 
                 StorageAction::Set(key, value) => {
-                    let response = match self.storage.access(&key) {
-                        Some(RedisValue::String(old_value)) => {
-                            StorageResult::String(old_value.serialize())
-                        }
-                        Some(_) => StorageResult::Ok,
-                        None => StorageResult::Error(RedisError::Nil),
-                    };
                     self.storage.insert(
                         &key,
                         RedisValue::String(RedisValueString::new(value.clone())),
                     );
+                    let response = StorageResult::Ok;
                     let _ = message.respond(response);
                 }
 
