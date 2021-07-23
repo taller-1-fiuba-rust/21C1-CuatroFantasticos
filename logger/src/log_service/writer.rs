@@ -1,15 +1,15 @@
 use std::io::Write;
 use std::sync::mpsc;
 
-use crate::log::message::LogMessage;
+use crate::log_service::message::LogMessage;
 
 pub struct LogWriter<T: Write> {
-    log_receiver: mpsc::Receiver<LogMessage>,
+    log_receiver: mpsc::Receiver<LogMessage<T>>,
     output_buffer: T,
 }
 
 impl<T: Write> LogWriter<T> {
-    pub fn new(log_receiver: mpsc::Receiver<LogMessage>, output_buffer: T) -> Self {
+    pub fn new(log_receiver: mpsc::Receiver<LogMessage<T>>, output_buffer: T) -> Self {
         LogWriter {
             log_receiver,
             output_buffer,
@@ -26,6 +26,9 @@ impl<T: Write> LogWriter<T> {
                 LogMessage::Terminate => {
                     break;
                 }
+                LogMessage::SetLogFile(file) => {
+                    self.output_buffer = file;
+                }
             }
         }
     }
@@ -36,9 +39,9 @@ mod tests {
     use std::sync::mpsc;
     use std::thread;
 
-    use crate::log::message::LogMessage;
-    use crate::log::test_resources::VectorWriter;
-    use crate::log::writer::LogWriter;
+    use crate::log_service::message::LogMessage;
+    use crate::log_service::test_resources::VectorWriter;
+    use crate::log_service::writer::LogWriter;
 
     #[test]
     fn log_writer_create() {
