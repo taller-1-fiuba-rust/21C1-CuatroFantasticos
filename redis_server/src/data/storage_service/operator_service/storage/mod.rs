@@ -21,6 +21,9 @@ const LAST_ACCESS_TIME: usize = 2;
 const TYPE: usize = 3;
 const VALUE: usize = 4;
 
+const RANDOM_EXPIRATION_AMOUNT: usize = 20;
+const RANDOM_EXPIRATION_MINIMUM: f32 = 0.5;
+
 #[derive(Debug, Default)]
 pub struct RedisStorage {
     values: HashMap<String, StorageValue>,
@@ -36,6 +39,22 @@ impl RedisStorage {
         if self.values.contains_key(key) && self.expirations.is_expired(key) {
             let _ = self.values.remove(key);
             let _ = self.expirations.remove(key);
+        }
+    }
+
+    pub fn clean_partial_expiration(&mut self) {
+        let volatile_keys = &mut self
+            .expirations
+            .get_random_volatile_keys(RANDOM_EXPIRATION_AMOUNT);
+        let mut times = 0;
+        for key in volatile_keys {
+            if self.expirations.is_expired(key) {
+                times += 1;
+            }
+            self.clean_if_expirated(key);
+        }
+        if (times / RANDOM_EXPIRATION_AMOUNT) as f32 > RANDOM_EXPIRATION_MINIMUM {
+            self.clean_partial_expiration();
         }
     }
 

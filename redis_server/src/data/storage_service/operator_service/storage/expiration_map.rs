@@ -1,6 +1,9 @@
 use crate::utilities::current_time_in_millis;
 use std::collections::HashMap;
 
+use rand::seq::IteratorRandom;
+use rand::thread_rng;
+
 #[derive(Debug, Default)]
 pub struct ExpirationMap {
     map: HashMap<String, u128>,
@@ -41,5 +44,15 @@ impl ExpirationMap {
 
     pub fn get(&self, key: &str) -> Option<u128> {
         self.map.get(key).cloned()
+    }
+
+    pub fn get_random_volatile_keys(&self, amount: usize) -> Vec<String> {
+        let mut rng = thread_rng();
+        self.map
+            .keys()
+            .choose_multiple(&mut rng, amount)
+            .into_iter()
+            .cloned()
+            .collect()
     }
 }
