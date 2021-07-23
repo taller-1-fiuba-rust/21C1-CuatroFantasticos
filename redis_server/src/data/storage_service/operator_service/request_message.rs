@@ -62,4 +62,5 @@ pub enum StorageAction {
     Keys(String),
     Ttl(String),
     Scard(String),
+    Sismember(String, String),
 }
