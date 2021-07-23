@@ -2,7 +2,25 @@ use crate::command::RedisCommand;
 use crate::data::storage_service::operator_service::accessor::StorageAccessor;
 use crate::data::storage_service::operator_service::request_message::StorageAction;
 use crate::protocol_serialization::ProtocolSerializer;
-
+///Returns the set cardinality (number of elements) of the set stored at key.
+/// # Arguments
+/// * key - String
+/// * number - String
+///
+///# Return value
+/// Integer reply, specifically:
+/// * 1 if the element is a member of the set.
+/// * 0 if the element is not a member of the set, or if key does not exist.
+///
+///Examples
+/// ```redis> SADD myset "one"
+/// (integer) 1
+/// redis> SISMEMBER myset "one"
+/// (integer) 1
+/// redis> SISMEMBER myset "two"
+/// (integer) 0
+/// redis>
+/// ```
 pub struct RedisCommandSismember {
     key: String,
     member: String,
