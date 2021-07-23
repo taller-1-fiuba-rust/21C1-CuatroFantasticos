@@ -1,16 +1,17 @@
-use crate::log::message::LogMessage;
+use crate::log_service::message::LogMessage;
 use core::result::Result;
 use core::result::Result::{Err, Ok};
 use std::error::Error;
+use std::io::Write;
 use std::sync::mpsc;
 
 #[derive(Clone, Debug)]
-pub struct Logger {
-    log_sender: mpsc::Sender<LogMessage>,
+pub struct Logger<T: Write> {
+    log_sender: mpsc::Sender<LogMessage<T>>,
 }
 
-impl Logger {
-    pub fn new(log_sender: mpsc::Sender<LogMessage>) -> Self {
+impl<T: Write> Logger<T> {
+    pub fn new(log_sender: mpsc::Sender<LogMessage<T>>) -> Self {
         Logger { log_sender }
     }
     pub fn log(&self, log_string: &str) -> Result<(), Box<dyn Error>> {
@@ -30,12 +31,14 @@ impl Logger {
 
 mod tests {
 
-    use crate::log::Logger;
+    use crate::log_service::logger::Logger;
+    use crate::log_service::message::LogMessage;
+    use std::fs::File;
     use std::sync::mpsc;
 
     #[test]
     fn new_logger_created() {
-        let (sender, _receiver) = mpsc::channel();
+        let (sender, _receiver) = mpsc::channel::<LogMessage<File>>();
         Logger::new(sender);
     }
 }

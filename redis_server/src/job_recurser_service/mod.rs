@@ -6,7 +6,7 @@ mod recurser;
 
 pub struct RecurringJobError {}
 pub trait RecurringJob {
-    fn execute_job(&self) -> Result<(), RecurringJobError>;
+    fn execute_job(&mut self) -> Result<(), RecurringJobError>;
 }
 
 pub struct JobRecurserService {

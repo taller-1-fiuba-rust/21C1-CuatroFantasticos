@@ -4,7 +4,7 @@ extern crate redis_server;
 use std::env;
 use std::fs::OpenOptions;
 
-use logger::log::LogService;
+use logger::log_service::LogService;
 use redis_server::architecture::server;
 use redis_server::configuration::Configuration;
 use redis_server::data::storage_service::StorageService;
@@ -20,8 +20,8 @@ fn main() {
         .create(true)
         .open(logfile)
         .expect("No se pudo crear un archivo de logs");
-    let log_service: LogService = LogService::new(file);
-    conf.set_logservice(log_service.create_logger());
+    let log_service = LogService::new(file);
+    conf.set_logger_builder(log_service.get_log_interface());
 
     let dbfilename = conf.get("dbfilename").unwrap();
     let db_file = OpenOptions::new()

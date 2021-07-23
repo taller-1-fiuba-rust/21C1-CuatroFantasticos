@@ -1,8 +1,10 @@
 use crate::configuration::verbose::Verbose;
 use crate::data::storage_service::operator_service::request_message::StorageRequestMessage;
-use logger::log::logger::Logger;
+use logger::log_service::log_interface::LogInterface;
+use logger::log_service::logger::Logger;
 use std::collections::HashMap;
 use std::fs;
+use std::fs::File;
 use std::sync::mpsc;
 
 pub mod verbose;
@@ -10,7 +12,7 @@ pub mod verbose;
 #[derive(Debug, Clone)]
 pub struct Configuration {
     conf: HashMap<String, String>,
-    logger: Option<Logger>,
+    logger_builder: Option<LogInterface<File>>,
     verbose: Verbose,
     data_sender: Option<mpsc::Sender<StorageRequestMessage>>,
 }
@@ -34,7 +36,7 @@ impl Configuration {
         Configuration {
             conf,
             verbose,
-            logger: None,
+            logger_builder: None,
             data_sender: None,
         }
     }
@@ -55,8 +57,8 @@ impl Configuration {
     fn create_verbose(verbose: &str) -> Verbose {
         Verbose::new(verbose)
     }
-    pub fn set_logservice(&mut self, logger: Logger) {
-        self.logger = Some(logger);
+    pub fn set_logger_builder(&mut self, logger_builder: LogInterface<File>) {
+        self.logger_builder = Some(logger_builder);
     }
 
     pub fn set_data_sender(&mut self, data_sender: mpsc::Sender<StorageRequestMessage>) {
@@ -69,8 +71,11 @@ impl Configuration {
             .expect("No sender in configuration")
     }
 
-    pub fn create_logger(&self) -> Logger {
-        self.logger.as_ref().expect("no hay un logservice").clone()
+    pub fn logger(&self) -> Logger<File> {
+        self.logger_builder
+            .as_ref()
+            .expect("There is no logger builder set")
+            .build_logger()
     }
 
     pub fn verbose(&self, content: &str) {
