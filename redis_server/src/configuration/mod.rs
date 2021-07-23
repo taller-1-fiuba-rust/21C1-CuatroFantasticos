@@ -1,13 +1,20 @@
-use crate::configuration::verbose::Verbose;
-use crate::data::storage_service::operator_service::request_message::StorageRequestMessage;
-use logger::log_service::log_interface::LogInterface;
-use logger::log_service::logger::Logger;
 use std::collections::HashMap;
 use std::fs;
 use std::fs::File;
 use std::sync::mpsc;
 
+use logger::log_service::log_interface::LogInterface;
+use logger::log_service::logger::Logger;
+
+use crate::configuration::verbose::Verbose;
+use crate::data::storage_service::operator_service::request_message::StorageRequestMessage;
+
 pub mod verbose;
+mod conf_worker;
+pub mod conf_accesor;
+pub mod conf_request_message;
+pub mod conf_response_message;
+pub mod conf_service;
 
 #[derive(Debug, Clone)]
 pub struct Configuration {
@@ -43,6 +50,10 @@ impl Configuration {
 
     pub fn get(&self, key: &str) -> Option<String> {
         self.conf.get(key).map(|s| s.to_string())
+    }
+
+    pub fn set(&mut self, key: String, value: String) {
+        self.conf.insert(key,value);
     }
 
     pub fn default_values() -> HashMap<String, String> {
@@ -85,7 +96,6 @@ impl Configuration {
 
 #[cfg(test)]
 mod tests {
-
     use crate::configuration::Configuration;
     use crate::configuration::CONST_DBFILENAME;
     use crate::configuration::CONST_LOGFILE;

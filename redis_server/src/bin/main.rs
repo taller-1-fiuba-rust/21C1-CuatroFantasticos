@@ -6,13 +6,22 @@ use std::fs::OpenOptions;
 
 use logger::log_service::LogService;
 use redis_server::architecture::server;
-use redis_server::configuration::Configuration;
 use redis_server::data::storage_service::StorageService;
+use redis_server::configuration::conf_service::ConfService;
+use redis_server::configuration::conf_accesor::ConfAccessor;
+use redis_server::configuration::conf_request_message::ConfRequestMessage;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     let filename = &args[1];
-    let mut conf: Configuration = Configuration::new(filename);
+
+    let conf_service = ConfService::new(filename.clone());
+
+    let (conf_sender , conf_receiver) = mpsc::Channel::<ConfRequestMessage>();
+    let conf_accesor = ConfAccessor::new();
+
+
+
     let logfile = conf.get("logfile").expect("No hay un logfile definido");
     let file = OpenOptions::new()
         .write(true)
