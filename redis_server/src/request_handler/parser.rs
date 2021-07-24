@@ -26,6 +26,7 @@ use crate::command::scard::RedisCommandScard;
 use crate::command::set::RedisCommandSet;
 use crate::command::sismember::RedisCommandSismember;
 use crate::command::sort::RedisCommandSort;
+use crate::command::srem::RedisCommandSrem;
 use crate::command::strlen::RedisCommandStrlen;
 use crate::command::subscribe::RedisCommandSubscribe;
 use crate::command::touch::RedisCommandTouch;
@@ -89,6 +90,7 @@ impl Parser {
             "SCARD" => self.parse_command_scard(&mut command_iter),
             "SISMEMBER" => self.parse_command_sismember(&mut command_iter),
             "SET" => self.parse_command_set(&mut command_iter),
+            "SREM" => self.parse_command_srem(&mut command_iter, command_qty),
             "MSET" => self.parse_command_mset(&mut command_iter, command_qty),
             "MGET" => self.parse_command_mget(&mut command_iter, command_qty),
             "SUBSCRIBE" => self.parse_command_subscribe(&mut command_iter, command_qty),
@@ -243,6 +245,20 @@ impl Parser {
             members.push(new_member);
         }
         Ok(RedisCommand::Sadd(RedisCommandSAdd::new(key, members)))
+    }
+
+    fn parse_command_srem(
+        &self,
+        command_iter: &mut Split<&str>,
+        command_qty: usize,
+    ) -> Result<RedisCommand, String> {
+        let key = self.parse_string(command_iter)?;
+        let mut members = Vec::<String>::new();
+        for _ in 1..(command_qty - 1) {
+            let new_member = self.parse_string(command_iter)?;
+            members.push(new_member);
+        }
+        Ok(RedisCommand::Srem(RedisCommandSrem::new(key, members)))
     }
 
     fn parse_command_mset(

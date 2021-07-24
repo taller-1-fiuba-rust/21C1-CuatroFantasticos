@@ -65,5 +65,6 @@ pub enum StorageAction {
     Scard(String),
     Sismember(String, String),
     Set(String, String),
+    Srem(String, Vec<String>),
     MGet(Vec<String>),
 }
