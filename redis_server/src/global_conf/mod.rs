@@ -1,7 +1,7 @@
+use crate::configuration::accesor::ConfAccessor;
 use crate::configuration::accessor_builder::ConfAccessorBuilder;
-use crate::configuration::conf_accesor::ConfAccessor;
-use crate::configuration::conf_request_message::ConfMessage;
-use crate::configuration::conf_response_message::ConfResult;
+use crate::configuration::request_message::ConfMessage;
+use crate::configuration::response_message::ConfResult;
 use crate::configuration::Configuration;
 use crate::data::storage_service::operator_service::accessor::StorageAccessor;
 use crate::data::storage_service::operator_service::accessor_builder::StorageAccessorBuilder;

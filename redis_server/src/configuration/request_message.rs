@@ -1,4 +1,4 @@
-use crate::configuration::conf_response_message::ConfResult;
+use crate::configuration::response_message::ConfResult;
 use std::sync::mpsc;
 
 pub struct ConfRequestMessage {

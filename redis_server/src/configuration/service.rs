@@ -1,8 +1,8 @@
+use crate::configuration::accesor::ConfAccessor;
 use crate::configuration::accessor_builder::ConfAccessorBuilder;
-use crate::configuration::conf_accesor::ConfAccessor;
-use crate::configuration::conf_request_message::{ConfMessage, ConfRequestMessage};
-use crate::configuration::conf_response_message::ConfResult;
-use crate::configuration::conf_worker::ConfWorker;
+use crate::configuration::request_message::{ConfMessage, ConfRequestMessage};
+use crate::configuration::response_message::ConfResult;
+use crate::configuration::worker::ConfWorker;
 use crate::configuration::Configuration;
 use std::sync::mpsc;
 use std::thread;

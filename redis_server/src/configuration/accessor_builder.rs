@@ -1,5 +1,5 @@
-use crate::configuration::conf_accesor::ConfAccessor;
-use crate::configuration::conf_request_message::ConfRequestMessage;
+use crate::configuration::accesor::ConfAccessor;
+use crate::configuration::request_message::ConfRequestMessage;
 use std::sync::mpsc;
 
 #[derive(Clone)]

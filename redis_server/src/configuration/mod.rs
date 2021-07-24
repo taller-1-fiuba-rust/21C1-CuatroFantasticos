@@ -9,13 +9,13 @@ use logger::log_service::logger::Logger;
 use crate::configuration::verbose::Verbose;
 use crate::data::storage_service::operator_service::request_message::StorageRequestMessage;
 
+pub mod accesor;
 pub mod accessor_builder;
-pub mod conf_accesor;
-pub mod conf_request_message;
-pub mod conf_response_message;
-pub mod conf_service;
-mod conf_worker;
+pub mod request_message;
+pub mod response_message;
+pub mod service;
 pub mod verbose;
+mod worker;
 
 #[derive(Debug, Clone)]
 pub struct Configuration {
