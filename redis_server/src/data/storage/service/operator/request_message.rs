@@ -52,6 +52,7 @@ pub enum StorageAction {
     ExpirationRound,
     Save,
     SAdd(String, Vec<String>),
+    MSet(Vec<String>, Vec<String>),
     Terminate,
     DecrBy(String, i32),
     IncrBy(String, i32),

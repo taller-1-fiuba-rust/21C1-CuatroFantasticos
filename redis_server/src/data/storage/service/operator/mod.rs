@@ -415,6 +415,17 @@ impl StorageOperatorService {
                     let _ = message.respond(response);
                 }
 
+                StorageAction::MSet(keys, values) => {
+                    for (key, value) in keys.iter().zip(values.iter()) {
+                        self.storage.insert(
+                            key,
+                            RedisValue::String(RedisValueString::new(value.clone())),
+                        );
+                    }
+                    let response = StorageResult::Ok;
+                    let _ = message.respond(response);
+                }
+
                 StorageAction::ExpirationRound => {
                     self.storage.clean_partial_expiration();
                     let _ = message.respond(StorageResult::Ok);
