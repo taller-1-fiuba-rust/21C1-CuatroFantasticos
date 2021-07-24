@@ -1,4 +1,4 @@
-use crate::configuration::request_message::{ConfMessage, ConfRequestMessage};
+use crate::configuration::request_message::{ConfAction, ConfRequestMessage};
 use crate::configuration::response_message::ConfResult;
 use std::fmt::{Debug, Formatter};
 use std::sync::mpsc;
@@ -43,7 +43,7 @@ impl ConfAccessor {
         }
     }
 
-    pub fn access(&self, message: ConfMessage) -> Result<ConfResult, ConfAccessorError> {
+    pub fn access(&self, message: ConfAction) -> Result<ConfResult, ConfAccessorError> {
         let storage_message =
             ConfRequestMessage::new(message, Some(self.sender_for_worker.clone()));
         match self.sender.send(storage_message) {

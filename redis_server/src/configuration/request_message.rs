@@ -2,19 +2,19 @@ use crate::configuration::response_message::ConfResult;
 use std::sync::mpsc;
 
 pub struct ConfRequestMessage {
-    message: ConfMessage,
+    message: ConfAction,
     sender: Option<mpsc::Sender<ConfResult>>,
 }
 
 impl ConfRequestMessage {
     pub fn new(
-        message: ConfMessage,
+        message: ConfAction,
         sender: Option<mpsc::Sender<ConfResult>>,
     ) -> ConfRequestMessage {
         ConfRequestMessage { message, sender }
     }
 
-    pub fn get_message(&self) -> ConfMessage {
+    pub fn get_message(&self) -> ConfAction {
         self.message.clone()
     }
 
@@ -28,7 +28,7 @@ impl ConfRequestMessage {
     }
 }
 #[derive(Clone)]
-pub enum ConfMessage {
+pub enum ConfAction {
     Terminate,
     Get,
     Set(String, String),

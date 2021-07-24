@@ -1,6 +1,6 @@
 use crate::configuration::accesor::ConfAccessor;
 use crate::configuration::accessor_builder::ConfAccessorBuilder;
-use crate::configuration::request_message::{ConfMessage, ConfRequestMessage};
+use crate::configuration::request_message::{ConfAction, ConfRequestMessage};
 use crate::configuration::response_message::ConfResult;
 use crate::configuration::worker::ConfWorker;
 use crate::configuration::Configuration;
@@ -34,7 +34,7 @@ impl ConfService {
 
     pub fn get_conf(&self) -> Result<Configuration, String> {
         let accessor = ConfAccessor::new(self.conf_request_sender.clone());
-        match accessor.access(ConfMessage::Get).unwrap() {
+        match accessor.access(ConfAction::Get).unwrap() {
             ConfResult::OkConf(value) => Ok(value),
             _ => Err(String::from("Couldn't get a configuration")),
         }
@@ -45,7 +45,7 @@ impl Drop for ConfService {
     fn drop(&mut self) {
         let _ = self
             .conf_request_sender
-            .send(ConfRequestMessage::new(ConfMessage::Terminate, None));
+            .send(ConfRequestMessage::new(ConfAction::Terminate, None));
         if let Some(th) = self.conf_thread_handler.take() {
             th.join().unwrap();
         }

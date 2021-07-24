@@ -1,9 +1,9 @@
-use crate::global_conf::GlobalConf;
+use crate::global_resources::GlobalResources;
 use crate::request_handler::parser::Parser;
 use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};
 
-pub fn handle_connection(mut stream: TcpStream, global_conf: GlobalConf) {
+pub fn handle_connection(mut stream: TcpStream, global_conf: GlobalResources) {
     let conf = global_conf
         .get_conf()
         .expect("could not get a configuration");

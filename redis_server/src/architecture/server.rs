@@ -1,10 +1,10 @@
 use crate::architecture::connection_handler;
-use crate::global_conf::GlobalConf;
+use crate::global_resources::GlobalResources;
 use std::net::TcpListener;
 use std::thread;
 use std::time::Duration;
 
-pub fn run_server(global_conf: GlobalConf) {
+pub fn run_server(global_conf: GlobalResources) {
     let conf = global_conf
         .get_conf()
         .expect("could not get a configuration");

@@ -1,4 +1,4 @@
-use crate::configuration::request_message::{ConfMessage, ConfRequestMessage};
+use crate::configuration::request_message::{ConfAction, ConfRequestMessage};
 use crate::configuration::response_message::{ConfError, ConfResult};
 use crate::configuration::Configuration;
 use std::sync::mpsc;
@@ -19,7 +19,7 @@ impl ConfWorker {
         }
     }
 
-    pub fn validate_key(&self, key: &str) -> Result<String, ()> {
+    fn validate_key(&self, key: &str) -> Result<String, ()> {
         match key {
             "verbose" | "dbfilename" | "timeout" | "logfile" => Ok(key.to_owned()),
             _ => Err(()),
@@ -29,10 +29,10 @@ impl ConfWorker {
     pub fn init(mut self) {
         for message in &self.conf_receiver {
             match message.get_message() {
-                ConfMessage::Get => {
+                ConfAction::Get => {
                     let _ = message.respond(ConfResult::OkConf(self.configuration.clone()));
                 }
-                ConfMessage::Set(key, value) => match self.validate_key(&key) {
+                ConfAction::Set(key, value) => match self.validate_key(&key) {
                     Ok(key) => {
                         self.configuration.set(key, value);
                         let _ = message.respond(ConfResult::Ok);
@@ -41,7 +41,7 @@ impl ConfWorker {
                         let _ = message.respond(ConfResult::Error(ConfError::NonExistent));
                     }
                 },
-                ConfMessage::Terminate => {
+                ConfAction::Terminate => {
                     break;
                 }
             }

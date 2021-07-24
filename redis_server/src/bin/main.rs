@@ -8,7 +8,7 @@ use logger::log_service::LogService;
 use redis_server::architecture::server;
 use redis_server::configuration::service::ConfService;
 use redis_server::data::storage_service::StorageService;
-use redis_server::global_conf::GlobalConf;
+use redis_server::global_resources::GlobalResources;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -26,7 +26,7 @@ fn main() {
         .expect("No se pudo crear un archivo de database");
 
     let storage_service = StorageService::new(db_file);
-    let global_conf = GlobalConf::new(
+    let global_conf = GlobalResources::new(
         log_service.get_log_interface(),
         conf_service.get_accessor_builder(),
         storage_service.get_accessor_builder(),
