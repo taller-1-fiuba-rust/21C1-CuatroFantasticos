@@ -12,6 +12,7 @@ use crate::global_resources::error::GlobalResourcesError;
 use logger::log_service::log_interface::LogInterface;
 use logger::log_service::logger::Logger;
 use std::fs::File;
+use crate::architecture::connection_handler::pub_sub_sender::ClientPubSubSender;
 
 #[derive(Clone)]
 pub struct GlobalResources {
@@ -19,6 +20,7 @@ pub struct GlobalResources {
     verbose: Verbose,
     configuration_access_builder: ConfAccessorBuilder,
     storage_access_builder: StorageAccessorBuilder,
+    client_pub_sub_sender: Option<ClientPubSubSender>,
 }
 
 impl GlobalResources {
@@ -33,6 +35,7 @@ impl GlobalResources {
             verbose,
             configuration_access_builder: configuration_sender,
             storage_access_builder: storage_sender,
+            client_pub_sub_sender: None,
         }
     }
 
@@ -58,5 +61,11 @@ impl GlobalResources {
             Ok(ConfResult::OkConf(value)) => Ok(value),
             _ => Err(GlobalResourcesError::GetConfError),
         }
+    }
+    pub fn set_client_pub_sub_sender(&mut self, client_pub_sub_sender: ClientPubSubSender) {
+        self.client_pub_sub_sender = Some(client_pub_sub_sender);
+    }
+    pub fn get_client_pub_sub_sender(&self) -> Option<ClientPubSubSender> {
+        self.client_pub_sub_sender.map(|v| v.clone())
     }
 }
