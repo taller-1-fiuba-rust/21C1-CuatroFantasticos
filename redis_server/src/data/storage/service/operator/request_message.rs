@@ -67,4 +67,5 @@ pub enum StorageAction {
     Set(String, String),
     Srem(String, Vec<String>),
     MGet(Vec<String>),
+    LPop(String, i32),
 }

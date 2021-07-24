@@ -457,6 +457,23 @@ impl StorageOperatorService {
                     let _ = message.respond(response);
                 }
 
+                StorageAction::LPop(key, times) => {
+                    match self.storage.mut_get(&key) {
+                        Some(RedisValue::List(value)) => {
+                            let response = StorageResult::Vector(value.pop(times));
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response = StorageResult::Error(RedisError::NotAList);
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            let response = StorageResult::Error(RedisError::NonExistent);
+                            let _ = message.respond(response);
+                        }
+                    };
+                }
+
                 StorageAction::ExpirationRound => {
                     self.storage.clean_partial_expiration();
                     let _ = message.respond(StorageResult::Ok);
