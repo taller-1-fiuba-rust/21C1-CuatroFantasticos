@@ -5,6 +5,16 @@ use crate::data::storage::service::operator::request_message::StorageAction;
 use crate::data::storage::service::operator::response_message::StorageResult;
 use crate::data::storage::service::operator::result_error::RedisError;
 use crate::protocol_serialization::ProtocolSerializer;
+/// Returns or stores the elements contained in the list,
+/// set or sorted set at key. By default, sorting is numeric
+/// and elements are compared by their value interpreted as double
+/// precision floating point number.
+///
+/// # Arguments
+/// * key - String
+///
+/// # Return value
+/// Array reply: without passing the store option the command returns a list of sorted elements.
 
 pub struct RedisCommandSort {
     key: String,

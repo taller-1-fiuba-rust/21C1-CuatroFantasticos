@@ -3,7 +3,18 @@ use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
 use crate::data::storage::service::operator::result_error::RedisError;
 use crate::protocol_serialization::ProtocolSerializer;
-
+///Set a timeout on key. After the timeout has expired,
+/// the key will automatically be deleted. A key with an associated
+/// timeout is often said to be volatile in Redis terminology.
+/// # Arguments
+/// *  key - String,
+/// *  new_value - String,
+///
+///# Return value
+///Integer reply, specifically:
+/// * 1 if the timeout was set.
+/// * 0 if key does not exist.
+///
 pub struct RedisCommandExpire {
     key: String,
     new_value: String,

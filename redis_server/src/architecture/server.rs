@@ -3,6 +3,10 @@ use crate::global_resources::GlobalResources;
 use std::net::TcpListener;
 use std::thread;
 use std::time::Duration;
+/// Run Server Sets the port the server will use,
+/// Starts a server for webhook
+/// # Arguments
+/// * conf - Configuration
 
 pub fn run_server(global_conf: GlobalResources) {
     let conf = global_conf

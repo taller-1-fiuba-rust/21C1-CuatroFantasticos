@@ -63,4 +63,5 @@ pub enum StorageAction {
     Ttl(String),
     Scard(String),
     Sismember(String, String),
+    Set(String, String),
 }

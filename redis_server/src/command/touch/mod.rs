@@ -2,6 +2,13 @@ use crate::command::RedisCommand;
 use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
 use crate::protocol_serialization::ProtocolSerializer;
+///Alters the last access time of a key(s). A key is ignored if it does not exist.
+///
+/// # Arguments
+/// * key - String
+///
+/// # Return value
+/// Integer reply: The number of keys that were touched.
 
 pub struct RedisCommandTouch {
     key: String,

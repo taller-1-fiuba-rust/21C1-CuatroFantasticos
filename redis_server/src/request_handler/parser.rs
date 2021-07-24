@@ -21,6 +21,7 @@ use crate::command::rename::RedisCommandRename;
 use crate::command::sadd::RedisCommandSAdd;
 use crate::command::save::RedisCommandSave;
 use crate::command::scard::RedisCommandScard;
+use crate::command::set::RedisCommandSet;
 use crate::command::sismember::RedisCommandSismember;
 use crate::command::sort::RedisCommandSort;
 use crate::command::strlen::RedisCommandStrlen;
@@ -84,6 +85,7 @@ impl Parser {
             "EXPIREAT" => self.parse_command_expireat(&mut command_iter),
             "SCARD" => self.parse_command_scard(&mut command_iter),
             "SISMEMBER" => self.parse_command_sismember(&mut command_iter),
+            "SET" => self.parse_command_set(&mut command_iter),
             _ => Err(format!(
                 "-Unknown or disabled command '{}'\r\n",
                 command_type
@@ -317,6 +319,15 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         let member = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandSismember::new(key, member)))
+    }
+
+    fn parse_command_set(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let key = self.parse_string(command_iter)?;
+        let value = self.parse_string(command_iter)?;
+        Ok(Box::new(RedisCommandSet::new(key, value)))
     }
 }
 

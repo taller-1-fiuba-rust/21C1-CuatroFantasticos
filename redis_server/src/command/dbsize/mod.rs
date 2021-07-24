@@ -2,6 +2,9 @@ use crate::command::RedisCommand;
 use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
 use crate::protocol_serialization::ProtocolSerializer;
+///Return the number of keys in the currently-selected database.
+/// # Return value
+///* Integer reply
 
 pub struct RedisCommandDbSize {}
 
