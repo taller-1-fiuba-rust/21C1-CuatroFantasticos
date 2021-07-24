@@ -426,6 +426,18 @@ impl StorageOperatorService {
                     let _ = message.respond(response);
                 }
 
+                StorageAction::MGet(keys) => {
+                    let mut values = Vec::new();
+                    for key in keys {
+                        match self.storage.access(&key) {
+                            Some(RedisValue::String(value)) => values.push(Some(value.serialize())),
+                            _ => values.push(None),
+                        };
+                    }
+                    let response = StorageResult::OptionVector(values);
+                    let _ = message.respond(response);
+                }
+
                 StorageAction::ExpirationRound => {
                     self.storage.clean_partial_expiration();
                     let _ = message.respond(StorageResult::Ok);
