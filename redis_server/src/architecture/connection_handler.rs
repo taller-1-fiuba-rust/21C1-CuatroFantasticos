@@ -6,7 +6,7 @@ use std::net::{Shutdown, TcpStream};
 pub fn handle_connection(mut stream: TcpStream, global_conf: GlobalResources) {
     let conf = global_conf
         .get_conf()
-        .expect("could not get a configuration");
+        .expect("handle_connection: Could not get a configuration");
     loop {
         let mut buffer = [0; 1024];
 
