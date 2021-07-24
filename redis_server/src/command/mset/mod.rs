@@ -1,5 +1,5 @@
-use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
+use crate::global_resources::GlobalResources;
 use crate::protocol_serialization::ProtocolSerializer;
 
 pub struct RedisCommandMSet {
@@ -14,12 +14,20 @@ impl RedisCommandMSet {
             member_values,
         }
     }
-    pub fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageAction::MSet(
-            self.member_keys.clone(),
-            self.member_values.clone(),
-        ))?;
+    pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
+        let verbose = global_resources.get_verbose();
+        verbose.print(&format!(
+            "Executing command MSet with keys: {:?} and values {:?}: ",
+            self.member_keys, self.member_values
+        ));
+        let response = global_resources
+            .get_storage_accessor()
+            .access(StorageAction::MSet(
+                self.member_keys.clone(),
+                self.member_values.clone(),
+            ))?;
         let response = response.get_value().protocol_serialize_to_simple_string();
+        verbose.print("Finalizing execution of command MSet");
         Ok(response)
     }
 }

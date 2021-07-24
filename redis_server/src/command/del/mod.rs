@@ -17,6 +17,7 @@ impl RedisCommandDel {
     pub fn new(key: String) -> RedisCommandDel {
         RedisCommandDel { key }
     }
+
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
         let verbose = global_resources.get_verbose();
         verbose.print(&format!("Executing command Del with key: {}", self.key));

@@ -16,7 +16,7 @@ impl RedisCommandSubscribe {
     pub fn new(channel: Vec<String>) -> RedisCommandSubscribe {
         RedisCommandSubscribe { _channel: channel }
     }
-    pub fn execute(&self, _resources: GlobalResources) -> Result<String, String> {
+    pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
         todo!()
     }
 }

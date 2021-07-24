@@ -1,8 +1,9 @@
-use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
 use crate::data::storage::service::operator::response_message::StorageResult;
 use crate::data::storage::service::operator::result_error::RedisError;
+use crate::global_resources::GlobalResources;
 use crate::protocol_serialization::ProtocolSerializer;
+
 ///Returns all keys matching pattern.
 /// While the time complexity for this operation is O(N),
 /// the constant times are fairly low. For example,
@@ -35,12 +36,20 @@ impl RedisCommandKeys {
     pub fn new(key: String) -> RedisCommandKeys {
         RedisCommandKeys { pattern: key }
     }
-    pub fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageAction::Keys(self.pattern.clone()))?;
+    pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
+        let verbose = global_resources.get_verbose();
+        verbose.print(&format!(
+            "Executing command Keys with string : {}",
+            self.pattern
+        ));
+        let response = global_resources
+            .get_storage_accessor()
+            .access(StorageAction::Keys(self.pattern.clone()))?;
         let response = match response.get_value() {
             StorageResult::Vector(vec) => vec.protocol_serialize_to_simple_string(),
             _ => RedisError::Unknown.protocol_serialize_to_simple_string(),
         };
+        verbose.print("Finalizing execution of command Keys");
         Ok(response)
     }
 }
