@@ -416,9 +416,7 @@ impl StorageOperatorService {
                 }
 
                 StorageAction::MSet(keys, values) => {
-                    println!("keys : {:?} values {:?}", keys, values);
                     for (key, value) in keys.iter().zip(values.iter()) {
-                        println!("adding key: {} value: {}", key, value);
                         self.storage.insert(
                             key,
                             RedisValue::String(RedisValueString::new(value.clone())),
