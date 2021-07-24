@@ -1,4 +1,3 @@
-use crate::command::RedisCommand;
 use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
 use crate::protocol_serialization::ProtocolSerializer;
@@ -29,10 +28,7 @@ impl RedisCommandCopy {
             destination_key,
         }
     }
-}
-
-impl RedisCommand for RedisCommandCopy {
-    fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
+    pub fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
         let copy = accessor.access(StorageAction::Copy(
             self.source_key.clone(),
             self.destination_key.clone(),

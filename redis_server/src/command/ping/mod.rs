@@ -1,4 +1,3 @@
-use crate::command::RedisCommand;
 use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::protocol_serialization::ProtocolSerializer;
 /// Implemented to test the connection of the server
@@ -11,10 +10,7 @@ impl RedisCommandPing {
     pub fn new() -> RedisCommandPing {
         RedisCommandPing {}
     }
-}
-
-impl RedisCommand for RedisCommandPing {
-    fn execute(&self, _accessor: StorageAccessor) -> Result<String, String> {
+    pub fn execute(&self, _accessor: StorageAccessor) -> Result<String, String> {
         let response = "PONG".protocol_serialize_to_simple_string();
         Ok(response)
     }

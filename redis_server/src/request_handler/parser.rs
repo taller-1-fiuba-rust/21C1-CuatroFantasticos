@@ -40,7 +40,7 @@ impl Parser {
         Parser {}
     }
 
-    pub fn parse(&self, packed_command: &[u8]) -> Result<Box<dyn RedisCommand>, String> {
+    pub fn parse(&self, packed_command: &[u8]) -> Result<RedisCommand, String> {
         let mut command_iter = std::str::from_utf8(packed_command)
             .map_err(|_| "Not an utf-8 string".to_string())?
             .split(TOKEN_SEPARATOR);
@@ -53,15 +53,15 @@ impl Parser {
         &self,
         mut command_iter: Split<&str>,
         command_qty: usize,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    ) -> Result<RedisCommand, String> {
         let command_type = self.parse_string(&mut command_iter)?;
         match command_type.to_uppercase().as_str() {
-            "COMMAND" => Ok(Box::new(RedisCommandPing::new())),
-            "PING" => Ok(Box::new(RedisCommandPing::new())),
+            "COMMAND" => Ok(RedisCommand::Ping(RedisCommandPing::new())),
+            "PING" => Ok(RedisCommand::Ping(RedisCommandPing::new())),
             "INFO" => todo!(),
             "KEYS" => self.parse_command_keys(&mut command_iter),
-            "DBSIZE" => Ok(Box::new(RedisCommandDbSize::new())),
-            "FLUSHDB" => Ok(Box::new(RedisCommandFlushDb::new())),
+            "DBSIZE" => Ok(RedisCommand::Dbsize(RedisCommandDbSize::new())),
+            "FLUSHDB" => Ok(RedisCommand::FlushDb(RedisCommandFlushDb::new())),
             "TYPE" => self.parse_command_type(&mut command_iter),
             "EXISTS" => self.parse_command_exists(&mut command_iter),
             "RENAME" => self.parse_command_rename(&mut command_iter),
@@ -81,7 +81,7 @@ impl Parser {
             "SADD" => self.parse_command_sadd(&mut command_iter, command_qty),
             "TTL" => self.parse_command_ttl(&mut command_iter),
             "PERSIST" => self.parse_command_persist(&mut command_iter),
-            "SAVE" => Ok(Box::new(RedisCommandSave::new())),
+            "SAVE" => Ok(RedisCommand::Save(RedisCommandSave::new())),
             "EXPIRE" => self.parse_command_expire(&mut command_iter),
             "EXPIREAT" => self.parse_command_expireat(&mut command_iter),
             "SCARD" => self.parse_command_scard(&mut command_iter),
@@ -116,183 +116,136 @@ impl Parser {
 }
 
 impl Parser {
-    fn parse_command_exists(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_exists(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandExists::new(key)))
+        Ok(RedisCommand::Exists(RedisCommandExists::new(key)))
     }
 
-    fn parse_command_keys(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_keys(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandKeys::new(key)))
+        Ok(RedisCommand::Keys(RedisCommandKeys::new(key)))
     }
 
-    fn parse_command_del(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_del(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandDel::new(key)))
+        Ok(RedisCommand::Del(RedisCommandDel::new(key)))
     }
 
-    fn parse_command_rename(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_rename(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let newkey = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandRename::new(key, newkey)))
+        Ok(RedisCommand::Rename(RedisCommandRename::new(key, newkey)))
     }
-    fn parse_command_append(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_append(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let new_value = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandAppend::new(key, new_value)))
+        Ok(RedisCommand::Append(RedisCommandAppend::new(
+            key, new_value,
+        )))
     }
 
-    fn parse_command_type(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_type(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandType::new(key)))
+        Ok(RedisCommand::Type(RedisCommandType::new(key)))
     }
 
-    fn parse_command_copy(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_copy(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let source_key = self.parse_string(command_iter)?;
         let destination_key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandCopy::new(source_key, destination_key)))
+        Ok(RedisCommand::Copy(RedisCommandCopy::new(
+            source_key,
+            destination_key,
+        )))
     }
 
-    fn parse_command_get(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_get(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandGet::new(key)))
+        Ok(RedisCommand::Get(RedisCommandGet::new(key)))
     }
 
-    fn parse_command_strlen(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_strlen(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandStrlen::new(key)))
+        Ok(RedisCommand::Strlen(RedisCommandStrlen::new(key)))
     }
 
-    fn parse_command_scard(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_scard(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandScard::new(key)))
+        Ok(RedisCommand::Scard(RedisCommandScard::new(key)))
     }
 
-    fn parse_command_getset(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_getset(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let new_value = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandGetSet::new(key, new_value)))
+        Ok(RedisCommand::GetSet(RedisCommandGetSet::new(
+            key, new_value,
+        )))
     }
 
-    fn parse_command_getdel(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_getdel(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandGetDel::new(key)))
+        Ok(RedisCommand::GetDel(RedisCommandGetDel::new(key)))
     }
 
-    fn parse_command_llen(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_llen(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandLlen::new(key)))
+        Ok(RedisCommand::Llen(RedisCommandLlen::new(key)))
     }
 
-    fn parse_command_lindex(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_lindex(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let index = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandLindex::new(key, index)))
+        Ok(RedisCommand::Lindex(RedisCommandLindex::new(key, index)))
     }
 
-    fn parse_command_sort(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_sort(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandSort::new(key)))
+        Ok(RedisCommand::Sort(RedisCommandSort::new(key)))
     }
 
-    fn parse_command_decrby(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_decrby(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandDecrBy::new(key, value)))
+        Ok(RedisCommand::DecrBy(RedisCommandDecrBy::new(key, value)))
     }
 
-    fn parse_command_incrby(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_incrby(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandIncrBy::new(key, value)))
+        Ok(RedisCommand::IncrBy(RedisCommandIncrBy::new(key, value)))
     }
 
-    fn parse_command_touch(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_touch(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandTouch::new(key)))
+        Ok(RedisCommand::Touch(RedisCommandTouch::new(key)))
     }
 
     fn parse_command_persist(
         &self,
         command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    ) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandPersist::new(key)))
+        Ok(RedisCommand::Persist(RedisCommandPersist::new(key)))
     }
 
     fn parse_command_sadd(
         &self,
         command_iter: &mut Split<&str>,
         command_qty: usize,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    ) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let mut members = Vec::<String>::new();
         for _ in 1..(command_qty - 1) {
             let new_member = self.parse_string(command_iter)?;
             members.push(new_member);
         }
-        Ok(Box::new(RedisCommandSAdd::new(key, members)))
+        Ok(RedisCommand::Sadd(RedisCommandSAdd::new(key, members)))
     }
 
     fn parse_command_mset(
         &self,
         command_iter: &mut Split<&str>,
         command_qty: usize,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    ) -> Result<RedisCommand, String> {
         let mut keys = Vec::<String>::new();
         let mut values = Vec::<String>::new();
         for _ in 0..(command_qty / 2) {
@@ -301,51 +254,46 @@ impl Parser {
             keys.push(new_key);
             values.push(new_value);
         }
-        Ok(Box::new(RedisCommandMSet::new(keys, values)))
+        Ok(RedisCommand::Mset(RedisCommandMSet::new(keys, values)))
     }
 
-    fn parse_command_expire(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_expire(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandExpire::new(key, value)))
+        Ok(RedisCommand::Expire(RedisCommandExpire::new(key, value)))
     }
 
     fn parse_command_expireat(
         &self,
         command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    ) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandExpireAt::new(key, value)))
+        Ok(RedisCommand::ExpireAt(RedisCommandExpireAt::new(
+            key, value,
+        )))
     }
 
-    fn parse_command_ttl(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_ttl(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandTtl::new(key)))
+        Ok(RedisCommand::Ttl(RedisCommandTtl::new(key)))
     }
 
     fn parse_command_sismember(
         &self,
         command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    ) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let member = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandSismember::new(key, member)))
+        Ok(RedisCommand::Sismember(RedisCommandSismember::new(
+            key, member,
+        )))
     }
 
-    fn parse_command_set(
-        &self,
-        command_iter: &mut Split<&str>,
-    ) -> Result<Box<dyn RedisCommand>, String> {
+    fn parse_command_set(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
-        Ok(Box::new(RedisCommandSet::new(key, value)))
+        Ok(RedisCommand::Set(RedisCommandSet::new(key, value)))
     }
 }
 

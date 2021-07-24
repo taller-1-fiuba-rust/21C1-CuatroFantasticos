@@ -1,8 +1,9 @@
-use crate::architecture::connection_handler;
+use crate::architecture::connection_handler::ConnectionHandler;
 use crate::global_resources::GlobalResources;
 use std::net::TcpListener;
 use std::thread;
 use std::time::Duration;
+
 /// Run Server Sets the port the server will use,
 /// Starts a server for webhook
 /// # Arguments
@@ -35,7 +36,8 @@ pub fn run_server(global_conf: GlobalResources) {
         let global_conf = global_conf.clone();
 
         thread::spawn(move || {
-            connection_handler::handle_connection(stream, global_conf);
+            let mut connection_handler = ConnectionHandler::new();
+            connection_handler.handle_connection(stream, global_conf);
         });
     }
     verbose.print("run_server: Game over");
