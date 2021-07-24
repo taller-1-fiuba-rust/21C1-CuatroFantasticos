@@ -9,11 +9,11 @@ use std::time::Duration;
 /// # Arguments
 /// * conf - Configuration
 
-pub fn run_server(global_conf: GlobalResources) {
-    let conf = global_conf
+pub fn run_server(global_resources: GlobalResources) {
+    let conf = global_resources
         .get_conf()
         .expect("run_server: Could not get a configuration");
-    let verbose = global_conf.get_verbose();
+    let verbose = global_resources.get_verbose();
     verbose.print(&format!(
         "run_server: Starting server with configuration \n {:?}",
         conf
@@ -33,11 +33,11 @@ pub fn run_server(global_conf: GlobalResources) {
 
         let timeout = conf.get("timeout").unwrap().parse().unwrap();
         let _result = stream.set_read_timeout(Some(Duration::new(timeout, 0)));
-        let global_conf = global_conf.clone();
+        let global_resources = global_resources.clone();
 
         thread::spawn(move || {
-            let mut connection_handler = ConnectionHandler::new();
-            connection_handler.handle_connection(stream, global_conf);
+            let mut connection_handler = ConnectionHandler::new(stream, global_resources);
+            connection_handler.handle_connection();
         });
     }
     verbose.print("run_server: Game over");

@@ -8,19 +8,25 @@ use std::net::{Shutdown, TcpStream};
 /// * stream - TCP Stream
 /// * conf - Configuration
 
-pub struct ConnectionHandler {}
+pub struct ConnectionHandler {
+    stream: TcpStream,
+    global_resources: GlobalResources,
+}
 
 impl ConnectionHandler {
-    pub fn new() -> Self {
-        Default::default()
+    pub fn new(stream: TcpStream, global_resources: GlobalResources) -> Self {
+        ConnectionHandler {
+            stream,
+            global_resources,
+        }
     }
-    pub fn handle_connection(&mut self, mut stream: TcpStream, global_resources: GlobalResources) {
-        let verbose = global_resources.get_verbose();
+    pub fn handle_connection(&mut self) {
+        let verbose = self.global_resources.get_verbose();
         loop {
             let mut buffer = [0; 1024];
 
             verbose.print("handle_connection: Waiting for request");
-            let read_size = stream.read(&mut buffer);
+            let read_size = self.stream.read(&mut buffer);
 
             match read_size {
                 Ok(0) => {
@@ -40,23 +46,22 @@ impl ConnectionHandler {
                     };
                     verbose.print(&format!("handle_connection: {}", s));
 
-                    let storage_accessor = global_resources.get_storage_accessor();
                     let parser = Parser::new();
                     let command = parser.parse(s.as_ref());
                     let message = match command {
-                        Ok(s) => match s.execute(storage_accessor) {
+                        Ok(s) => match s.execute(self.global_resources.clone()) {
                             Ok(v) => v,
                             Err(e) => e,
                         },
                         Err(e) => e,
                     };
 
-                    if stream.write_all(message.as_ref()).is_err() {
+                    if self.stream.write_all(message.as_ref()).is_err() {
                         verbose.print("handle_connection: Could not write response");
                         break;
                     }
 
-                    if stream.flush().is_err() {
+                    if self.stream.flush().is_err() {
                         verbose.print("handle_connection: Could not flush response");
                         break;
                     }
@@ -68,12 +73,6 @@ impl ConnectionHandler {
                 }
             }
         }
-        let _ = stream.shutdown(Shutdown::Both);
-    }
-}
-
-impl Default for ConnectionHandler {
-    fn default() -> Self {
-        ConnectionHandler {}
+        let _ = self.stream.shutdown(Shutdown::Both);
     }
 }
