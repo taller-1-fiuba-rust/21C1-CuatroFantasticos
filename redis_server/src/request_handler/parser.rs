@@ -14,6 +14,7 @@ use crate::command::incrby::RedisCommandIncrBy;
 use crate::command::keys::RedisCommandKeys;
 use crate::command::lindex::RedisCommandLindex;
 use crate::command::llen::RedisCommandLlen;
+use crate::command::mset::RedisCommandMSet;
 use crate::command::persist::RedisCommandPersist;
 use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
@@ -86,6 +87,7 @@ impl Parser {
             "SCARD" => self.parse_command_scard(&mut command_iter),
             "SISMEMBER" => self.parse_command_sismember(&mut command_iter),
             "SET" => self.parse_command_set(&mut command_iter),
+            "MSET" => self.parse_command_mset(&mut command_iter, command_qty),
             _ => Err(format!(
                 "-Unknown or disabled command '{}'\r\n",
                 command_type
@@ -284,6 +286,22 @@ impl Parser {
             members.push(new_member);
         }
         Ok(Box::new(RedisCommandSAdd::new(key, members)))
+    }
+
+    fn parse_command_mset(
+        &self,
+        command_iter: &mut Split<&str>,
+        command_qty: usize,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let mut keys = Vec::<String>::new();
+        let mut values = Vec::<String>::new();
+        for _ in 0..(command_qty / 2) {
+            let new_key = self.parse_string(command_iter)?;
+            let new_value = self.parse_string(command_iter)?;
+            keys.push(new_key);
+            values.push(new_value);
+        }
+        Ok(Box::new(RedisCommandMSet::new(keys, values)))
     }
 
     fn parse_command_expire(
