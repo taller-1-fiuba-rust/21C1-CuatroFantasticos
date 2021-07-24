@@ -52,6 +52,16 @@ impl RedisValueList {
         let sorted = contents.iter().map(|v| v.to_string()).collect();
         Ok(sorted)
     }
+
+    pub fn pop(&mut self, times: i32) -> Vec<String> {
+        let mut values = Vec::new();
+        for _ in 0..times {
+            if !self.contents.is_empty() {
+                values.push(self.contents.remove(0))
+            }
+        }
+        values
+    }
 }
 
 impl ProtocolSerializer for RedisValueList {

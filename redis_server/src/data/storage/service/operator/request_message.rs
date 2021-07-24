@@ -66,4 +66,5 @@ pub enum StorageAction {
     Sismember(String, String),
     Set(String, String),
     MGet(Vec<String>),
+    LPop(String, i32),
 }
