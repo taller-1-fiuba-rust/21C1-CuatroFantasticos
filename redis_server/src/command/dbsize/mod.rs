@@ -1,6 +1,7 @@
-use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
+use crate::global_resources::GlobalResources;
 use crate::protocol_serialization::ProtocolSerializer;
+
 ///Return the number of keys in the currently-selected database.
 /// # Return value
 ///* Integer reply
@@ -11,9 +12,14 @@ impl RedisCommandDbSize {
     pub fn new() -> RedisCommandDbSize {
         RedisCommandDbSize {}
     }
-    pub fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageAction::Dbsize)?;
+    pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
+        let verbose = global_resources.get_verbose();
+        verbose.print("Executing command DbSize");
+        let response = global_resources
+            .get_storage_accessor()
+            .access(StorageAction::Dbsize)?;
         let response = response.get_value().protocol_serialize_to_int();
+        verbose.print("Finalizing execution of comand Copy");
         Ok(response)
     }
 }
