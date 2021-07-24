@@ -27,6 +27,7 @@ use crate::command::scard::RedisCommandScard;
 use crate::command::set::RedisCommandSet;
 use crate::command::sismember::RedisCommandSismember;
 use crate::command::sort::RedisCommandSort;
+use crate::command::srem::RedisCommandSrem;
 use crate::command::strlen::RedisCommandStrlen;
 use crate::command::subscribe::RedisCommandSubscribe;
 use crate::command::touch::RedisCommandTouch;
@@ -61,6 +62,7 @@ pub mod scard;
 pub mod set;
 pub mod sismember;
 pub mod sort;
+pub mod srem;
 pub mod strlen;
 pub mod subscribe;
 pub mod touch;
@@ -93,6 +95,7 @@ pub enum RedisCommand {
     Sadd(RedisCommandSAdd),
     Save(RedisCommandSave),
     Scard(RedisCommandScard),
+    Srem(RedisCommandSrem),
     Set(RedisCommandSet),
     Sismember(RedisCommandSismember),
     Sort(RedisCommandSort),
@@ -134,6 +137,7 @@ impl RedisCommand {
             RedisCommand::Set(c) => c.execute(accessor),
             RedisCommand::Sismember(c) => c.execute(accessor),
             RedisCommand::Sort(c) => c.execute(accessor),
+            RedisCommand::Srem(c) => c.execute(global_resources),
             RedisCommand::Strlen(c) => c.execute(accessor),
             RedisCommand::Subscribe(c) => c.execute(global_resources),
             RedisCommand::Touch(c) => c.execute(accessor),

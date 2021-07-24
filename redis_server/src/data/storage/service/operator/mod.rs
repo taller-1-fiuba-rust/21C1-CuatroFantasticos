@@ -382,6 +382,25 @@ impl StorageOperatorService {
                     }
                 },
 
+                StorageAction::Srem(key, values) => match self.storage.mut_get(&key) {
+                    Some(RedisValue::Set(value)) => {
+                        let mut members_deleted = 0;
+                        for member in values {
+                            members_deleted += value.delete(member);
+                        }
+                        let response = StorageResult::Int(members_deleted);
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotASet);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response = StorageResult::Int(0);
+                        let _ = message.respond(response);
+                    }
+                },
+
                 StorageAction::ExpireAt(key, expiration) => {
                     if self.storage.contains_key(&key) {
                         self.storage.expire_at(&key, expiration);
