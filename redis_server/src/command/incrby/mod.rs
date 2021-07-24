@@ -1,7 +1,7 @@
 use crate::command::RedisCommand;
-use crate::data::storage_service::operator_service::accessor::StorageAccessor;
-use crate::data::storage_service::operator_service::request_message::StorageAction;
-use crate::data::storage_service::operator_service::result_error::RedisError;
+use crate::data::storage::service::operator::accessor::StorageAccessor;
+use crate::data::storage::service::operator::request_message::StorageAction;
+use crate::data::storage::service::operator::result_error::RedisError;
 use crate::protocol_serialization::ProtocolSerializer;
 ///Increments the number stored at key by decrement.
 /// If the key does not exist, it is set to 0 before performing the operation.

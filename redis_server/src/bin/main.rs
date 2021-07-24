@@ -6,30 +6,36 @@ use std::fs::OpenOptions;
 
 use logger::log_service::LogService;
 use redis_server::architecture::server;
-use redis_server::configuration::Configuration;
-use redis_server::data::storage_service::StorageService;
+use redis_server::configuration::service::ConfService;
+use redis_server::configuration::verbose::Verbose;
+use redis_server::data::storage::service::StorageService;
+use redis_server::global_resources::GlobalResources;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     let filename = &args[1];
-    let mut conf: Configuration = Configuration::new(filename);
-    let logfile = conf.get("logfile").expect("No hay un logfile definido");
-    let file = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .create(true)
-        .open(logfile)
-        .expect("No se pudo crear un archivo de logs");
-    let log_service = LogService::new(file);
-    conf.set_logger_builder(log_service.get_log_interface());
 
-    let dbfilename = conf.get("dbfilename").unwrap();
+    let conf_service = ConfService::new(filename);
+    let conf = conf_service.get_conf().unwrap();
+    let log_filename = conf.get("logfile").expect("main: Couldn't get a logfile");
+    let verbose_conf = conf.get("verbose").expect("main: Couldn't get a logfile");
+    let db_filename = conf
+        .get("dbfilename")
+        .expect("main: Couldn't get a dbfilename");
+    let log_service = LogService::new_with_path(log_filename);
+    let verbose = Verbose::new(verbose_conf);
+
     let db_file = OpenOptions::new()
         .read(true)
-        .open(dbfilename)
-        .expect("No se pudo crear un archivo de database");
+        .open(db_filename)
+        .expect("main: Couldn't open database file");
 
     let storage_service = StorageService::new(db_file);
-    conf.set_data_sender(storage_service.get_storage_sender());
-    server::run_server(&conf);
+    let global_conf = GlobalResources::new(
+        log_service.get_log_interface(),
+        verbose,
+        conf_service.get_accessor_builder(),
+        storage_service.get_accessor_builder(),
+    );
+    server::run_server(global_conf);
 }

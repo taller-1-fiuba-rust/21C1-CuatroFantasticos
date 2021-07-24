@@ -1,7 +1,7 @@
 use crate::command::RedisCommand;
-use crate::data::storage_service::operator_service::accessor::StorageAccessor;
-use crate::data::storage_service::operator_service::request_message::StorageAction;
-use crate::data::storage_service::operator_service::response_message::StorageResult;
+use crate::data::storage::service::operator::accessor::StorageAccessor;
+use crate::data::storage::service::operator::request_message::StorageAction;
+use crate::data::storage::service::operator::response_message::StorageResult;
 use crate::protocol_serialization::ProtocolSerializer;
 ///Returns the string representation of the type of the value stored at key.
 /// The different types that can be returned are: string, list, set, zset, hash and stream.

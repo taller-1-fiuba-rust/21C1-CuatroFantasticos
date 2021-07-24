@@ -1,20 +1,12 @@
-use crate::configuration::verbose::Verbose;
-use crate::data::storage_service::operator_service::request_message::StorageRequestMessage;
-use logger::log_service::log_interface::LogInterface;
-use logger::log_service::logger::Logger;
 use std::collections::HashMap;
 use std::fs;
-use std::fs::File;
-use std::sync::mpsc;
 
+pub mod service;
 pub mod verbose;
 
 #[derive(Debug, Clone)]
 pub struct Configuration {
     conf: HashMap<String, String>,
-    logger_builder: Option<LogInterface<File>>,
-    verbose: Verbose,
-    data_sender: Option<mpsc::Sender<StorageRequestMessage>>,
 }
 
 const CONST_VERBOSE: &str = "0";
@@ -31,18 +23,15 @@ impl Configuration {
             let parsed_line: Vec<&str> = split.collect();
             conf.insert(parsed_line[0].to_owned(), parsed_line[1].trim().to_owned());
         }
-        let verbose =
-            Configuration::create_verbose(conf.get("verbose").expect("No hay un verbose definido"));
-        Configuration {
-            conf,
-            verbose,
-            logger_builder: None,
-            data_sender: None,
-        }
+        Configuration { conf }
     }
 
-    pub fn get(&self, key: &str) -> Option<String> {
-        self.conf.get(key).map(|s| s.to_string())
+    pub fn get(&self, key: &str) -> Option<&String> {
+        self.conf.get(key)
+    }
+
+    pub fn set(&mut self, key: String, value: String) {
+        self.conf.insert(key, value);
     }
 
     pub fn default_values() -> HashMap<String, String> {
@@ -53,39 +42,10 @@ impl Configuration {
         conf.insert(String::from("logfile"), String::from(CONST_LOGFILE));
         conf
     }
-
-    fn create_verbose(verbose: &str) -> Verbose {
-        Verbose::new(verbose)
-    }
-    pub fn set_logger_builder(&mut self, logger_builder: LogInterface<File>) {
-        self.logger_builder = Some(logger_builder);
-    }
-
-    pub fn set_data_sender(&mut self, data_sender: mpsc::Sender<StorageRequestMessage>) {
-        self.data_sender = Some(data_sender);
-    }
-
-    pub fn get_data_sender(&mut self) -> &mpsc::Sender<StorageRequestMessage> {
-        self.data_sender
-            .as_ref()
-            .expect("No sender in configuration")
-    }
-
-    pub fn logger(&self) -> Logger<File> {
-        self.logger_builder
-            .as_ref()
-            .expect("There is no logger builder set")
-            .build_logger()
-    }
-
-    pub fn verbose(&self, content: &str) {
-        self.verbose.print(content);
-    }
 }
 
 #[cfg(test)]
 mod tests {
-
     use crate::configuration::Configuration;
     use crate::configuration::CONST_DBFILENAME;
     use crate::configuration::CONST_LOGFILE;

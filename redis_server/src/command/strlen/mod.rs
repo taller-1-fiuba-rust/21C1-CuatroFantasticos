@@ -1,6 +1,6 @@
 use crate::command::RedisCommand;
-use crate::data::storage_service::operator_service::accessor::StorageAccessor;
-use crate::data::storage_service::operator_service::request_message::StorageAction;
+use crate::data::storage::service::operator::accessor::StorageAccessor;
+use crate::data::storage::service::operator::request_message::StorageAction;
 use crate::protocol_serialization::ProtocolSerializer;
 ///Returns the length of the string value stored at key. An error is returned when key holds a non-string value.
 ///

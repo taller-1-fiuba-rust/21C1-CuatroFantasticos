@@ -1,4 +1,7 @@
 use std::collections::HashMap;
+use std::fmt::Debug;
+
+use regex::Regex;
 
 use value::StorageValue;
 
@@ -6,13 +9,11 @@ use crate::data::redis_value::list::RedisValueList;
 use crate::data::redis_value::set::RedisValueSet;
 use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
-use crate::data::storage_service::operator_service::storage::expiration_map::ExpirationMap;
+use crate::data::storage::expiration_map::ExpirationMap;
 use crate::utilities::current_time_in_millis;
-use std::fmt::Debug;
-
-use regex::Regex;
 
 pub mod expiration_map;
+pub mod service;
 pub mod value;
 
 const KEY: usize = 0;

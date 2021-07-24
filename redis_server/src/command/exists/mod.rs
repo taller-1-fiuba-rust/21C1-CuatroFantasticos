@@ -1,6 +1,6 @@
 use crate::command::RedisCommand;
-use crate::data::storage_service::operator_service::accessor::StorageAccessor;
-use crate::data::storage_service::operator_service::request_message::StorageAction;
+use crate::data::storage::service::operator::accessor::StorageAccessor;
+use crate::data::storage::service::operator::request_message::StorageAction;
 use crate::protocol_serialization::ProtocolSerializer;
 ///Returns if key exists.
 ///Since Redis 3.0.3 it is possible to specify multiple keys instead of a single one.

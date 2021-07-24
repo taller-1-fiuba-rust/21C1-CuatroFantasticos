@@ -48,7 +48,7 @@ impl StorageValue {
 mod tests {
     use crate::data::redis_value::string::RedisValueString;
     use crate::data::redis_value::RedisValue;
-    use crate::data::storage_service::operator_service::storage::value::StorageValue;
+    use crate::data::storage::value::StorageValue;
     use std::thread::sleep;
     use std::time::Duration;
 

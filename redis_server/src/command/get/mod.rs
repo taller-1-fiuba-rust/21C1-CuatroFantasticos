@@ -1,9 +1,9 @@
 use crate::command::RedisCommand;
 use crate::data::redis_value::RedisValue;
-use crate::data::storage_service::operator_service::accessor::StorageAccessor;
-use crate::data::storage_service::operator_service::request_message::StorageAction;
-use crate::data::storage_service::operator_service::response_message::StorageResult;
-use crate::data::storage_service::operator_service::result_error::RedisError;
+use crate::data::storage::service::operator::accessor::StorageAccessor;
+use crate::data::storage::service::operator::request_message::StorageAction;
+use crate::data::storage::service::operator::response_message::StorageResult;
+use crate::data::storage::service::operator::result_error::RedisError;
 use crate::protocol_serialization::ProtocolSerializer;
 ///Get the value of key. If the key does not exist the special value nil is returned.
 /// An error is returned if the value stored at key is not a string, because GET only handles string values.
