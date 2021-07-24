@@ -14,15 +14,15 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let filename = &args[1];
 
-    let conf_service = ConfService::new(filename.clone());
+    let conf_service = ConfService::new(filename);
     let conf = conf_service.get_conf().unwrap();
-    let logfilename = conf.get("logfile").expect("couldn't get a logfile");
-    let dbfilename = conf.get("dbfilename").expect("couldn't get a dbfilename");
-    let log_service = LogService::new_with_path(&logfilename);
+    let log_filename = conf.get("logfile").expect("couldn't get a logfile");
+    let db_filename = conf.get("dbfilename").expect("couldn't get a dbfilename");
+    let log_service = LogService::new_with_path(&log_filename);
 
     let db_file = OpenOptions::new()
         .read(true)
-        .open(dbfilename)
+        .open(db_filename)
         .expect("No se pudo crear un archivo de database");
 
     let storage_service = StorageService::new(db_file);

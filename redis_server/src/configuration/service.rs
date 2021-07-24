@@ -13,8 +13,8 @@ pub struct ConfService {
 }
 
 impl ConfService {
-    pub fn new(conf_filename: String) -> Self {
-        let configuration = Configuration::new(&conf_filename);
+    pub fn new(conf_filename: &str) -> Self {
+        let configuration = Configuration::new(conf_filename);
         let (conf_tx, conf_rx) = mpsc::channel::<ConfRequestMessage>();
 
         let conf_th = thread::spawn(move || {
