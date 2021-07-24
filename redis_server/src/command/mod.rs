@@ -17,6 +17,7 @@ pub mod keys;
 pub mod lindex;
 pub mod llen;
 pub mod mget;
+pub mod mset;
 pub mod persist;
 pub mod ping;
 pub mod rename;
