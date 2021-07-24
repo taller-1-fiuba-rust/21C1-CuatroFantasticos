@@ -406,6 +406,12 @@ impl StorageOperatorService {
                     }
                 }
 
+                StorageAction::MGet(keys) => {
+                    let values = self.storage.get_string_values(&keys);
+                    let response = StorageResult::Vector(values);
+                    let _ = message.respond(response);
+                }
+
                 StorageAction::ExpirationRound => {
                     self.storage.clean_partial_expiration();
                     let _ = message.respond(StorageResult::Ok);

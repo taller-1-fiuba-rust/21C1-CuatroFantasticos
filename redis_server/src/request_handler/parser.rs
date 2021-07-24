@@ -28,6 +28,7 @@ use crate::command::touch::RedisCommandTouch;
 use crate::command::ttl::RedisCommandTtl;
 use crate::command::RedisCommand;
 use std::str::Split;
+use crate::command::mget::RedisCommandMGet;
 
 const TOKEN_SEPARATOR: &str = "\r\n";
 
@@ -84,6 +85,7 @@ impl Parser {
             "EXPIREAT" => self.parse_command_expireat(&mut command_iter),
             "SCARD" => self.parse_command_scard(&mut command_iter),
             "SISMEMBER" => self.parse_command_sismember(&mut command_iter),
+            "MGET" => self.parse_command_mget(&mut command_iter, command_qty),
             _ => Err(format!(
                 "-Unknown or disabled command '{}'\r\n",
                 command_type
@@ -317,6 +319,19 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         let member = self.parse_string(command_iter)?;
         Ok(Box::new(RedisCommandSismember::new(key, member)))
+    }
+
+    fn parse_command_mget(
+        &self,
+        command_iter: &mut Split<&str>,
+        command_qty: usize,
+    ) -> Result<Box<dyn RedisCommand>, String> {
+        let mut keys = Vec::<String>::new();
+        for _ in 1..(command_qty - 1) {
+            let new_key = self.parse_string(command_iter)?;
+            keys.push(new_key);
+        }
+        Ok(Box::new(RedisCommandMGet::new(key, keys)))
     }
 }
 

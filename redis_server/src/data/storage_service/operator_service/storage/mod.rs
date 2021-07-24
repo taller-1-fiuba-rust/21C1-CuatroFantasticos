@@ -163,6 +163,24 @@ impl RedisStorage {
         matching_keys
     }
 
+    pub fn get_string_values(&mut self, keys: &Vec<String>) -> Vec<String> {
+        let mut values = Vec::new();
+        for key in keys {
+            self.clean_if_expirated(key);
+            match self.values.get(key) {
+                Some(value) => {
+                    let redis_value = value.clone().access();
+                    match redis_value.get_type() {
+                        String::from("String") => values.push(redis_value.serialize()),
+                        _ => {}
+                    };
+                }
+                None => {}
+            };
+        }
+        values
+    }
+
     pub fn serialize(&self) -> Vec<String> {
         let mut contents = Vec::new();
         for (key, value) in &self.values {

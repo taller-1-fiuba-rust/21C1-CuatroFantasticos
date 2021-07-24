@@ -28,6 +28,7 @@ pub mod strlen;
 pub mod touch;
 pub mod ttl;
 pub mod r#type;
+pub mod mget;
 
 pub trait RedisCommand {
     fn execute(&self, accessor: StorageAccessor) -> Result<String, String>;
