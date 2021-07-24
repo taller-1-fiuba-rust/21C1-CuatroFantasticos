@@ -1,5 +1,6 @@
 use crate::data::storage_service::expiration_job::ExpirationJob;
 use crate::data::storage_service::operator_service::accessor::StorageAccessor;
+use crate::data::storage_service::operator_service::accessor_builder::StorageAccessorBuilder;
 use crate::data::storage_service::operator_service::request_message::{
     StorageAction, StorageRequestMessage,
 };
@@ -56,8 +57,8 @@ impl StorageService {
         }
     }
 
-    pub fn get_storage_sender(&self) -> mpsc::Sender<StorageRequestMessage> {
-        self.operator_request_sender.clone()
+    pub fn get_accessor_builder(&self) -> StorageAccessorBuilder {
+        StorageAccessorBuilder::new(self.operator_request_sender.clone())
     }
 }
 

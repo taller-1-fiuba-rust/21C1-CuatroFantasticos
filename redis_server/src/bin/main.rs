@@ -28,8 +28,8 @@ fn main() {
     let storage_service = StorageService::new(db_file);
     let global_conf = GlobalConf::new(
         log_service.get_log_interface(),
-        conf_service.get_conf_sender(),
-        storage_service.get_storage_sender(),
+        conf_service.get_accessor_builder(),
+        storage_service.get_accessor_builder(),
     );
     server::run_server(global_conf);
 }

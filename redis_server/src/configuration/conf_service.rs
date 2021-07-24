@@ -1,3 +1,4 @@
+use crate::configuration::accessor_builder::ConfAccessorBuilder;
 use crate::configuration::conf_accesor::ConfAccessor;
 use crate::configuration::conf_request_message::{ConfMessage, ConfRequestMessage};
 use crate::configuration::conf_response_message::ConfResult;
@@ -27,8 +28,8 @@ impl ConfService {
         }
     }
 
-    pub fn get_conf_sender(&self) -> mpsc::Sender<ConfRequestMessage> {
-        self.conf_request_sender.clone()
+    pub fn get_accessor_builder(&self) -> ConfAccessorBuilder {
+        ConfAccessorBuilder::new(self.conf_request_sender.clone())
     }
 
     pub fn get_conf(&self) -> Result<Configuration, String> {

@@ -13,6 +13,7 @@ use std::fs::File;
 use std::io::{Read, Write};
 
 pub mod accessor;
+pub mod accessor_builder;
 pub mod request_message;
 pub mod response_message;
 pub mod result_error;
