@@ -1,7 +1,10 @@
 use crate::command::RedisCommand;
 use crate::data::storage_service::operator_service::accessor::StorageAccessor;
 use crate::protocol_serialization::ProtocolSerializer;
-
+/// Implemented to test the connection of the server
+///
+/// # Return value
+/// String : PONG
 pub struct RedisCommandPing {}
 
 impl RedisCommandPing {

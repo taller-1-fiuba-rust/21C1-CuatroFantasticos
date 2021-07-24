@@ -3,6 +3,10 @@ use crate::configuration::Configuration;
 use std::net::TcpListener;
 use std::thread;
 use std::time::Duration;
+/// Run Server Sets the port the server will use,
+/// Starts a server for webhook
+/// # Arguments
+/// * conf - Configuration
 
 pub fn run_server(conf: &Configuration) {
     conf.verbose(&format!(

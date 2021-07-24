@@ -3,6 +3,14 @@ use crate::data::storage_service::operator_service::accessor::StorageAccessor;
 use crate::data::storage_service::operator_service::request_message::StorageAction;
 use crate::data::storage_service::operator_service::response_message::StorageResult;
 use crate::protocol_serialization::ProtocolSerializer;
+///Returns the string representation of the type of the value stored at key.
+/// The different types that can be returned are: string, list, set, zset, hash and stream.
+///
+/// # Arguments
+/// * key - String
+///
+/// # Return value
+/// Simple string reply: type of key, or none when key does not exist.
 
 pub struct RedisCommandType {
     key: String,
