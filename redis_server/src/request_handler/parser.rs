@@ -27,6 +27,7 @@ use crate::command::set::RedisCommandSet;
 use crate::command::sismember::RedisCommandSismember;
 use crate::command::sort::RedisCommandSort;
 use crate::command::strlen::RedisCommandStrlen;
+use crate::command::subscribe::RedisCommandSubscribe;
 use crate::command::touch::RedisCommandTouch;
 use crate::command::ttl::RedisCommandTtl;
 use crate::command::RedisCommand;
@@ -90,6 +91,7 @@ impl Parser {
             "SET" => self.parse_command_set(&mut command_iter),
             "MSET" => self.parse_command_mset(&mut command_iter, command_qty),
             "MGET" => self.parse_command_mget(&mut command_iter, command_qty),
+            "SUBSCRIBE" => self.parse_command_subscribe(&mut command_iter, command_qty),
             _ => Err(format!(
                 "-Unknown or disabled command '{}'\r\n",
                 command_type
@@ -309,6 +311,21 @@ impl Parser {
             keys.push(new_key);
         }
         Ok(RedisCommand::Mget(RedisCommandMGet::new(keys)))
+    }
+
+    fn parse_command_subscribe(
+        &self,
+        command_iter: &mut Split<&str>,
+        command_qty: usize,
+    ) -> Result<RedisCommand, String> {
+        let mut channels = Vec::<String>::new();
+        for _ in 1..command_qty {
+            let new_channel = self.parse_string(command_iter)?;
+            channels.push(new_channel);
+        }
+        Ok(RedisCommand::Subscribe(RedisCommandSubscribe::new(
+            channels,
+        )))
     }
 }
 

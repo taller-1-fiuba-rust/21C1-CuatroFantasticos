@@ -27,9 +27,10 @@ use crate::command::set::RedisCommandSet;
 use crate::command::sismember::RedisCommandSismember;
 use crate::command::sort::RedisCommandSort;
 use crate::command::strlen::RedisCommandStrlen;
+use crate::command::subscribe::RedisCommandSubscribe;
 use crate::command::touch::RedisCommandTouch;
 use crate::command::ttl::RedisCommandTtl;
-use crate::data::storage::service::operator::accessor::StorageAccessor;
+use crate::global_resources::GlobalResources;
 
 pub mod append;
 pub mod copy;
@@ -59,6 +60,7 @@ pub mod set;
 pub mod sismember;
 pub mod sort;
 pub mod strlen;
+pub mod subscribe;
 pub mod touch;
 pub mod ttl;
 pub mod r#type;
@@ -92,12 +94,14 @@ pub enum RedisCommand {
     Sismember(RedisCommandSismember),
     Sort(RedisCommandSort),
     Strlen(RedisCommandStrlen),
+    Subscribe(RedisCommandSubscribe),
     Touch(RedisCommandTouch),
     Ttl(RedisCommandTtl),
     Type(RedisCommandType),
 }
 impl RedisCommand {
-    pub fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
+    pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
+        let accessor = global_resources.get_storage_accessor();
         match self {
             RedisCommand::Append(c) => c.execute(accessor),
             RedisCommand::Copy(c) => c.execute(accessor),
@@ -127,6 +131,7 @@ impl RedisCommand {
             RedisCommand::Sismember(c) => c.execute(accessor),
             RedisCommand::Sort(c) => c.execute(accessor),
             RedisCommand::Strlen(c) => c.execute(accessor),
+            RedisCommand::Subscribe(c) => c.execute(global_resources),
             RedisCommand::Touch(c) => c.execute(accessor),
             RedisCommand::Ttl(c) => c.execute(accessor),
             RedisCommand::Type(c) => c.execute(accessor),
