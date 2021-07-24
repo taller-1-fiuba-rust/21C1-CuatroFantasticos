@@ -1,4 +1,3 @@
-use crate::command::RedisCommand;
 use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
 use crate::protocol_serialization::ProtocolSerializer;
@@ -23,10 +22,7 @@ impl RedisCommandAppend {
     pub fn new(key: String, new_value: String) -> RedisCommandAppend {
         RedisCommandAppend { key, new_value }
     }
-}
-
-impl RedisCommand for RedisCommandAppend {
-    fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
+    pub fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
         let response = accessor.access(StorageAction::Append(
             self.key.clone(),
             self.new_value.clone(),

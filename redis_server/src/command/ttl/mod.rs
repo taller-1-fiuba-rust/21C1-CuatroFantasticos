@@ -1,4 +1,3 @@
-use crate::command::RedisCommand;
 use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
 use crate::data::storage::service::operator::response_message::StorageResult;
@@ -13,10 +12,7 @@ impl RedisCommandTtl {
     pub fn new(key: String) -> RedisCommandTtl {
         RedisCommandTtl { key }
     }
-}
-
-impl RedisCommand for RedisCommandTtl {
-    fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
+    pub fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
         let response = accessor.access(StorageAction::Ttl(self.key.clone()))?;
         let response = match response.get_value() {
             StorageResult::Int(_) => response.get_value().protocol_serialize_to_int(),

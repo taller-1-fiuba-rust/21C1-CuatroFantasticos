@@ -1,4 +1,3 @@
-use crate::command::RedisCommand;
 use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
 use crate::data::storage::service::operator::response_message::StorageResult;
@@ -28,10 +27,7 @@ impl RedisCommandLindex {
     pub fn new(key: String, index: String) -> RedisCommandLindex {
         RedisCommandLindex { key, index }
     }
-}
-
-impl RedisCommand for RedisCommandLindex {
-    fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
+    pub fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
         let response = match self.index.parse::<i32>() {
             Ok(index) => {
                 let response = accessor.access(StorageAction::Lindex(self.key.clone(), index))?;
