@@ -382,6 +382,25 @@ impl StorageOperatorService {
                     }
                 },
 
+                StorageAction::Srem(key, values) => match self.storage.mut_get(&key) {
+                    Some(RedisValue::Set(value)) => {
+                        let mut members_deleted = 0;
+                        for member in values {
+                            members_deleted += value.delete(member);
+                        }
+                        let response = StorageResult::Int(members_deleted);
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotASet);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response = StorageResult::Int(0);
+                        let _ = message.respond(response);
+                    }
+                },
+
                 StorageAction::ExpireAt(key, expiration) => {
                     if self.storage.contains_key(&key) {
                         self.storage.expire_at(&key, expiration);
@@ -436,6 +455,23 @@ impl StorageOperatorService {
                     }
                     let response = StorageResult::OptionVector(values);
                     let _ = message.respond(response);
+                }
+
+                StorageAction::LPop(key, times) => {
+                    match self.storage.mut_get(&key) {
+                        Some(RedisValue::List(value)) => {
+                            let response = StorageResult::Vector(value.pop(times));
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response = StorageResult::Error(RedisError::NotAList);
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            let response = StorageResult::Error(RedisError::NonExistent);
+                            let _ = message.respond(response);
+                        }
+                    };
                 }
 
                 StorageAction::ExpirationRound => {

@@ -14,6 +14,7 @@ use crate::command::incrby::RedisCommandIncrBy;
 use crate::command::keys::RedisCommandKeys;
 use crate::command::lindex::RedisCommandLindex;
 use crate::command::llen::RedisCommandLlen;
+use crate::command::lpop::RedisCommandLPop;
 use crate::command::mget::RedisCommandMGet;
 use crate::command::mset::RedisCommandMSet;
 use crate::command::persist::RedisCommandPersist;
@@ -26,6 +27,7 @@ use crate::command::scard::RedisCommandScard;
 use crate::command::set::RedisCommandSet;
 use crate::command::sismember::RedisCommandSismember;
 use crate::command::sort::RedisCommandSort;
+use crate::command::srem::RedisCommandSrem;
 use crate::command::strlen::RedisCommandStrlen;
 use crate::command::subscribe::RedisCommandSubscribe;
 use crate::command::touch::RedisCommandTouch;
@@ -48,6 +50,7 @@ pub mod incrby;
 pub mod keys;
 pub mod lindex;
 pub mod llen;
+pub mod lpop;
 pub mod mget;
 pub mod mset;
 pub mod persist;
@@ -59,6 +62,7 @@ pub mod scard;
 pub mod set;
 pub mod sismember;
 pub mod sort;
+pub mod srem;
 pub mod strlen;
 pub mod subscribe;
 pub mod touch;
@@ -82,6 +86,7 @@ pub enum RedisCommand {
     Keys(RedisCommandKeys),
     Lindex(RedisCommandLindex),
     Llen(RedisCommandLlen),
+    Lpop(RedisCommandLPop),
     Mget(RedisCommandMGet),
     Mset(RedisCommandMSet),
     Persist(RedisCommandPersist),
@@ -90,6 +95,7 @@ pub enum RedisCommand {
     Sadd(RedisCommandSAdd),
     Save(RedisCommandSave),
     Scard(RedisCommandScard),
+    Srem(RedisCommandSrem),
     Set(RedisCommandSet),
     Sismember(RedisCommandSismember),
     Sort(RedisCommandSort),
@@ -118,6 +124,7 @@ impl RedisCommand {
             RedisCommand::Keys(c) => c.execute(global_resources),
             RedisCommand::Lindex(c) => c.execute(global_resources),
             RedisCommand::Llen(c) => c.execute(global_resources),
+            RedisCommand::Lpop(c) => c.execute(global_resources),
             RedisCommand::Mget(c) => c.execute(global_resources),
             RedisCommand::Mset(c) => c.execute(global_resources),
             RedisCommand::Persist(c) => c.execute(global_resources),
@@ -130,6 +137,7 @@ impl RedisCommand {
             RedisCommand::Sismember(c) => c.execute(global_resources),
             RedisCommand::Sort(c) => c.execute(global_resources),
             RedisCommand::Strlen(c) => c.execute(global_resources),
+            RedisCommand::Srem(c) => c.execute(global_resources),
             RedisCommand::Subscribe(c) => c.execute(global_resources),
             RedisCommand::Touch(c) => c.execute(global_resources),
             RedisCommand::Ttl(c) => c.execute(global_resources),
