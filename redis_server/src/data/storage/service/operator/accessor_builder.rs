@@ -1,5 +1,5 @@
-use crate::data::storage_service::operator_service::accessor::StorageAccessor;
-use crate::data::storage_service::operator_service::request_message::StorageRequestMessage;
+use crate::data::storage::service::operator::accessor::StorageAccessor;
+use crate::data::storage::service::operator::request_message::StorageRequestMessage;
 use std::sync::mpsc;
 
 #[derive(Clone)]

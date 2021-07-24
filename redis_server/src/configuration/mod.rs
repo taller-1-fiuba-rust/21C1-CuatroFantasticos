@@ -7,15 +7,10 @@ use logger::log_service::log_interface::LogInterface;
 use logger::log_service::logger::Logger;
 
 use crate::configuration::verbose::Verbose;
-use crate::data::storage_service::operator_service::request_message::StorageRequestMessage;
+use crate::data::storage::service::operator::request_message::StorageRequestMessage;
 
-pub mod accesor;
-pub mod accessor_builder;
-pub mod request_message;
-pub mod response_message;
 pub mod service;
 pub mod verbose;
-mod worker;
 
 #[derive(Debug, Clone)]
 pub struct Configuration {

@@ -1,7 +1,7 @@
-use crate::data::storage_service::operator_service::request_message::{
+use crate::data::storage::service::operator::request_message::{
     StorageAction, StorageRequestMessage,
 };
-use crate::data::storage_service::operator_service::response_message::StorageResponseMessage;
+use crate::data::storage::service::operator::response_message::StorageResponseMessage;
 use std::fmt::{Debug, Formatter};
 use std::sync::mpsc;
 

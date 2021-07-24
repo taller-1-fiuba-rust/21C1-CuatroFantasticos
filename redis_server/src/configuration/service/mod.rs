@@ -1,11 +1,21 @@
-use crate::configuration::accesor::ConfAccessor;
-use crate::configuration::accessor_builder::ConfAccessorBuilder;
-use crate::configuration::request_message::{ConfAction, ConfRequestMessage};
-use crate::configuration::response_message::ConfResult;
-use crate::configuration::worker::ConfWorker;
-use crate::configuration::Configuration;
 use std::sync::mpsc;
 use std::thread;
+
+use accesor::ConfAccessor;
+use accessor_builder::ConfAccessorBuilder;
+use response_message::ConfResult;
+use worker::ConfWorker;
+
+use crate::configuration::service::error::ConfServiceError;
+use crate::configuration::service::request_message::{ConfAction, ConfRequestMessage};
+use crate::configuration::Configuration;
+
+pub mod accesor;
+pub mod accessor_builder;
+mod error;
+pub mod request_message;
+pub mod response_message;
+mod worker;
 
 pub struct ConfService {
     conf_request_sender: mpsc::Sender<ConfRequestMessage>,
@@ -32,11 +42,11 @@ impl ConfService {
         ConfAccessorBuilder::new(self.conf_request_sender.clone())
     }
 
-    pub fn get_conf(&self) -> Result<Configuration, String> {
+    pub fn get_conf(&self) -> Result<Configuration, ConfServiceError> {
         let accessor = ConfAccessor::new(self.conf_request_sender.clone());
-        match accessor.access(ConfAction::Get).unwrap() {
-            ConfResult::OkConf(value) => Ok(value),
-            _ => Err(String::from("Couldn't get a configuration")),
+        match accessor.access(ConfAction::Get) {
+            Ok(ConfResult::OkConf(value)) => Ok(value),
+            _ => Err(ConfServiceError::GetConfError),
         }
     }
 }

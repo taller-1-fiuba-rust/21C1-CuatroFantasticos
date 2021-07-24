@@ -1,18 +1,19 @@
-use crate::data::storage_service::expiration_job::ExpirationJob;
-use crate::data::storage_service::operator_service::accessor::StorageAccessor;
-use crate::data::storage_service::operator_service::accessor_builder::StorageAccessorBuilder;
-use crate::data::storage_service::operator_service::request_message::{
-    StorageAction, StorageRequestMessage,
-};
-use crate::data::storage_service::operator_service::StorageOperatorService;
-use crate::data::storage_service::persistence_job::PersistenceJob;
-use crate::job_recurser_service::JobRecurserService;
 use std::io::Read;
 use std::sync::mpsc;
 use std::thread;
 
+use crate::data::storage::service::expiration_job::ExpirationJob;
+use crate::data::storage::service::operator::accessor::StorageAccessor;
+use crate::data::storage::service::operator::accessor_builder::StorageAccessorBuilder;
+use crate::data::storage::service::operator::request_message::{
+    StorageAction, StorageRequestMessage,
+};
+use crate::data::storage::service::operator::StorageOperatorService;
+use crate::data::storage::service::persistence_job::PersistenceJob;
+use crate::job_recurser_service::JobRecurserService;
+
 mod expiration_job;
-pub mod operator_service;
+pub mod operator;
 mod persistence_job;
 
 const EXPIRATION_PERIOD_IN_MILLIS: u128 = 2 * 1000;

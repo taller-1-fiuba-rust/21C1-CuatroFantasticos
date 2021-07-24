@@ -1,4 +1,4 @@
-use crate::data::storage_service::operator_service::response_message::{
+use crate::data::storage::service::operator::response_message::{
     StorageResponseMessage, StorageResult,
 };
 use std::sync::mpsc;

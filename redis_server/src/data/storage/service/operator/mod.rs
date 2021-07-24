@@ -1,23 +1,22 @@
+use std::fs::File;
+use std::io::{Read, Write};
 use std::sync::mpsc;
 
 use crate::data::redis_value::set::RedisValueSet;
 use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
-use crate::data::storage_service::operator_service::request_message::{
+use crate::data::storage::service::operator::request_message::{
     StorageAction, StorageRequestMessage,
 };
-use crate::data::storage_service::operator_service::response_message::StorageResult;
-use crate::data::storage_service::operator_service::result_error::RedisError;
-use crate::data::storage_service::operator_service::storage::RedisStorage;
-use std::fs::File;
-use std::io::{Read, Write};
+use crate::data::storage::service::operator::response_message::StorageResult;
+use crate::data::storage::service::operator::result_error::RedisError;
+use crate::data::storage::RedisStorage;
 
 pub mod accessor;
 pub mod accessor_builder;
 pub mod request_message;
 pub mod response_message;
 pub mod result_error;
-pub mod storage;
 
 pub struct StorageOperatorService {
     storage: RedisStorage,

@@ -1,5 +1,5 @@
 use crate::data::redis_value::RedisValue;
-use crate::data::storage_service::operator_service::result_error::RedisError;
+use crate::data::storage::service::operator::result_error::RedisError;
 use crate::protocol_serialization::ProtocolSerializer;
 use std::borrow::Borrow;
 use std::fmt::Display;

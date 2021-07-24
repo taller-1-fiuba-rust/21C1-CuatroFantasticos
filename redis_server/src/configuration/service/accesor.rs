@@ -1,5 +1,5 @@
-use crate::configuration::request_message::{ConfAction, ConfRequestMessage};
-use crate::configuration::response_message::ConfResult;
+use crate::configuration::service::request_message::{ConfAction, ConfRequestMessage};
+use crate::configuration::service::response_message::ConfResult;
 use std::fmt::{Debug, Formatter};
 use std::sync::mpsc;
 

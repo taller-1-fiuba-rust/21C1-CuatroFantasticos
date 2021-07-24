@@ -7,7 +7,7 @@ use std::fs::OpenOptions;
 use logger::log_service::LogService;
 use redis_server::architecture::server;
 use redis_server::configuration::service::ConfService;
-use redis_server::data::storage_service::StorageService;
+use redis_server::data::storage::service::StorageService;
 use redis_server::global_resources::GlobalResources;
 
 fn main() {
