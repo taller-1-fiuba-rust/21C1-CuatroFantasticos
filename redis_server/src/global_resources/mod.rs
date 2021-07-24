@@ -4,6 +4,7 @@ use crate::configuration::service::accesor::ConfAccessor;
 use crate::configuration::service::accessor_builder::ConfAccessorBuilder;
 use crate::configuration::service::request_message::ConfAction;
 use crate::configuration::service::response_message::ConfResult;
+use crate::configuration::verbose::Verbose;
 use crate::configuration::Configuration;
 use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::accessor_builder::StorageAccessorBuilder;
@@ -15,6 +16,7 @@ use std::fs::File;
 #[derive(Clone)]
 pub struct GlobalResources {
     logger_builder: LogInterface<File>,
+    verbose: Verbose,
     configuration_access_builder: ConfAccessorBuilder,
     storage_access_builder: StorageAccessorBuilder,
 }
@@ -22,11 +24,13 @@ pub struct GlobalResources {
 impl GlobalResources {
     pub fn new(
         logger_builder: LogInterface<File>,
+        verbose: Verbose,
         configuration_sender: ConfAccessorBuilder,
         storage_sender: StorageAccessorBuilder,
     ) -> Self {
         GlobalResources {
             logger_builder,
+            verbose,
             configuration_access_builder: configuration_sender,
             storage_access_builder: storage_sender,
         }
@@ -42,6 +46,10 @@ impl GlobalResources {
 
     pub fn get_logger(&self) -> Logger<File> {
         self.logger_builder.build_logger()
+    }
+
+    pub fn get_verbose(&self) -> Verbose {
+        self.verbose
     }
 
     pub fn get_conf(&self) -> Result<Configuration, GlobalResourcesError> {
