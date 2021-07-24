@@ -125,7 +125,7 @@ impl RedisCommand {
             RedisCommand::Keys(c) => c.execute(accessor),
             RedisCommand::Lindex(c) => c.execute(accessor),
             RedisCommand::Llen(c) => c.execute(accessor),
-            RedisCommand::Lpop(c) => c.execute(accessor),
+            RedisCommand::Lpop(c) => c.execute(global_resources),
             RedisCommand::Mget(c) => c.execute(accessor),
             RedisCommand::Mset(c) => c.execute(accessor),
             RedisCommand::Persist(c) => c.execute(accessor),
