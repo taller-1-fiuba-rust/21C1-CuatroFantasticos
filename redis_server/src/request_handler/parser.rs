@@ -18,6 +18,7 @@ use crate::command::llen::RedisCommandLlen;
 use crate::command::lpop::RedisCommandLPop;
 use crate::command::lpush::RedisCommandLPush;
 use crate::command::lpushx::RedisCommandLPushx;
+use crate::command::lrange::RedisCommandLRange;
 use crate::command::lset::RedisCommandLSet;
 use crate::command::mget::RedisCommandMGet;
 use crate::command::mset::RedisCommandMSet;
@@ -112,6 +113,7 @@ impl Parser {
             "RPOP" => self.parse_command_rpop(&mut command_iter, command_qty),
             "LSET" => self.parse_command_lset(&mut command_iter),
             "CONFIG" => self.parse_command_config(&mut command_iter),
+            "LRANGE" => self.parse_command_lrange(&mut command_iter),
             _ => Err(format!(
                 "-Unknown or disabled command '{}'\r\n",
                 command_type
@@ -144,17 +146,14 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Exists(RedisCommandExists::new(key)))
     }
-
     fn parse_command_keys(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Keys(RedisCommandKeys::new(key)))
     }
-
     fn parse_command_del(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Del(RedisCommandDel::new(key)))
     }
-
     fn parse_command_rename(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let newkey = self.parse_string(command_iter)?;
@@ -167,12 +166,10 @@ impl Parser {
             key, new_value,
         )))
     }
-
     fn parse_command_type(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Type(RedisCommandType::new(key)))
     }
-
     fn parse_command_copy(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let source_key = self.parse_string(command_iter)?;
         let destination_key = self.parse_string(command_iter)?;
@@ -181,22 +178,18 @@ impl Parser {
             destination_key,
         )))
     }
-
     fn parse_command_get(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Get(RedisCommandGet::new(key)))
     }
-
     fn parse_command_strlen(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Strlen(RedisCommandStrlen::new(key)))
     }
-
     fn parse_command_scard(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Scard(RedisCommandScard::new(key)))
     }
-
     fn parse_command_getset(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let new_value = self.parse_string(command_iter)?;
@@ -204,45 +197,37 @@ impl Parser {
             key, new_value,
         )))
     }
-
     fn parse_command_getdel(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::GetDel(RedisCommandGetDel::new(key)))
     }
-
     fn parse_command_llen(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Llen(RedisCommandLlen::new(key)))
     }
-
     fn parse_command_lindex(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let index = self.parse_string(command_iter)?;
         Ok(RedisCommand::Lindex(RedisCommandLindex::new(key, index)))
     }
-
     fn parse_command_sort(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Sort(RedisCommandSort::new(key)))
     }
-
     fn parse_command_decrby(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
         Ok(RedisCommand::DecrBy(RedisCommandDecrBy::new(key, value)))
     }
-
     fn parse_command_incrby(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
         Ok(RedisCommand::IncrBy(RedisCommandIncrBy::new(key, value)))
     }
-
     fn parse_command_touch(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Touch(RedisCommandTouch::new(key)))
     }
-
     fn parse_command_persist(
         &self,
         command_iter: &mut Split<&str>,
@@ -250,7 +235,6 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Persist(RedisCommandPersist::new(key)))
     }
-
     fn parse_command_sadd(
         &self,
         command_iter: &mut Split<&str>,
@@ -264,7 +248,6 @@ impl Parser {
         }
         Ok(RedisCommand::Sadd(RedisCommandSAdd::new(key, members)))
     }
-
     fn parse_command_lpush(
         &self,
         command_iter: &mut Split<&str>,
@@ -278,7 +261,6 @@ impl Parser {
         }
         Ok(RedisCommand::Lpush(RedisCommandLPush::new(key, members)))
     }
-
     fn parse_command_lpushx(
         &self,
         command_iter: &mut Split<&str>,
@@ -292,7 +274,6 @@ impl Parser {
         }
         Ok(RedisCommand::Lpushx(RedisCommandLPushx::new(key, members)))
     }
-
     fn parse_command_rpush(
         &self,
         command_iter: &mut Split<&str>,
@@ -319,7 +300,6 @@ impl Parser {
         }
         Ok(RedisCommand::Rpushx(RedisCommandRPushx::new(key, members)))
     }
-
     fn parse_command_srem(
         &self,
         command_iter: &mut Split<&str>,
@@ -333,7 +313,6 @@ impl Parser {
         }
         Ok(RedisCommand::Srem(RedisCommandSrem::new(key, members)))
     }
-
     fn parse_command_mset(
         &self,
         command_iter: &mut Split<&str>,
@@ -349,13 +328,11 @@ impl Parser {
         }
         Ok(RedisCommand::Mset(RedisCommandMSet::new(keys, values)))
     }
-
     fn parse_command_expire(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
         Ok(RedisCommand::Expire(RedisCommandExpire::new(key, value)))
     }
-
     fn parse_command_smembers(
         &self,
         command_iter: &mut Split<&str>,
@@ -363,7 +340,6 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Smembers(RedisCommandSmembers::new(key)))
     }
-
     fn parse_command_expireat(
         &self,
         command_iter: &mut Split<&str>,
@@ -374,12 +350,10 @@ impl Parser {
             key, value,
         )))
     }
-
     fn parse_command_ttl(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         Ok(RedisCommand::Ttl(RedisCommandTtl::new(key)))
     }
-
     fn parse_command_sismember(
         &self,
         command_iter: &mut Split<&str>,
@@ -390,13 +364,11 @@ impl Parser {
             key, member,
         )))
     }
-
     fn parse_command_set(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
         Ok(RedisCommand::Set(RedisCommandSet::new(key, value)))
     }
-
     fn parse_command_mget(
         &self,
         command_iter: &mut Split<&str>,
@@ -409,7 +381,6 @@ impl Parser {
         }
         Ok(RedisCommand::Mget(RedisCommandMGet::new(keys)))
     }
-
     fn parse_command_subscribe(
         &self,
         command_iter: &mut Split<&str>,
@@ -424,7 +395,6 @@ impl Parser {
             channels,
         )))
     }
-
     fn parse_command_lpop(
         &self,
         command_iter: &mut Split<&str>,
@@ -439,7 +409,6 @@ impl Parser {
         }
         Ok(RedisCommand::Lpop(RedisCommandLPop::new(key, times)))
     }
-
     fn parse_command_rpop(
         &self,
         command_iter: &mut Split<&str>,
@@ -454,14 +423,12 @@ impl Parser {
         }
         Ok(RedisCommand::Rpop(RedisCommandRPop::new(key, times)))
     }
-
     fn parse_command_lset(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         let key = self.parse_string(command_iter)?;
         let index = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
         Ok(RedisCommand::Lset(RedisCommandLSet::new(key, index, value)))
     }
-
     fn parse_command_config(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
         match self.parse_string(command_iter)?.to_uppercase().as_str() {
             "GET" => {
@@ -473,6 +440,14 @@ impl Parser {
             }
             _ => todo!(),
         }
+    }
+    fn parse_command_lrange(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
+        let key = self.parse_string(command_iter)?;
+        let start = self.parse_string(command_iter)?;
+        let stop = self.parse_string(command_iter)?;
+        Ok(RedisCommand::Lrange(RedisCommandLRange::new(
+            key, start, stop,
+        )))
     }
 }
 
