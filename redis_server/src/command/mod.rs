@@ -28,6 +28,7 @@ use crate::command::save::RedisCommandSave;
 use crate::command::scard::RedisCommandScard;
 use crate::command::set::RedisCommandSet;
 use crate::command::sismember::RedisCommandSismember;
+use crate::command::smembers::RedisCommandSmembers;
 use crate::command::sort::RedisCommandSort;
 use crate::command::srem::RedisCommandSrem;
 use crate::command::strlen::RedisCommandStrlen;
@@ -65,6 +66,7 @@ pub mod save;
 pub mod scard;
 pub mod set;
 pub mod sismember;
+pub mod smembers;
 pub mod sort;
 pub mod srem;
 pub mod strlen;
@@ -104,6 +106,7 @@ pub enum RedisCommand {
     Srem(RedisCommandSrem),
     Set(RedisCommandSet),
     Sismember(RedisCommandSismember),
+    Smembers(RedisCommandSmembers),
     Sort(RedisCommandSort),
     Strlen(RedisCommandStrlen),
     Subscribe(RedisCommandSubscribe),
@@ -143,6 +146,7 @@ impl RedisCommand {
             RedisCommand::Scard(c) => c.execute(global_resources),
             RedisCommand::Set(c) => c.execute(global_resources),
             RedisCommand::Sismember(c) => c.execute(global_resources),
+            RedisCommand::Smembers(c) => c.execute(global_resources),
             RedisCommand::Sort(c) => c.execute(global_resources),
             RedisCommand::Strlen(c) => c.execute(global_resources),
             RedisCommand::Srem(c) => c.execute(global_resources),

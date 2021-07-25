@@ -62,6 +62,10 @@ impl RedisValueSet {
     pub fn contains(&self, member: String) -> bool {
         self.contents.contains(&member)
     }
+
+    pub fn keys(&self) -> Vec<String> {
+        self.contents.iter().map(|value| value.to_owned()).collect()
+    }
 }
 
 impl ProtocolSerializer for RedisValueSet {
