@@ -69,6 +69,14 @@ impl RedisValueList {
         values
     }
 
+    pub fn lpush(&mut self, value: String) {
+        self.contents.insert(0, value);
+    }
+
+    pub fn rpush(&mut self, value: String) {
+        self.contents.push(value);
+    }
+
     pub fn rpop(&mut self, times: i32) -> Vec<String> {
         let mut values = Vec::new();
         for _ in 0..times {
@@ -106,7 +114,11 @@ impl ProtocolSerializer for RedisValueList {
 }
 
 impl RedisValueList {
-    pub fn new(contents_string: String) -> RedisValueList {
+    pub fn new() -> RedisValueList {
+        let contents: Vec<String> = vec![];
+        RedisValueList { contents }
+    }
+    pub fn new_with_contents(contents_string: String) -> RedisValueList {
         let mut contents = Vec::new();
         let split = contents_string.split(',');
         let parsed_line: Vec<&str> = split.collect();
@@ -117,6 +129,12 @@ impl RedisValueList {
     }
 }
 
+impl Default for RedisValueList {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::data::redis_value::list::RedisValueList;
@@ -124,14 +142,14 @@ mod tests {
     #[test]
     fn test_create_empty_redis_value() {
         let string = String::from("");
-        let redis_value_list = RedisValueList::new(string.clone());
+        let redis_value_list = RedisValueList::new_with_contents(string.clone());
         assert_eq!(redis_value_list.serialize(), string);
     }
 
     #[test]
     fn test_create_redis_value() {
         let string = String::from("hola, como, estas, ?");
-        let redis_value_set = RedisValueList::new(string.clone());
+        let redis_value_set = RedisValueList::new_with_contents(string.clone());
         assert_eq!(redis_value_set.serialize(), string);
     }
 }

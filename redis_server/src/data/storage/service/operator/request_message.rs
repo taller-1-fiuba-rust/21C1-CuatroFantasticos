@@ -69,6 +69,10 @@ pub enum StorageAction {
     Srem(String, Vec<String>),
     MGet(Vec<String>),
     LPop(String, i32),
+    LPush(String, Vec<String>),
+    RPush(String, Vec<String>),
+    RPushx(String, Vec<String>),
+    LPushx(String, Vec<String>),
     RPop(String, i32),
     LSet(String, i32, String),
 }

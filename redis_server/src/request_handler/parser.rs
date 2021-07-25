@@ -15,6 +15,8 @@ use crate::command::keys::RedisCommandKeys;
 use crate::command::lindex::RedisCommandLindex;
 use crate::command::llen::RedisCommandLlen;
 use crate::command::lpop::RedisCommandLPop;
+use crate::command::lpush::RedisCommandLPush;
+use crate::command::lpushx::RedisCommandLPushx;
 use crate::command::lset::RedisCommandLSet;
 use crate::command::mget::RedisCommandMGet;
 use crate::command::mset::RedisCommandMSet;
@@ -23,6 +25,8 @@ use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::rpop::RedisCommandRPop;
+use crate::command::rpush::RedisCommandRPush;
+use crate::command::rpushx::RedisCommandRPushx;
 use crate::command::sadd::RedisCommandSAdd;
 use crate::command::save::RedisCommandSave;
 use crate::command::scard::RedisCommandScard;
@@ -86,6 +90,10 @@ impl Parser {
             "INCRBY" => self.parse_command_incrby(&mut command_iter),
             "TOUCH" => self.parse_command_touch(&mut command_iter),
             "SADD" => self.parse_command_sadd(&mut command_iter, command_qty),
+            "LPUSH" => self.parse_command_lpush(&mut command_iter, command_qty),
+            "RPUSH" => self.parse_command_rpush(&mut command_iter, command_qty),
+            "RPUSHX" => self.parse_command_rpushx(&mut command_iter, command_qty),
+            "LPUSHX" => self.parse_command_lpushx(&mut command_iter, command_qty),
             "TTL" => self.parse_command_ttl(&mut command_iter),
             "PERSIST" => self.parse_command_persist(&mut command_iter),
             "SAVE" => Ok(RedisCommand::Save(RedisCommandSave::new())),
@@ -253,6 +261,61 @@ impl Parser {
             members.push(new_member);
         }
         Ok(RedisCommand::Sadd(RedisCommandSAdd::new(key, members)))
+    }
+
+    fn parse_command_lpush(
+        &self,
+        command_iter: &mut Split<&str>,
+        command_qty: usize,
+    ) -> Result<RedisCommand, String> {
+        let key = self.parse_string(command_iter)?;
+        let mut members = Vec::<String>::new();
+        for _ in 1..(command_qty - 1) {
+            let new_member = self.parse_string(command_iter)?;
+            members.push(new_member);
+        }
+        Ok(RedisCommand::Lpush(RedisCommandLPush::new(key, members)))
+    }
+
+    fn parse_command_lpushx(
+        &self,
+        command_iter: &mut Split<&str>,
+        command_qty: usize,
+    ) -> Result<RedisCommand, String> {
+        let key = self.parse_string(command_iter)?;
+        let mut members = Vec::<String>::new();
+        for _ in 1..(command_qty - 1) {
+            let new_member = self.parse_string(command_iter)?;
+            members.push(new_member);
+        }
+        Ok(RedisCommand::Lpushx(RedisCommandLPushx::new(key, members)))
+    }
+
+    fn parse_command_rpush(
+        &self,
+        command_iter: &mut Split<&str>,
+        command_qty: usize,
+    ) -> Result<RedisCommand, String> {
+        let key = self.parse_string(command_iter)?;
+        let mut members = Vec::<String>::new();
+        for _ in 1..(command_qty - 1) {
+            let new_member = self.parse_string(command_iter)?;
+            members.push(new_member);
+        }
+        Ok(RedisCommand::Rpush(RedisCommandRPush::new(key, members)))
+    }
+    fn parse_command_rpushx(
+        &self,
+        command_iter: &mut Split<&str>,
+        command_qty: usize,
+    ) -> Result<RedisCommand, String> {
+        let key = self.parse_string(command_iter)?;
+        let mut members = Vec::<String>::new();
+        for _ in 1..(command_qty - 1) {
+            let new_member = self.parse_string(command_iter)?;
+            members.push(new_member);
+        }
+        Ok(RedisCommand::Rpushx(RedisCommandRPushx::new(key, members)))
     }
 
     fn parse_command_srem(

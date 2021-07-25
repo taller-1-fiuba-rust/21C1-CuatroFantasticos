@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::sync::mpsc;
 
+use crate::data::redis_value::list::RedisValueList;
 use crate::data::redis_value::set::RedisValueSet;
 use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
@@ -366,6 +367,86 @@ impl StorageOperatorService {
                         }
                         self.storage.insert(&key, RedisValue::Set(new_set));
                         let response = StorageResult::Int(members_added);
+                        let _ = message.respond(response);
+                    }
+                },
+                StorageAction::LPush(key, members) => match self.storage.mut_get(&key) {
+                    Some(RedisValue::List(value)) => {
+                        for member in members {
+                            value.lpush(member);
+                        }
+                        let response = StorageResult::Int(value.length() as i32);
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotAList);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let mut new_list = RedisValueList::new();
+                        for member in members {
+                            new_list.lpush(member);
+                        }
+                        self.storage
+                            .insert(&key, RedisValue::List(new_list.clone()));
+                        let response = StorageResult::Int(new_list.length() as i32);
+                        let _ = message.respond(response);
+                    }
+                },
+                StorageAction::RPush(key, members) => match self.storage.mut_get(&key) {
+                    Some(RedisValue::List(value)) => {
+                        for member in members {
+                            value.rpush(member);
+                        }
+                        let response = StorageResult::Int(value.length() as i32);
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotAList);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let mut new_list = RedisValueList::new();
+                        for member in members {
+                            new_list.rpush(member);
+                        }
+                        self.storage
+                            .insert(&key, RedisValue::List(new_list.clone()));
+                        let response = StorageResult::Int(new_list.length() as i32);
+                        let _ = message.respond(response);
+                    }
+                },
+                StorageAction::RPushx(key, members) => match self.storage.mut_get(&key) {
+                    Some(RedisValue::List(value)) => {
+                        for member in members {
+                            value.rpush(member);
+                        }
+                        let response = StorageResult::Int(value.length() as i32);
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotAList);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response = StorageResult::Int(0);
+                        let _ = message.respond(response);
+                    }
+                },
+                StorageAction::LPushx(key, members) => match self.storage.mut_get(&key) {
+                    Some(RedisValue::List(value)) => {
+                        for member in members {
+                            value.lpush(member);
+                        }
+                        let response = StorageResult::Int(value.length() as i32);
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotAList);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response = StorageResult::Int(0);
                         let _ = message.respond(response);
                     }
                 },
