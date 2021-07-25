@@ -16,6 +16,7 @@ use crate::command::lindex::RedisCommandLindex;
 use crate::command::llen::RedisCommandLlen;
 use crate::command::lpop::RedisCommandLPop;
 use crate::command::lpush::RedisCommandLPush;
+use crate::command::lpushx::RedisCommandLPushx;
 use crate::command::mget::RedisCommandMGet;
 use crate::command::mset::RedisCommandMSet;
 use crate::command::persist::RedisCommandPersist;
@@ -56,6 +57,7 @@ pub mod lindex;
 pub mod llen;
 pub mod lpop;
 pub mod lpush;
+pub mod lpushx;
 pub mod mget;
 pub mod mset;
 pub mod persist;
@@ -96,6 +98,7 @@ pub enum RedisCommand {
     Llen(RedisCommandLlen),
     Lpop(RedisCommandLPop),
     Lpush(RedisCommandLPush),
+    Lpushx(RedisCommandLPushx),
     Mget(RedisCommandMGet),
     Mset(RedisCommandMSet),
     Persist(RedisCommandPersist),
@@ -138,6 +141,7 @@ impl RedisCommand {
             RedisCommand::Llen(c) => c.execute(global_resources),
             RedisCommand::Lpop(c) => c.execute(global_resources),
             RedisCommand::Lpush(c) => c.execute(global_resources),
+            RedisCommand::Lpushx(c) => c.execute(global_resources),
             RedisCommand::Mget(c) => c.execute(global_resources),
             RedisCommand::Mset(c) => c.execute(global_resources),
             RedisCommand::Persist(c) => c.execute(global_resources),
