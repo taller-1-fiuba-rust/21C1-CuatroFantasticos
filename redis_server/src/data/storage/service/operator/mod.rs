@@ -460,7 +460,24 @@ impl StorageOperatorService {
                 StorageAction::LPop(key, times) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::List(value)) => {
-                            let response = StorageResult::Vector(value.pop(times));
+                            let response = StorageResult::Vector(value.lpop(times));
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response = StorageResult::Error(RedisError::NotAList);
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            let response = StorageResult::Error(RedisError::NonExistent);
+                            let _ = message.respond(response);
+                        }
+                    };
+                }
+
+                StorageAction::RPop(key, times) => {
+                    match self.storage.mut_get(&key) {
+                        Some(RedisValue::List(value)) => {
+                            let response = StorageResult::Vector(value.rpop(times));
                             let _ = message.respond(response);
                         }
                         Some(_) => {

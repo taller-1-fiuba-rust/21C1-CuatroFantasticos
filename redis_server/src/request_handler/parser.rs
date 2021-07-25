@@ -21,6 +21,7 @@ use crate::command::persist::RedisCommandPersist;
 use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
+use crate::command::rpop::RedisCommandRPop;
 use crate::command::sadd::RedisCommandSAdd;
 use crate::command::save::RedisCommandSave;
 use crate::command::scard::RedisCommandScard;
@@ -98,6 +99,7 @@ impl Parser {
             "MGET" => self.parse_command_mget(&mut command_iter, command_qty),
             "SUBSCRIBE" => self.parse_command_subscribe(&mut command_iter, command_qty),
             "LPOP" => self.parse_command_lpop(&mut command_iter, command_qty),
+            "RPOP" => self.parse_command_rpop(&mut command_iter, command_qty),
             _ => Err(format!(
                 "-Unknown or disabled command '{}'\r\n",
                 command_type
@@ -369,6 +371,21 @@ impl Parser {
             times = String::from("1");
         }
         Ok(RedisCommand::Lpop(RedisCommandLPop::new(key, times)))
+    }
+
+    fn parse_command_rpop(
+        &self,
+        command_iter: &mut Split<&str>,
+        command_qty: usize,
+    ) -> Result<RedisCommand, String> {
+        let key = self.parse_string(command_iter)?;
+        let times;
+        if command_qty == 3 {
+            times = self.parse_string(command_iter)?;
+        } else {
+            times = String::from("1");
+        }
+        Ok(RedisCommand::Rpop(RedisCommandRPop::new(key, times)))
     }
 }
 
