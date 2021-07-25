@@ -428,6 +428,23 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 },
+                StorageAction::RPushx(key, members) => match self.storage.mut_get(&key) {
+                    Some(RedisValue::List(value)) => {
+                        for member in members {
+                            value.rpush(member);
+                        }
+                        let response = StorageResult::Int(value.length() as i32);
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotAList);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response = StorageResult::Int(0);
+                        let _ = message.respond(response);
+                    }
+                },
                 StorageAction::LPushx(key, members) => match self.storage.mut_get(&key) {
                     Some(RedisValue::List(value)) => {
                         for member in members {
