@@ -1,7 +1,8 @@
-use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
 use crate::data::storage::service::operator::response_message::StorageResult;
+use crate::global_resources::GlobalResources;
 use crate::protocol_serialization::ProtocolSerializer;
+
 ///Returns the string representation of the type of the value stored at key.
 /// The different types that can be returned are: string, list, set, zset, hash and stream.
 ///
@@ -19,14 +20,23 @@ impl RedisCommandType {
     pub fn new(key: String) -> RedisCommandType {
         RedisCommandType { key }
     }
-    pub fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageAction::Type(self.key.clone()))?;
+    pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
+        let verbose = global_resources.get_verbose();
+        verbose.print(&format!("Executing command Type with key: {}", self.key));
+        let response = global_resources
+            .get_storage_accessor()
+            .access(StorageAction::Type(self.key.clone()))?;
         let response = match response.get_value() {
             StorageResult::RedisValue(value) => {
+                verbose.print("Got a redisValue response");
                 value.get_type().protocol_serialize_to_simple_string()
             }
-            value => value.protocol_serialize_to_simple_string(),
+            value => {
+                verbose.print("Got an error response");
+                value.protocol_serialize_to_simple_string()
+            }
         };
+        verbose.print("Finalizing execution of command Type");
         Ok(response)
     }
 }

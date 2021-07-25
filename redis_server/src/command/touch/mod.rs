@@ -1,6 +1,7 @@
-use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
+use crate::global_resources::GlobalResources;
 use crate::protocol_serialization::ProtocolSerializer;
+
 ///Alters the last access time of a key(s). A key is ignored if it does not exist.
 ///
 /// # Arguments
@@ -17,9 +18,14 @@ impl RedisCommandTouch {
     pub fn new(key: String) -> RedisCommandTouch {
         RedisCommandTouch { key }
     }
-    pub fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageAction::Touch(self.key.clone()))?;
+    pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
+        let verbose = global_resources.get_verbose();
+        verbose.print(&format!("Executing command Touch with key: {}", self.key));
+        let response = global_resources
+            .get_storage_accessor()
+            .access(StorageAction::Touch(self.key.clone()))?;
         let response = response.get_value().protocol_serialize_to_int();
+        verbose.print("Finalizing execution of command Touch");
         Ok(response)
     }
 }

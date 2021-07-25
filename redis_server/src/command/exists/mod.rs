@@ -1,6 +1,7 @@
-use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
+use crate::global_resources::GlobalResources;
 use crate::protocol_serialization::ProtocolSerializer;
+
 ///Returns if key exists.
 ///Since Redis 3.0.3 it is possible to specify multiple keys instead of a single one.
 /// In such a case, it returns the total number of keys existing. Note that returning 1 or 0
@@ -25,9 +26,14 @@ impl RedisCommandExists {
     pub fn new(key: String) -> RedisCommandExists {
         RedisCommandExists { key }
     }
-    pub fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let response = accessor.access(StorageAction::Exists(self.key.clone()))?;
+    pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
+        let verbose = global_resources.get_verbose();
+        verbose.print(&format!("Executing command Exists with key: {}", self.key));
+        let response = global_resources
+            .get_storage_accessor()
+            .access(StorageAction::Exists(self.key.clone()))?;
         let response = response.get_value().protocol_serialize_to_int();
+        verbose.print("Finalizing execution of command Exists");
         Ok(response)
     }
 }
