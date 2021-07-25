@@ -1,6 +1,7 @@
-use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::request_message::StorageAction;
+use crate::global_resources::GlobalResources;
 use crate::protocol_serialization::ProtocolSerializer;
+
 ///This command copies the value stored at the source key to the destination key
 /// By default, the destination key is created in the logical database used by the connection.
 /// The DB option allows specifying an alternative logical database index for the destination key.
@@ -28,12 +29,20 @@ impl RedisCommandCopy {
             destination_key,
         }
     }
-    pub fn execute(&self, accessor: StorageAccessor) -> Result<String, String> {
-        let copy = accessor.access(StorageAction::Copy(
-            self.source_key.clone(),
-            self.destination_key.clone(),
-        ))?;
+    pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
+        let verbose = global_resources.get_verbose();
+        verbose.print(&format!(
+            "Executing command Copy with source_key: {} and destination_key: {}",
+            self.source_key, self.destination_key
+        ));
+        let copy = global_resources
+            .get_storage_accessor()
+            .access(StorageAction::Copy(
+                self.source_key.clone(),
+                self.destination_key.clone(),
+            ))?;
         let response = copy.get_value().protocol_serialize_to_int();
+        verbose.print("Finalizing execution of command Copy");
         Ok(response)
     }
 }

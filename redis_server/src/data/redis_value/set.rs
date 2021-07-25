@@ -33,6 +33,15 @@ impl RedisValueSet {
         }
     }
 
+    pub fn delete(&mut self, member: String) -> i32 {
+        let deleted = self.contents.remove(&member);
+        if deleted {
+            1
+        } else {
+            0
+        }
+    }
+
     pub fn sort(&self) -> Result<Vec<String>, RedisError> {
         let mut contents: Vec<i32> = vec![];
         for x in &self.contents {
