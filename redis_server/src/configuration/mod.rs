@@ -39,7 +39,8 @@ impl Configuration {
         };
         for (key, value) in self.conf.iter() {
             if regex.is_match(key) {
-                matching_keys_values.push(format!("{} : {}", key.clone(), value.clone()));
+                matching_keys_values.push(key.to_owned());
+                matching_keys_values.push(value.to_owned());
             }
         }
         matching_keys_values
