@@ -1,5 +1,6 @@
 use crate::command::append::RedisCommandAppend;
 use crate::command::config_get::RedisCommandConfigGet;
+use crate::command::config_set::RedisCommandConfigSet;
 use crate::command::copy::RedisCommandCopy;
 use crate::command::dbsize::RedisCommandDbSize;
 use crate::command::decrby::RedisCommandDecrBy;
@@ -469,7 +470,11 @@ impl Parser {
                 Ok(RedisCommand::ConfigGet(RedisCommandConfigGet::new(key)))
             }
             "SET" => {
-                todo!()
+                let key = self.parse_string(command_iter)?;
+                let value = self.parse_string(command_iter)?;
+                Ok(RedisCommand::ConfigSet(RedisCommandConfigSet::new(
+                    key, value,
+                )))
             }
             _ => todo!(),
         }
