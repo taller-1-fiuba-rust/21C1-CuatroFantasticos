@@ -16,6 +16,7 @@ impl ConfResponseMessage {
 
 pub enum ConfResult {
     Ok,
+    OkParameter(String),
     OkConf(Configuration),
     Error(ConfError),
 }

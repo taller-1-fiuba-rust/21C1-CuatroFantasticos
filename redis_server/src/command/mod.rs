@@ -1,4 +1,5 @@
 use crate::command::append::RedisCommandAppend;
+use crate::command::config_get::RedisCommandConfigGet;
 use crate::command::copy::RedisCommandCopy;
 use crate::command::dbsize::RedisCommandDbSize;
 use crate::command::decrby::RedisCommandDecrBy;
@@ -37,6 +38,7 @@ use crate::command::ttl::RedisCommandTtl;
 use crate::global_resources::GlobalResources;
 
 pub mod append;
+pub mod config_get;
 pub mod copy;
 pub mod dbsize;
 pub mod decrby;
@@ -75,6 +77,7 @@ pub mod r#type;
 
 pub enum RedisCommand {
     Append(RedisCommandAppend),
+    ConfigGet(RedisCommandConfigGet),
     Copy(RedisCommandCopy),
     Dbsize(RedisCommandDbSize),
     DecrBy(RedisCommandDecrBy),
@@ -115,6 +118,7 @@ impl RedisCommand {
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
         match self {
             RedisCommand::Append(c) => c.execute(global_resources),
+            RedisCommand::ConfigGet(c) => c.execute(global_resources),
             RedisCommand::Copy(c) => c.execute(global_resources),
             RedisCommand::Dbsize(c) => c.execute(global_resources),
             RedisCommand::DecrBy(c) => c.execute(global_resources),

@@ -41,6 +41,14 @@ impl ConfWorker {
                         let _ = message.respond(ConfResult::Error(ConfError::NonExistent));
                     }
                 },
+                ConfAction::GetParameter(value) => match self.configuration.get(&value) {
+                    Some(value) => {
+                        let _ = message.respond(ConfResult::OkParameter(value.clone()));
+                    }
+                    None => {
+                        let _ = message.respond(ConfResult::Error(ConfError::NonExistent));
+                    }
+                },
                 ConfAction::Terminate => {
                     break;
                 }
