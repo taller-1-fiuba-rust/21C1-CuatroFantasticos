@@ -41,6 +41,12 @@ impl ConfWorker {
                         let _ = message.respond(ConfResult::Error(ConfError::NonExistent));
                     }
                 },
+                ConfAction::GetParameters(pattern) => {
+                    let keys = self.configuration.values_by_pattern(&pattern);
+                    let response = ConfResult::Vector(keys);
+                    let _ = message.respond(response);
+                }
+
                 ConfAction::Terminate => {
                     break;
                 }

@@ -1,4 +1,5 @@
 use crate::command::append::RedisCommandAppend;
+use crate::command::config_get::RedisCommandConfigGet;
 use crate::command::copy::RedisCommandCopy;
 use crate::command::dbsize::RedisCommandDbSize;
 use crate::command::decrby::RedisCommandDecrBy;
@@ -110,6 +111,7 @@ impl Parser {
             "LPOP" => self.parse_command_lpop(&mut command_iter, command_qty),
             "RPOP" => self.parse_command_rpop(&mut command_iter, command_qty),
             "LSET" => self.parse_command_lset(&mut command_iter),
+            "CONFIG" => self.parse_command_config(&mut command_iter),
             _ => Err(format!(
                 "-Unknown or disabled command '{}'\r\n",
                 command_type
@@ -458,6 +460,19 @@ impl Parser {
         let index = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
         Ok(RedisCommand::Lset(RedisCommandLSet::new(key, index, value)))
+    }
+
+    fn parse_command_config(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
+        match self.parse_string(command_iter)?.to_uppercase().as_str() {
+            "GET" => {
+                let key = self.parse_string(command_iter)?;
+                Ok(RedisCommand::ConfigGet(RedisCommandConfigGet::new(key)))
+            }
+            "SET" => {
+                todo!()
+            }
+            _ => todo!(),
+        }
     }
 }
 
