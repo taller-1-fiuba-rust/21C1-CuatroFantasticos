@@ -588,6 +588,26 @@ impl StorageOperatorService {
                         }
                     };
                 }
+                StorageAction::LRange(key, start, stop) => match self.storage.access(&key) {
+                    Some(RedisValue::List(value)) => match value.lrange(start, stop) {
+                        Ok(value) => {
+                            let response = StorageResult::Vector(value);
+                            let _ = message.respond(response);
+                        }
+                        Err(error) => {
+                            let response = StorageResult::Error(error);
+                            let _ = message.respond(response);
+                        }
+                    },
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotAList);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response = StorageResult::Error(RedisError::Nil);
+                        let _ = message.respond(response);
+                    }
+                },
                 StorageAction::ExpirationRound => {
                     self.storage.clean_partial_expiration();
                     let _ = message.respond(StorageResult::Ok);

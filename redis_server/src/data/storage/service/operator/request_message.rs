@@ -75,4 +75,5 @@ pub enum StorageAction {
     LPushx(String, Vec<String>),
     RPop(String, i32),
     LSet(String, i32, String),
+    LRange(String, i32, i32),
 }
