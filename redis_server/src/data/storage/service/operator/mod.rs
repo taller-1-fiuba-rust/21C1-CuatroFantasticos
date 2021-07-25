@@ -506,7 +506,7 @@ impl StorageOperatorService {
                             let _ = message.respond(response);
                         }
                     };
-                },
+                }
                 StorageAction::ExpirationRound => {
                     self.storage.clean_partial_expiration();
                     let _ = message.respond(StorageResult::Ok);
