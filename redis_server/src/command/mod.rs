@@ -53,6 +53,7 @@ pub mod keys;
 pub mod lindex;
 pub mod llen;
 pub mod lpop;
+pub mod lpush;
 pub mod mget;
 pub mod mset;
 pub mod persist;
