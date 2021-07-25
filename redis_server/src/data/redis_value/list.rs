@@ -53,11 +53,21 @@ impl RedisValueList {
         Ok(sorted)
     }
 
-    pub fn pop(&mut self, times: i32) -> Vec<String> {
+    pub fn lpop(&mut self, times: i32) -> Vec<String> {
         let mut values = Vec::new();
         for _ in 0..times {
             if !self.contents.is_empty() {
                 values.push(self.contents.remove(0))
+            }
+        }
+        values
+    }
+
+    pub fn rpop(&mut self, times: i32) -> Vec<String> {
+        let mut values = Vec::new();
+        for _ in 0..times {
+            if !self.contents.is_empty() {
+                values.push(self.contents.pop().unwrap());
             }
         }
         values
