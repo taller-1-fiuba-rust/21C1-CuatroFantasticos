@@ -11,6 +11,7 @@ use crate::data::storage::service::operator::request_message::{
 use crate::data::storage::service::operator::response_message::StorageResult;
 use crate::data::storage::service::operator::result_error::RedisError;
 use crate::data::storage::RedisStorage;
+use crate::data::redis_value::list::RedisValueList;
 
 pub mod accessor;
 pub mod accessor_builder;
@@ -161,7 +162,29 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 },
+                StorageAction::RPush(key, new_values) => {
+                    match self.storage.mut_get(&key) {
+                        Some(RedisValue::List(value)) => {
+                            let result = value.rpush(new_values);
 
+                            let response = StorageResult::Int(result);
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response = StorageResult::Error(RedisError::NotAList);
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            self.storage.insert(
+                                &key,
+                                RedisValue::List(RedisValueList::new(self.newRpush(new_values))),
+                            );
+
+                            let response = StorageResult::Int(new_values.len() as i32);
+                            let _ = message.respond(response);
+                        }
+                    };
+                }
                 StorageAction::Append(key, new_value) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(value)) => {

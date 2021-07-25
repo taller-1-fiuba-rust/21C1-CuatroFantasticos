@@ -35,7 +35,7 @@ use crate::command::subscribe::RedisCommandSubscribe;
 use crate::command::touch::RedisCommandTouch;
 use crate::command::ttl::RedisCommandTtl;
 use crate::global_resources::GlobalResources;
-
+use crate::command::rpush::RedisCommandRPush;
 pub mod append;
 pub mod copy;
 pub mod dbsize;
@@ -72,6 +72,7 @@ pub mod subscribe;
 pub mod touch;
 pub mod ttl;
 pub mod r#type;
+pub mod rpush;
 
 pub enum RedisCommand {
     Append(RedisCommandAppend),
@@ -108,6 +109,7 @@ pub enum RedisCommand {
     Strlen(RedisCommandStrlen),
     Subscribe(RedisCommandSubscribe),
     Touch(RedisCommandTouch),
+    RPush(RedisCommandRPush),
     Ttl(RedisCommandTtl),
     Type(RedisCommandType),
 }
@@ -148,6 +150,7 @@ impl RedisCommand {
             RedisCommand::Srem(c) => c.execute(global_resources),
             RedisCommand::Subscribe(c) => c.execute(global_resources),
             RedisCommand::Touch(c) => c.execute(global_resources),
+            RedisCommand::RPush(c) => c.execute(global_resources),
             RedisCommand::Ttl(c) => c.execute(global_resources),
             RedisCommand::Type(c) => c.execute(global_resources),
         }

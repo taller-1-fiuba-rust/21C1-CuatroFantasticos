@@ -72,6 +72,21 @@ impl RedisValueList {
         }
         values
     }
+    pub fn rpush(&mut self, new_values: Vec<String>) -> i32 {
+        for new_value in new_values {
+            self.contents.push(new_value);
+        }
+        length(self.contents.clone());
+    }
+
+    pub fn newRpush(&mut self, new_values: Vec<String>) -> Vec<String> {
+        let mut values = Vec::new();
+        for value in  new_values {
+            values.push(value);
+
+        }
+        values
+    }
 }
 
 impl ProtocolSerializer for RedisValueList {
