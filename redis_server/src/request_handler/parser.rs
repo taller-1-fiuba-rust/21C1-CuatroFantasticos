@@ -19,6 +19,7 @@ use crate::command::mget::RedisCommandMGet;
 use crate::command::mset::RedisCommandMSet;
 use crate::command::persist::RedisCommandPersist;
 use crate::command::ping::RedisCommandPing;
+use crate::command::publish::RedisCommandPublish;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::sadd::RedisCommandSAdd;
@@ -95,6 +96,7 @@ impl Parser {
             "MSET" => self.parse_command_mset(&mut command_iter, command_qty),
             "MGET" => self.parse_command_mget(&mut command_iter, command_qty),
             "SUBSCRIBE" => self.parse_command_subscribe(&mut command_iter, command_qty),
+            "PUBLISH" => self.parse_command_publish(&mut command_iter, command_qty),
             "LPOP" => self.parse_command_lpop(&mut command_iter, command_qty),
             _ => Err(format!(
                 "-Unknown or disabled command '{}'\r\n",
@@ -343,6 +345,18 @@ impl Parser {
         }
         Ok(RedisCommand::Subscribe(RedisCommandSubscribe::new(
             channels,
+        )))
+    }
+
+    fn parse_command_publish(
+        &self,
+        command_iter: &mut Split<&str>,
+        _command_qty: usize,
+    ) -> Result<RedisCommand, String> {
+        let message = self.parse_string(command_iter)?;
+        let channel = self.parse_string(command_iter)?;
+        Ok(RedisCommand::Publish(RedisCommandPublish::new(
+            message, channel,
         )))
     }
 
