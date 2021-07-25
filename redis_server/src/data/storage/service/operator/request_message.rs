@@ -69,4 +69,5 @@ pub enum StorageAction {
     MGet(Vec<String>),
     LPop(String, i32),
     RPop(String, i32),
+    LSet(String, i32, String),
 }

@@ -27,16 +27,22 @@ impl RedisValueList {
         self.contents.len()
     }
 
-    pub fn get_index(&self, index: i32) -> Option<String> {
-        if index >= 0 {
-            self.contents.get(index as usize).cloned()
+    fn index(&self, number: i32) -> Result<usize, ()> {
+        let mut idx = number;
+        if idx < 0 {
+            idx += self.contents.len() as i32;
+        }
+        if idx >= 0 && idx < self.contents.len() as i32 {
+            Ok(idx as usize)
         } else {
-            let index = index + self.contents.len() as i32;
-            if index >= 0 {
-                self.contents.get(index as usize).cloned()
-            } else {
-                None
-            }
+            Err(())
+        }
+    }
+
+    pub fn get_index(&self, index: i32) -> Option<String> {
+        match self.index(index) {
+            Ok(idx) => self.contents.get(idx).cloned(),
+            Err(_) => None,
         }
     }
 
@@ -71,6 +77,17 @@ impl RedisValueList {
             }
         }
         values
+    }
+
+    pub fn replace(&mut self, index: i32, value: String) -> bool {
+        match self.index(index) {
+            Ok(idx) => {
+                self.contents.remove(idx);
+                self.contents.insert(idx, value);
+                true
+            }
+            Err(_) => false,
+        }
     }
 }
 
