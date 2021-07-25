@@ -33,21 +33,41 @@ impl RedisCommandSort {
             .access(StorageAction::Get(self.key.clone()))?;
         let response = match response.get_value() {
             StorageResult::RedisValue(RedisValue::Set(value)) => match value.sort() {
-                Ok(value) => value.protocol_serialize_to_bulk_string(),
-                Err(value) => value.protocol_serialize_to_bulk_string(),
+                Ok(value) => {
+                    verbose.print("Sorted redisValue Set successfully");
+                    value.protocol_serialize_to_bulk_string()
+                }
+                Err(value) => {
+                    verbose.print("Could not sort redisValue Set successfully");
+                    value.protocol_serialize_to_bulk_string()
+                }
             },
             StorageResult::RedisValue(RedisValue::List(value)) => match value.sort() {
-                Ok(value) => value.protocol_serialize_to_bulk_string(),
-                Err(value) => value.protocol_serialize_to_bulk_string(),
+                Ok(value) => {
+                    verbose.print("Sorted redisValue List successfully");
+                    value.protocol_serialize_to_bulk_string()
+                }
+                Err(value) => {
+                    verbose.print("Could not sort redisValue List successfully");
+                    value.protocol_serialize_to_bulk_string()
+                }
             },
             StorageResult::RedisValue(RedisValue::String(_)) => {
+                verbose.print("Got a redisValue String response");
                 RedisError::NotAListNorSet.protocol_serialize_to_bulk_string()
             }
             StorageResult::Error(RedisError::NonExistent) => {
+                verbose.print("Got a NonExistent Error response");
                 RedisError::NilArray.protocol_serialize_to_bulk_string()
             }
-            StorageResult::Error(value) => value.protocol_serialize_to_bulk_string(),
-            _ => StorageResult::Error(RedisError::Unknown).protocol_serialize_to_bulk_string(),
+            StorageResult::Error(value) => {
+                verbose.print("Got an Error response");
+                value.protocol_serialize_to_bulk_string()
+            }
+            _ => {
+                verbose.print("Unexpected error response");
+                StorageResult::Error(RedisError::Unknown).protocol_serialize_to_bulk_string()
+            }
         };
         verbose.print("Finalizing execution of command Sort");
         Ok(response)

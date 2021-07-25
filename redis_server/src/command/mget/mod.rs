@@ -13,7 +13,7 @@ impl RedisCommandMGet {
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
         let verbose = global_resources.get_verbose();
         verbose.print(&format!(
-            "Executing command MGet with key: {:?} ",
+            "Executing command MGet with keys: {:?} ",
             self.keys
         ));
         let response = global_resources

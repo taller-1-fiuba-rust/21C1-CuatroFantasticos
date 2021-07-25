@@ -39,7 +39,7 @@ impl RedisCommandKeys {
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
         let verbose = global_resources.get_verbose();
         verbose.print(&format!(
-            "Executing command Keys with string : {}",
+            "Executing command Keys with pattern : {}",
             self.pattern
         ));
         let response = global_resources

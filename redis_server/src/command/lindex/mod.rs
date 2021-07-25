@@ -35,15 +35,23 @@ impl RedisCommandLindex {
         ));
         let response = match self.index.parse::<i32>() {
             Ok(index) => {
+                verbose.print(&format!("Value of argument was a number: {}", index));
                 let response = global_resources
                     .get_storage_accessor()
                     .access(StorageAction::Lindex(self.key.clone(), index))?;
                 match response.get_value() {
-                    StorageResult::String(value) => value.protocol_serialize_to_bulk_string(),
-                    value => value.protocol_serialize_to_bulk_string(),
+                    StorageResult::String(value) => {
+                        verbose.print(&format!("Got a string response: {}", value));
+                        value.protocol_serialize_to_bulk_string()
+                    }
+                    value => {
+                        verbose.print("Got an error response");
+                        value.protocol_serialize_to_bulk_string()
+                    }
                 }
             }
             Err(_) => {
+                verbose.print("Value of argument was not a number");
                 StorageResult::Error(RedisError::NotANumber).protocol_serialize_to_bulk_string()
             }
         };

@@ -28,9 +28,13 @@ impl RedisCommandType {
             .access(StorageAction::Type(self.key.clone()))?;
         let response = match response.get_value() {
             StorageResult::RedisValue(value) => {
+                verbose.print("Got a redisValue response");
                 value.get_type().protocol_serialize_to_simple_string()
             }
-            value => value.protocol_serialize_to_simple_string(),
+            value => {
+                verbose.print("Got an error response");
+                value.protocol_serialize_to_simple_string()
+            }
         };
         verbose.print("Finalizing execution of command Type");
         Ok(response)
