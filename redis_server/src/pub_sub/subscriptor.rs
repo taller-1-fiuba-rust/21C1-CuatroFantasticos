@@ -1,7 +1,8 @@
 use crate::architecture::connection_handler::pub_sub_sender::ClientPubSubSender;
-use crate::pub_sub::service::broadcast::PubSubBroadcastMessage;
+use crate::pub_sub::broadcast::PubSubBroadcastMessage;
 use std::hash::{Hash, Hasher};
 
+#[derive(Clone)]
 pub struct PubSubSubscriptor {
     client_id: usize,
     client_sender: ClientPubSubSender,

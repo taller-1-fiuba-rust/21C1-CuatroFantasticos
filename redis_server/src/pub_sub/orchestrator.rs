@@ -1,5 +1,5 @@
+use crate::pub_sub::broadcast::PubSubBroadcastMessage;
 use crate::pub_sub::channel::PubSubChannel;
-use crate::pub_sub::service::broadcast::PubSubBroadcastMessage;
 use crate::pub_sub::subscriptor::PubSubSubscriptor;
 use std::collections::HashMap;
 
@@ -29,13 +29,13 @@ impl PubSubOrchestrator {
             channel.remove_subscriptor(&subscriptor)
         }
     }
-    pub fn publish_to_channel(&mut self, message: &str, channel_name: &str) {
-        if !self.channels.contains_key(channel_name) {
-            return;
-        }
-        if let Some(channel) = self.channels.get_mut(channel_name) {
-            let message = PubSubBroadcastMessage::new(message, channel_name);
-            channel.broadcast(message);
+    pub fn publish_to_channel(&mut self, message: &str, channel_name: &str) -> usize {
+        match self.channels.get_mut(channel_name) {
+            None => 0,
+            Some(channel) => {
+                let message = PubSubBroadcastMessage::new(message, channel_name);
+                channel.broadcast(message)
+            }
         }
     }
 }

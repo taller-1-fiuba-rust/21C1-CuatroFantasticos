@@ -3,7 +3,7 @@ pub mod pub_sub_sender;
 use crate::architecture::connection_handler::pub_sub_sender::ClientPubSubSender;
 use crate::command::RedisCommand;
 use crate::global_resources::GlobalResources;
-use crate::pub_sub::service::broadcast::PubSubBroadcastMessage;
+use crate::pub_sub::broadcast::PubSubBroadcastMessage;
 use crate::request_handler::parser::Parser;
 use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};

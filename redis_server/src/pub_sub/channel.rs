@@ -1,4 +1,4 @@
-use crate::pub_sub::service::broadcast::PubSubBroadcastMessage;
+use crate::pub_sub::broadcast::PubSubBroadcastMessage;
 use crate::pub_sub::subscriptor::PubSubSubscriptor;
 use std::collections::HashSet;
 
@@ -17,9 +17,13 @@ impl PubSubChannel {
     pub fn remove_subscriptor(&mut self, subscriptor: &PubSubSubscriptor) {
         self.broadcasting_list.remove(subscriptor);
     }
-    pub fn broadcast(&mut self, message: PubSubBroadcastMessage) {
+    pub fn broadcast(&mut self, message: PubSubBroadcastMessage) -> usize {
+        let mut receiver_qty: usize = 0;
         for subscriptor in &self.broadcasting_list {
-            let _ = subscriptor.send(message.clone());
+            if subscriptor.send(message.clone()).is_ok() {
+                receiver_qty += 1;
+            }
         }
+        receiver_qty
     }
 }

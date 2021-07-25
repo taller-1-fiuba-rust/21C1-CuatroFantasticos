@@ -1,4 +1,4 @@
-use crate::pub_sub::service::broadcast::PubSubBroadcastMessage;
+use crate::pub_sub::broadcast::PubSubBroadcastMessage;
 use std::sync::mpsc;
 
 #[derive(Clone)]
