@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::sync::mpsc;
 
+use crate::data::redis_value::list::RedisValueList;
 use crate::data::redis_value::set::RedisValueSet;
 use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
@@ -381,7 +382,29 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 },
-
+                StorageAction::LPush(key, members) => match self.storage.mut_get(&key) {
+                    Some(RedisValue::List(value)) => {
+                        for member in members {
+                            value.lpush(member);
+                        }
+                        let response = StorageResult::Int(value.length() as i32);
+                        let _ = message.respond(response);
+                    }
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotAList);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let mut new_list = RedisValueList::new();
+                        for member in members {
+                            new_list.lpush(member);
+                        }
+                        self.storage
+                            .insert(&key, RedisValue::List(new_list.clone()));
+                        let response = StorageResult::Int(new_list.length() as i32);
+                        let _ = message.respond(response);
+                    }
+                },
                 StorageAction::Srem(key, values) => match self.storage.mut_get(&key) {
                     Some(RedisValue::Set(value)) => {
                         let mut members_deleted = 0;
