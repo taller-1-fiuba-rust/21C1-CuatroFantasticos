@@ -1,10 +1,11 @@
-pub struct PubSubBroadcast {
+#[derive(Clone)]
+pub struct PubSubBroadcastMessage {
     message: String,
 }
 
-impl PubSubBroadcast {
+impl PubSubBroadcastMessage {
     pub fn new(message: String) -> Self {
-        PubSubBroadcast { message }
+        PubSubBroadcastMessage { message }
     }
     pub fn message(&self) -> &str {
         &self.message

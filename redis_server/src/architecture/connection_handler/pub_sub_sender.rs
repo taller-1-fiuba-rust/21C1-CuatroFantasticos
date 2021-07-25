@@ -1,9 +1,9 @@
-use crate::pub_sub::broadcast::PubSubBroadcast;
+use crate::pub_sub::service::broadcast::PubSubBroadcastMessage;
 use std::sync::mpsc;
 
 #[derive(Clone)]
 pub struct ClientPubSubSender {
-    sender: mpsc::Sender<PubSubBroadcast>,
+    sender: mpsc::Sender<PubSubBroadcastMessage>,
 }
 
 pub enum ClientPubSubSenderError {
@@ -11,10 +11,10 @@ pub enum ClientPubSubSenderError {
 }
 
 impl ClientPubSubSender {
-    pub fn new(sender: mpsc::Sender<PubSubBroadcast>) -> Self {
+    pub fn new(sender: mpsc::Sender<PubSubBroadcastMessage>) -> Self {
         ClientPubSubSender { sender }
     }
-    pub fn send(&self, message: PubSubBroadcast) -> Result<(), ClientPubSubSenderError> {
+    pub fn send(&self, message: PubSubBroadcastMessage) -> Result<(), ClientPubSubSenderError> {
         self.sender
             .send(message)
             .map_err(|_| ClientPubSubSenderError::SendError)

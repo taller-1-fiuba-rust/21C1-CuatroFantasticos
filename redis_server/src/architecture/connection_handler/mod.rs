@@ -3,7 +3,7 @@ pub mod pub_sub_sender;
 use crate::architecture::connection_handler::pub_sub_sender::ClientPubSubSender;
 use crate::command::RedisCommand;
 use crate::global_resources::GlobalResources;
-use crate::pub_sub::broadcast::PubSubBroadcast;
+use crate::pub_sub::service::broadcast::PubSubBroadcastMessage;
 use crate::request_handler::parser::Parser;
 use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};
@@ -16,11 +16,11 @@ use std::sync::mpsc;
 /// * conf - Configuration
 
 pub struct ConnectionHandler {
-    client_id: u128,
+    client_id: usize,
     stream: TcpStream,
     global_resources: GlobalResources,
     state: ClientState,
-    pub_sub_receiver: mpsc::Receiver<PubSubBroadcast>,
+    pub_sub_receiver: mpsc::Receiver<PubSubBroadcastMessage>,
 }
 
 enum ClientState {
@@ -34,8 +34,8 @@ enum ConnectionState {
 }
 
 impl ConnectionHandler {
-    pub fn new(client_id: u128, stream: TcpStream, global_resources: GlobalResources) -> Self {
-        let (tx, rx) = mpsc::channel::<PubSubBroadcast>();
+    pub fn new(client_id: usize, stream: TcpStream, global_resources: GlobalResources) -> Self {
+        let (tx, rx) = mpsc::channel::<PubSubBroadcastMessage>();
         let mut global_resources = global_resources;
         global_resources.set_client_pub_sub_sender(ClientPubSubSender::new(tx));
         ConnectionHandler {
@@ -127,7 +127,7 @@ impl ConnectionHandler {
     }
     fn handle_connection_pubsub(&mut self) -> ConnectionState {
         let verbose = self.global_resources.get_verbose();
-        for pub_sub_message in self.pub_sub_receiver {
+        for pub_sub_message in &self.pub_sub_receiver {
             let pub_sub_message = pub_sub_message.message();
             if self.stream.write_all(pub_sub_message.as_ref()).is_err() {
                 verbose.print("handle_connection: Could not write response");
