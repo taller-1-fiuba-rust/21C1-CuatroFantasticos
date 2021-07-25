@@ -19,4 +19,5 @@ impl ClientPubSubSender {
             .send(message)
             .map_err(|_| ClientPubSubSenderError::SendError)
     }
+    pub fn protocolize(&self) {}
 }
