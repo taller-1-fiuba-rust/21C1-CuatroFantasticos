@@ -202,7 +202,8 @@ impl RedisStorage {
                     );
                 }
                 "List" => {
-                    let value = RedisValueList::new(parsed_line[VALUE].trim().to_owned());
+                    let value =
+                        RedisValueList::new_with_contents(parsed_line[VALUE].trim().to_owned());
                     storage.insert_with_last_access_time(
                         key,
                         RedisValue::List(value),
