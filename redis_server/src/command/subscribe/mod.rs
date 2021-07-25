@@ -6,7 +6,7 @@ use crate::global_resources::GlobalResources;
 /// * key - String
 ///
 /// # Return value
-/// Integer reply: the length of the string at key, or 0 when key does not exist.
+///
 
 pub struct RedisCommandSubscribe {
     _channel: Vec<String>,

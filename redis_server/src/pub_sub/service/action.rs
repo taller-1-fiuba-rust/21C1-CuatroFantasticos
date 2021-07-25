@@ -6,4 +6,5 @@ pub enum PubSubAction {
     Unsubscribe(PubSubSubscriptor, String),
     UnsubscribeAll(PubSubSubscriptor),
     Publish(String, String),
+    Terminate,
 }

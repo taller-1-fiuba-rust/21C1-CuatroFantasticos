@@ -10,6 +10,7 @@ use redis_server::configuration::service::ConfService;
 use redis_server::configuration::verbose::Verbose;
 use redis_server::data::storage::service::StorageService;
 use redis_server::global_resources::GlobalResources;
+use redis_server::pub_sub::service::PubSubService;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -31,11 +32,13 @@ fn main() {
         .expect("main: Couldn't open database file");
 
     let storage_service = StorageService::new(db_file);
+    let pub_sub_service = PubSubService::new();
     let global_conf = GlobalResources::new(
         log_service.get_log_interface(),
         verbose,
         conf_service.get_accessor_builder(),
         storage_service.get_accessor_builder(),
+        pub_sub_service.get_accessor_builder(),
     );
     server::run_server(global_conf);
 }
