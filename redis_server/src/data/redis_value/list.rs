@@ -67,6 +67,10 @@ impl RedisValueList {
         self.contents.insert(0, value);
     }
 
+    pub fn rpush(&mut self, value: String) {
+        self.contents.push(value);
+    }
+
     pub fn rpop(&mut self, times: i32) -> Vec<String> {
         let mut values = Vec::new();
         for _ in 0..times {
