@@ -16,6 +16,9 @@ use crate::command::keys::RedisCommandKeys;
 use crate::command::lindex::RedisCommandLindex;
 use crate::command::llen::RedisCommandLlen;
 use crate::command::lpop::RedisCommandLPop;
+use crate::command::lpush::RedisCommandLPush;
+use crate::command::lpushx::RedisCommandLPushx;
+use crate::command::lset::RedisCommandLSet;
 use crate::command::mget::RedisCommandMGet;
 use crate::command::mset::RedisCommandMSet;
 use crate::command::persist::RedisCommandPersist;
@@ -23,6 +26,8 @@ use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::rpop::RedisCommandRPop;
+use crate::command::rpush::RedisCommandRPush;
+use crate::command::rpushx::RedisCommandRPushx;
 use crate::command::sadd::RedisCommandSAdd;
 use crate::command::save::RedisCommandSave;
 use crate::command::scard::RedisCommandScard;
@@ -55,12 +60,17 @@ pub mod keys;
 pub mod lindex;
 pub mod llen;
 pub mod lpop;
+pub mod lpush;
+pub mod lpushx;
+pub mod lset;
 pub mod mget;
 pub mod mset;
 pub mod persist;
 pub mod ping;
 pub mod rename;
 pub mod rpop;
+pub mod rpush;
+pub mod rpushx;
 pub mod sadd;
 pub mod save;
 pub mod scard;
@@ -94,12 +104,17 @@ pub enum RedisCommand {
     Lindex(RedisCommandLindex),
     Llen(RedisCommandLlen),
     Lpop(RedisCommandLPop),
+    Lpush(RedisCommandLPush),
+    Lpushx(RedisCommandLPushx),
+    Lset(RedisCommandLSet),
     Mget(RedisCommandMGet),
     Mset(RedisCommandMSet),
     Persist(RedisCommandPersist),
     Ping(RedisCommandPing),
     Rename(RedisCommandRename),
     Rpop(RedisCommandRPop),
+    Rpush(RedisCommandRPush),
+    Rpushx(RedisCommandRPushx),
     Sadd(RedisCommandSAdd),
     Save(RedisCommandSave),
     Scard(RedisCommandScard),
@@ -135,12 +150,17 @@ impl RedisCommand {
             RedisCommand::Lindex(c) => c.execute(global_resources),
             RedisCommand::Llen(c) => c.execute(global_resources),
             RedisCommand::Lpop(c) => c.execute(global_resources),
+            RedisCommand::Lpush(c) => c.execute(global_resources),
+            RedisCommand::Lpushx(c) => c.execute(global_resources),
+            RedisCommand::Lset(c) => c.execute(global_resources),
             RedisCommand::Mget(c) => c.execute(global_resources),
             RedisCommand::Mset(c) => c.execute(global_resources),
             RedisCommand::Persist(c) => c.execute(global_resources),
             RedisCommand::Ping(c) => c.execute(global_resources),
             RedisCommand::Rename(c) => c.execute(global_resources),
             RedisCommand::Rpop(c) => c.execute(global_resources),
+            RedisCommand::Rpush(c) => c.execute(global_resources),
+            RedisCommand::Rpushx(c) => c.execute(global_resources),
             RedisCommand::Sadd(c) => c.execute(global_resources),
             RedisCommand::Save(c) => c.execute(global_resources),
             RedisCommand::Scard(c) => c.execute(global_resources),
