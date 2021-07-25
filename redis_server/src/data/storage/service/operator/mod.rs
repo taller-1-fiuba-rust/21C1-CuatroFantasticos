@@ -55,13 +55,11 @@ impl StorageOperatorService {
                     let response = StorageResult::Ok;
                     let _ = message.respond(response);
                 }
-
                 StorageAction::Keys(pattern) => {
                     let keys = self.storage.keys_by_pattern(&pattern);
                     let response = StorageResult::Vector(keys);
                     let _ = message.respond(response);
                 }
-
                 StorageAction::Rename(key, new_key) => {
                     if let Some(value) = self.storage.remove(&key) {
                         self.storage.insert(&new_key, value);
@@ -162,7 +160,6 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 },
-
                 StorageAction::Append(key, new_value) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(value)) => {
@@ -198,7 +195,6 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 },
-
                 StorageAction::GetDel(key) => {
                     match self.storage.get(&key) {
                         Some(RedisValue::String(value)) => {
@@ -216,7 +212,6 @@ impl StorageOperatorService {
                         }
                     };
                 }
-
                 StorageAction::GetSet(key, new_value) => {
                     match self.storage.get(&key) {
                         Some(RedisValue::String(value)) => {
@@ -237,7 +232,6 @@ impl StorageOperatorService {
                         }
                     };
                 }
-
                 StorageAction::DecrBy(key, decr_value) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(old_value)) => {
@@ -269,7 +263,6 @@ impl StorageOperatorService {
                         }
                     };
                 }
-
                 StorageAction::Expire(key, expiration) => {
                     if self.storage.contains_key(&key) {
                         self.storage.expire(&key, expiration * 1000);
@@ -280,7 +273,6 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 }
-
                 StorageAction::Sismember(key, member) => match self.storage.get(&key) {
                     Some(RedisValue::Set(value)) => {
                         let response = StorageResult::Bool(value.contains(member));
@@ -295,7 +287,6 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 },
-
                 StorageAction::IncrBy(key, incr_value) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::String(old_value)) => {
@@ -327,7 +318,6 @@ impl StorageOperatorService {
                         }
                     };
                 }
-
                 StorageAction::Strlen(key) => match self.storage.get(&key) {
                     Some(RedisValue::String(value)) => {
                         let response = StorageResult::Int(value.length() as i32);
@@ -342,7 +332,6 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 },
-
                 StorageAction::Llen(key) => match self.storage.access(&key) {
                     Some(RedisValue::List(value)) => {
                         let response = StorageResult::Int(value.length() as i32);
@@ -357,7 +346,6 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 },
-
                 StorageAction::SAdd(key, members) => match self.storage.mut_get(&key) {
                     Some(RedisValue::Set(value)) => {
                         let mut members_added = 0;
@@ -480,7 +468,6 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 },
-
                 StorageAction::ExpireAt(key, expiration) => {
                     if self.storage.contains_key(&key) {
                         self.storage.expire_at(&key, expiration);
@@ -491,7 +478,6 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 }
-
                 StorageAction::Ttl(key) => {
                     if self.storage.contains_key(&key) {
                         let response = match self.storage.ttl(&key) {
@@ -504,7 +490,6 @@ impl StorageOperatorService {
                         let _ = message.respond(response);
                     }
                 }
-
                 StorageAction::Set(key, value) => {
                     self.storage.insert(
                         &key,
@@ -513,7 +498,6 @@ impl StorageOperatorService {
                     let response = StorageResult::Ok;
                     let _ = message.respond(response);
                 }
-
                 StorageAction::MSet(keys, values) => {
                     for (key, value) in keys.iter().zip(values.iter()) {
                         self.storage.insert(
@@ -524,7 +508,6 @@ impl StorageOperatorService {
                     let response = StorageResult::Ok;
                     let _ = message.respond(response);
                 }
-
                 StorageAction::MGet(keys) => {
                     let mut values = Vec::new();
                     for key in keys {
@@ -536,7 +519,6 @@ impl StorageOperatorService {
                     let response = StorageResult::OptionVector(values);
                     let _ = message.respond(response);
                 }
-
                 StorageAction::LPop(key, times) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::List(value)) => {
@@ -553,7 +535,6 @@ impl StorageOperatorService {
                         }
                     };
                 }
-
                 StorageAction::RPop(key, times) => {
                     match self.storage.mut_get(&key) {
                         Some(RedisValue::List(value)) => {
@@ -570,7 +551,26 @@ impl StorageOperatorService {
                         }
                     };
                 }
-
+                StorageAction::LSet(key, index, new_value) => match self.storage.mut_get(&key) {
+                    Some(RedisValue::List(value)) => {
+                        let result = value.replace(index, new_value);
+                        if result {
+                            let response = StorageResult::Ok;
+                            let _ = message.respond(response);
+                        } else {
+                            let response = StorageResult::Error(RedisError::IdxOutOfRange);
+                            let _ = message.respond(response);
+                        }
+                    }
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotAList);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response = StorageResult::Error(RedisError::Nil);
+                        let _ = message.respond(response);
+                    }
+                },
                 StorageAction::Smembers(key) => {
                     match self.storage.get(&key) {
                         Some(RedisValue::Set(value)) => {
@@ -588,12 +588,10 @@ impl StorageOperatorService {
                         }
                     };
                 }
-
                 StorageAction::ExpirationRound => {
                     self.storage.clean_partial_expiration();
                     let _ = message.respond(StorageResult::Ok);
                 }
-
                 StorageAction::Save => {
                     let mut file = File::create("./dump.rdb").expect("could not create file");
                     for line in self.storage.serialize() {

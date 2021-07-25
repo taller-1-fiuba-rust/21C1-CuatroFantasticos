@@ -17,6 +17,7 @@ use crate::command::llen::RedisCommandLlen;
 use crate::command::lpop::RedisCommandLPop;
 use crate::command::lpush::RedisCommandLPush;
 use crate::command::lpushx::RedisCommandLPushx;
+use crate::command::lset::RedisCommandLSet;
 use crate::command::mget::RedisCommandMGet;
 use crate::command::mset::RedisCommandMSet;
 use crate::command::persist::RedisCommandPersist;
@@ -108,6 +109,7 @@ impl Parser {
             "SUBSCRIBE" => self.parse_command_subscribe(&mut command_iter, command_qty),
             "LPOP" => self.parse_command_lpop(&mut command_iter, command_qty),
             "RPOP" => self.parse_command_rpop(&mut command_iter, command_qty),
+            "LSET" => self.parse_command_lset(&mut command_iter),
             _ => Err(format!(
                 "-Unknown or disabled command '{}'\r\n",
                 command_type
@@ -449,6 +451,13 @@ impl Parser {
             times = String::from("1");
         }
         Ok(RedisCommand::Rpop(RedisCommandRPop::new(key, times)))
+    }
+
+    fn parse_command_lset(&self, command_iter: &mut Split<&str>) -> Result<RedisCommand, String> {
+        let key = self.parse_string(command_iter)?;
+        let index = self.parse_string(command_iter)?;
+        let value = self.parse_string(command_iter)?;
+        Ok(RedisCommand::Lset(RedisCommandLSet::new(key, index, value)))
     }
 }
 
