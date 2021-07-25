@@ -27,6 +27,7 @@ use crate::command::save::RedisCommandSave;
 use crate::command::scard::RedisCommandScard;
 use crate::command::set::RedisCommandSet;
 use crate::command::sismember::RedisCommandSismember;
+use crate::command::smembers::RedisCommandSmembers;
 use crate::command::sort::RedisCommandSort;
 use crate::command::srem::RedisCommandSrem;
 use crate::command::strlen::RedisCommandStrlen;
@@ -91,6 +92,7 @@ impl Parser {
             "EXPIREAT" => self.parse_command_expireat(&mut command_iter),
             "SCARD" => self.parse_command_scard(&mut command_iter),
             "SISMEMBER" => self.parse_command_sismember(&mut command_iter),
+            "SMEMBERS" => self.parse_command_smembers(&mut command_iter),
             "SET" => self.parse_command_set(&mut command_iter),
             "SREM" => self.parse_command_srem(&mut command_iter, command_qty),
             "MSET" => self.parse_command_mset(&mut command_iter, command_qty),
@@ -285,6 +287,14 @@ impl Parser {
         let key = self.parse_string(command_iter)?;
         let value = self.parse_string(command_iter)?;
         Ok(RedisCommand::Expire(RedisCommandExpire::new(key, value)))
+    }
+
+    fn parse_command_smembers(
+        &self,
+        command_iter: &mut Split<&str>,
+    ) -> Result<RedisCommand, String> {
+        let key = self.parse_string(command_iter)?;
+        Ok(RedisCommand::Smembers(RedisCommandSmembers::new(key)))
     }
 
     fn parse_command_expireat(
