@@ -474,6 +474,24 @@ impl StorageOperatorService {
                     };
                 }
 
+                StorageAction::Smembers(key) => {
+                    match self.storage.get(&key) {
+                        Some(RedisValue::Set(value)) => {
+                            let response =
+                                StorageResult::RedisValue(RedisValue::Set(value.clone()));
+                            let _ = message.respond(response);
+                        }
+                        Some(_) => {
+                            let response = StorageResult::Error(RedisError::NotASet);
+                            let _ = message.respond(response);
+                        }
+                        None => {
+                            let response = StorageResult::Error(RedisError::NonExistent);
+                            let _ = message.respond(response);
+                        }
+                    };
+                }
+
                 StorageAction::ExpirationRound => {
                     self.storage.clean_partial_expiration();
                     let _ = message.respond(StorageResult::Ok);
