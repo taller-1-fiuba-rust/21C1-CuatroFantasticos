@@ -24,6 +24,7 @@ use crate::command::ping::RedisCommandPing;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::rpop::RedisCommandRPop;
+use crate::command::rpush::RedisCommandRPush;
 use crate::command::sadd::RedisCommandSAdd;
 use crate::command::save::RedisCommandSave;
 use crate::command::scard::RedisCommandScard;
@@ -63,6 +64,7 @@ pub mod persist;
 pub mod ping;
 pub mod rename;
 pub mod rpop;
+pub mod rpush;
 pub mod sadd;
 pub mod save;
 pub mod scard;
@@ -103,6 +105,7 @@ pub enum RedisCommand {
     Ping(RedisCommandPing),
     Rename(RedisCommandRename),
     Rpop(RedisCommandRPop),
+    Rpush(RedisCommandRPush),
     Sadd(RedisCommandSAdd),
     Save(RedisCommandSave),
     Scard(RedisCommandScard),
@@ -145,6 +148,7 @@ impl RedisCommand {
             RedisCommand::Ping(c) => c.execute(global_resources),
             RedisCommand::Rename(c) => c.execute(global_resources),
             RedisCommand::Rpop(c) => c.execute(global_resources),
+            RedisCommand::Rpush(c) => c.execute(global_resources),
             RedisCommand::Sadd(c) => c.execute(global_resources),
             RedisCommand::Save(c) => c.execute(global_resources),
             RedisCommand::Scard(c) => c.execute(global_resources),
