@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 use std::fmt::Debug;
 
-use regex::Regex;
-
 use value::StorageValue;
 
 use crate::data::redis_value::list::RedisValueList;
@@ -10,6 +8,7 @@ use crate::data::redis_value::set::RedisValueSet;
 use crate::data::redis_value::string::RedisValueString;
 use crate::data::redis_value::RedisValue;
 use crate::data::storage::expiration_map::ExpirationMap;
+use crate::redis_pattern::RedisPattern;
 use crate::utilities::current_time_in_millis;
 
 pub mod expiration_map;
@@ -150,9 +149,7 @@ impl RedisStorage {
 
     pub fn keys_by_pattern(&mut self, pattern: &str) -> Vec<String> {
         let mut matching_keys = Vec::new();
-        let pattern = pattern.replace("?", ".?").replace("*", ".*");
-        let pattern = format!("^{}$", pattern);
-        let regex = match Regex::new(&pattern) {
+        let regex = match RedisPattern::new(pattern) {
             Ok(v) => v,
             Err(_) => return matching_keys,
         };
