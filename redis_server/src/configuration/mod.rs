@@ -1,3 +1,4 @@
+use crate::redis_pattern::RedisPattern;
 use std::collections::HashMap;
 use std::fs;
 
@@ -28,6 +29,20 @@ impl Configuration {
 
     pub fn get(&self, key: &str) -> Option<&String> {
         self.conf.get(key)
+    }
+
+    pub fn values_by_pattern(&mut self, pattern: &str) -> Vec<String> {
+        let mut matching_keys_values = Vec::new();
+        let regex = match RedisPattern::new(pattern) {
+            Ok(v) => v,
+            Err(_) => return matching_keys_values,
+        };
+        for (key, value) in self.conf.iter() {
+            if regex.is_match(key) {
+                matching_keys_values.push(format!("{} : {}", key.clone(), value.clone()));
+            }
+        }
+        matching_keys_values
     }
 
     pub fn set(&mut self, key: String, value: String) {

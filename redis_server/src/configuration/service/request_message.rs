@@ -31,6 +31,6 @@ impl ConfRequestMessage {
 pub enum ConfAction {
     Terminate,
     Get,
-    GetParameter(String),
+    GetParameters(String),
     Set(String, String),
 }

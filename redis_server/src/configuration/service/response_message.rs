@@ -16,7 +16,7 @@ impl ConfResponseMessage {
 
 pub enum ConfResult {
     Ok,
-    OkParameter(String),
+    Vector(Vec<String>),
     OkConf(Configuration),
     Error(ConfError),
 }

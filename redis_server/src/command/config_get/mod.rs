@@ -21,13 +21,12 @@ impl RedisCommandConfigGet {
 
         let response = global_resources
             .get_configuration_accessor()
-            .access(ConfAction::GetParameter(self.key.clone()))?;
+            .access(ConfAction::GetParameters(self.key.clone()))?;
 
         let response = match response {
-            ConfResult::OkParameter(value) => {
+            ConfResult::Vector(value) => {
                 verbose.print("Received parameter successfully");
-                let vec = vec![value];
-                vec.protocol_serialize_to_bulk_string()
+                value.protocol_serialize_to_bulk_string()
             }
             _ => {
                 verbose.print("Error, Parameter did not exist");
