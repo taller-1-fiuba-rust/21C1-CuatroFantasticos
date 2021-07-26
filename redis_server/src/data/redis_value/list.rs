@@ -59,6 +59,69 @@ impl RedisValueList {
         }
     }
 
+    pub fn lrem(&mut self, count: i32, element: String) -> i32 {
+        let mut times = count;
+        let mut i = 0;
+        while i < self.contents.len() {
+            match self.contents.get(i) {
+                Some(value) => {
+                    if *value == element {
+                        self.contents.remove(i);
+                        times -= 1;
+                        if times == 0 {
+                            break;
+                        }
+                    } else {
+                        i += 1;
+                    }
+                }
+                None => break,
+            }
+        }
+        count - times
+    }
+
+    pub fn rem_all(&mut self, element: String) -> i32 {
+        let mut times = 0;
+        let mut i = 0;
+        while i < self.contents.len() {
+            match self.contents.get(i) {
+                Some(value) => {
+                    if *value == element {
+                        self.contents.remove(i);
+                        times += 1;
+                    } else {
+                        i += 1;
+                    }
+                }
+                None => break,
+            }
+        }
+        times
+    }
+
+    pub fn rrem(&mut self, count: i32, element: String) -> i32 {
+        let mut times = count;
+        let mut i = self.contents.len();
+        while i > 0 {
+            match self.contents.get(i - 1) {
+                Some(value) => {
+                    if *value == element {
+                        self.contents.remove(i - 1);
+                        times -= 1;
+                        if times == 0 {
+                            break;
+                        }
+                    } else {
+                        i -= 1;
+                    }
+                }
+                None => i -= 1,
+            }
+        }
+        count - times
+    }
+
     pub fn sort(&self) -> Result<Vec<String>, RedisError> {
         let mut contents: Vec<i32> = vec![];
         for x in &self.contents {
