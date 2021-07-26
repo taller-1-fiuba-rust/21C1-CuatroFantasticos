@@ -1,6 +1,6 @@
 list: 0: 1627166238371: List: loque, quieras, !
-hola: 0: 1627065967425: String: chau anda?
-hash: 0: 1627166211087: Set: hola, dsa
 messi: 0: 1627065952615: String: rve
+hola: 0: 1627065967425: String: chau anda?
 lautaro: 0: 1627154743739: String: manzano
+hash: 0: 1627166211087: Set: hola, dsa
 juan: 0: 1627154743739: String: serra

@@ -353,10 +353,10 @@ impl Parser {
         command_iter: &mut Split<&str>,
         _command_qty: usize,
     ) -> Result<RedisCommand, String> {
-        let message = self.parse_string(command_iter)?;
         let channel = self.parse_string(command_iter)?;
+        let message = self.parse_string(command_iter)?;
         Ok(RedisCommand::Publish(RedisCommandPublish::new(
-            message, channel,
+            channel, message,
         )))
     }
 

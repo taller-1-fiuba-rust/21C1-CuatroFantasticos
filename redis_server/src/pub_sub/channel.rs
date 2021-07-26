@@ -2,7 +2,7 @@ use crate::pub_sub::broadcast::PubSubBroadcastMessage;
 use crate::pub_sub::subscriptor::PubSubSubscriptor;
 use std::collections::HashSet;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct PubSubChannel {
     broadcasting_list: HashSet<PubSubSubscriptor>,
 }

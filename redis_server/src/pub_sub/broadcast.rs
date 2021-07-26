@@ -2,15 +2,15 @@ use crate::protocol_serialization::ProtocolSerializer;
 
 #[derive(Clone)]
 pub struct PubSubBroadcastMessage {
-    message: String,
     channel: String,
+    message: String,
 }
 
 impl PubSubBroadcastMessage {
-    pub fn new(message: &str, channel: &str) -> Self {
+    pub fn new(channel: &str, message: &str) -> Self {
         PubSubBroadcastMessage {
-            message: message.to_owned(),
             channel: channel.to_owned(),
+            message: message.to_owned(),
         }
     }
     pub fn message(&self) -> &str {

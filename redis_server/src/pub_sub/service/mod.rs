@@ -7,10 +7,10 @@ use std::thread;
 
 pub mod accessor;
 pub mod accessor_builder;
-mod action;
+pub mod action;
 mod operator;
 mod request_message;
-mod result;
+pub mod result;
 
 pub struct PubSubService {
     operator_request_sender: mpsc::Sender<PubSubOperatorRequest>,

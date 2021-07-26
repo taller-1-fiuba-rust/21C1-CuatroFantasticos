@@ -1,6 +1,6 @@
-pub mod pub_sub_sender;
+pub mod client_accessor;
 
-use crate::architecture::connection_handler::pub_sub_sender::ClientPubSubSender;
+use crate::architecture::connection_handler::client_accessor::ClientAccessor;
 use crate::command::RedisCommand;
 use crate::global_resources::GlobalResources;
 use crate::pub_sub::broadcast::PubSubBroadcastMessage;
@@ -37,7 +37,7 @@ impl ConnectionHandler {
     pub fn new(client_id: usize, stream: TcpStream, global_resources: GlobalResources) -> Self {
         let (tx, rx) = mpsc::channel::<PubSubBroadcastMessage>();
         let mut global_resources = global_resources;
-        global_resources.set_client_pub_sub_sender(ClientPubSubSender::new(tx));
+        global_resources.set_client_accessor(ClientAccessor::new(client_id, tx));
         ConnectionHandler {
             client_id,
             stream,
@@ -127,8 +127,16 @@ impl ConnectionHandler {
     }
     fn handle_connection_pubsub(&mut self) -> ConnectionState {
         let verbose = self.global_resources.get_verbose();
+        verbose.print(&format!(
+            "handle_connection: Client {} waiting in pub sub state",
+            self.client_id
+        ));
         for pub_sub_message in &self.pub_sub_receiver {
-            let pub_sub_message = pub_sub_message.message();
+            verbose.print(&format!(
+                "handle_connection: Client {} received a pub sub message",
+                self.client_id
+            ));
+            let pub_sub_message = pub_sub_message.protocolize();
             if self.stream.write_all(pub_sub_message.as_ref()).is_err() {
                 verbose.print("handle_connection: Could not write response");
                 return ConnectionState::Shutdown;

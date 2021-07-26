@@ -1,11 +1,11 @@
-use crate::architecture::connection_handler::pub_sub_sender::ClientPubSubSender;
+use crate::architecture::connection_handler::client_accessor::ClientAccessor;
 use crate::pub_sub::broadcast::PubSubBroadcastMessage;
 use std::hash::{Hash, Hasher};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PubSubSubscriptor {
     client_id: usize,
-    client_sender: ClientPubSubSender,
+    client_sender: ClientAccessor,
 }
 
 pub enum PubSubSubscriptorError {
@@ -13,7 +13,7 @@ pub enum PubSubSubscriptorError {
 }
 
 impl PubSubSubscriptor {
-    pub fn new(client_id: usize, client_sender: ClientPubSubSender) -> Self {
+    pub fn new(client_id: usize, client_sender: ClientAccessor) -> Self {
         PubSubSubscriptor {
             client_id,
             client_sender,

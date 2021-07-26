@@ -7,7 +7,7 @@ use crate::configuration::service::response_message::ConfResult;
 use crate::configuration::verbose::Verbose;
 use crate::configuration::Configuration;
 
-use crate::architecture::connection_handler::pub_sub_sender::ClientPubSubSender;
+use crate::architecture::connection_handler::client_accessor::ClientAccessor;
 use crate::data::storage::service::operator::accessor::StorageAccessor;
 use crate::data::storage::service::operator::accessor_builder::StorageAccessorBuilder;
 use crate::global_resources::error::GlobalResourcesError;
@@ -24,7 +24,7 @@ pub struct GlobalResources {
     configuration_access_builder: ConfAccessorBuilder,
     storage_access_builder: StorageAccessorBuilder,
     pub_sub_access_builder: PubSubAccessorBuilder,
-    client_pub_sub_sender: Option<ClientPubSubSender>,
+    client_pub_sub_sender: Option<ClientAccessor>,
 }
 
 impl GlobalResources {
@@ -72,10 +72,10 @@ impl GlobalResources {
             _ => Err(GlobalResourcesError::GetConfError),
         }
     }
-    pub fn set_client_pub_sub_sender(&mut self, client_pub_sub_sender: ClientPubSubSender) {
+    pub fn set_client_accessor(&mut self, client_pub_sub_sender: ClientAccessor) {
         self.client_pub_sub_sender = Some(client_pub_sub_sender);
     }
-    pub fn get_client_pub_sub_sender(&self) -> Option<ClientPubSubSender> {
+    pub fn get_client_accessor(&self) -> Option<ClientAccessor> {
         self.client_pub_sub_sender.as_ref().cloned()
     }
 }
