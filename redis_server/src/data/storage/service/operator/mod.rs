@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{Read, Write};
+use std::io::{Error, Read, Write};
 use std::sync::mpsc;
 
 use crate::data::redis_value::list::RedisValueList;
@@ -620,8 +620,16 @@ impl StorageOperatorService {
                     let _ = message.respond(StorageResult::Ok);
                 }
                 StorageAction::Save => {
-                    let filename = self.global_resources.get_dbfilename().unwrap();
-                    let mut file = File::create(filename).expect("could not create file");
+                    let filename = match self.global_resources.get_dbfilename() {
+                        Ok(f) => f,
+                        Err(_) => "dump.rdb".to_owned(),
+                    };
+                    let mut file = match File::create(filename) {
+                        Ok(file) => file,
+                        Err(_) => {
+                            continue;
+                        }
+                    };
                     for line in self.storage.serialize() {
                         let _ = file.write(&line.as_bytes());
                     }
