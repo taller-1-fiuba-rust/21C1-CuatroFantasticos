@@ -30,7 +30,6 @@ impl RedisCommandConfigSet {
             _ => ConfError::Unknown.protocol_serialize_to_simple_string(),
         };
         verbose.print("Finalizing execution of ConfigSet command");
-        println!("result is: {}", result);
         Ok(result)
     }
 }
