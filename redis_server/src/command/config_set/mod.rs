@@ -2,6 +2,7 @@ use crate::configuration::service::request_message::ConfAction;
 use crate::configuration::service::response_message::{ConfError, ConfResult};
 use crate::global_resources::GlobalResources;
 use crate::protocol_serialization::ProtocolSerializer;
+
 pub struct RedisCommandConfigSet {
     key: String,
     value: String,
@@ -28,7 +29,6 @@ impl RedisCommandConfigSet {
             _ => ConfError::Unknown.protocol_serialize_to_simple_string(),
         };
         verbose.print("Finalizing execution of ConfigSet command");
-        println!("result is: {}", result);
         Ok(result)
     }
 }

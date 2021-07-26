@@ -1,3 +1,4 @@
+use crate::configuration::verbose::Verbose;
 use crate::configuration::Configuration;
 use crate::protocol_serialization::ProtocolSerializer;
 use std::fmt::Display;
@@ -19,6 +20,7 @@ impl ConfResponseMessage {
 pub enum ConfResult {
     Ok,
     Vector(Vec<String>),
+    Verbose(Verbose),
     OkConf(Configuration),
     Error(ConfError),
 }
@@ -34,6 +36,7 @@ impl ProtocolSerializer for ConfResult {
             ConfResult::Ok => {
                 format!("+{}\r\n", "OK")
             }
+            ConfResult::Verbose(_) => "-ERR can't serialize verbose\r\n".to_string(),
             ConfResult::Vector(vec) => vec.protocol_serialize_to_simple_string(),
             ConfResult::OkConf(_) => "-ERR can not get configuration\r\n".to_string(),
             ConfResult::Error(err) => err.protocol_serialize_to_simple_string(),
@@ -45,6 +48,7 @@ impl ProtocolSerializer for ConfResult {
             ConfResult::Ok => {
                 format!(":{}\r\n", "OK")
             }
+            ConfResult::Verbose(_) => "-ERR can't serialize verbose\r\n".to_string(),
             ConfResult::Vector(vec) => vec.protocol_serialize_to_int(),
             ConfResult::OkConf(_) => "-ERR can not get configuration\r\n".to_string(),
             ConfResult::Error(err) => err.protocol_serialize_to_int(),
@@ -60,6 +64,7 @@ impl ProtocolSerializer for ConfResult {
         match self {
             ConfResult::Ok => bulk_string_formatter("OK"),
             ConfResult::Vector(vec) => vec.protocol_serialize_to_bulk_string(),
+            ConfResult::Verbose(_) => "-ERR can't serialize verbose\r\n".to_string(),
             ConfResult::OkConf(_) => "-ERR can not get configuration\r\n".to_string(),
             ConfResult::Error(err) => err.protocol_serialize_to_bulk_string(),
         }

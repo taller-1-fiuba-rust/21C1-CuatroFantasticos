@@ -19,54 +19,111 @@ use std::fs::File;
 
 #[derive(Clone)]
 pub struct GlobalResources {
-    logger_builder: LogInterface<File>,
-    verbose: Verbose,
-    configuration_access_builder: ConfAccessorBuilder,
-    storage_access_builder: StorageAccessorBuilder,
-    pub_sub_access_builder: PubSubAccessorBuilder,
+    logger_builder: Option<LogInterface<File>>,
+    configuration_access_builder: Option<ConfAccessorBuilder>,
+    storage_access_builder: Option<StorageAccessorBuilder>,
+    pub_sub_access_builder: Option<PubSubAccessorBuilder>,
     client_pub_sub_sender: Option<ClientAccessor>,
 }
 
 impl GlobalResources {
-    pub fn new(
-        logger_builder: LogInterface<File>,
-        verbose: Verbose,
-        configuration_access_builder: ConfAccessorBuilder,
-        storage_access_builder: StorageAccessorBuilder,
-        pub_sub_access_builder: PubSubAccessorBuilder,
-    ) -> Self {
+    pub fn new() -> GlobalResources {
         GlobalResources {
-            logger_builder,
-            verbose,
-            configuration_access_builder,
-            storage_access_builder,
-            pub_sub_access_builder,
+            logger_builder: None,
+            configuration_access_builder: None,
+            storage_access_builder: None,
+            pub_sub_access_builder: None,
             client_pub_sub_sender: None,
         }
     }
 
+    pub fn add_logger_builder(&mut self, logger_builder: LogInterface<File>) {
+        self.logger_builder = Some(logger_builder);
+    }
+
+    pub fn add_conf_access_builder(&mut self, conf_access_builder: ConfAccessorBuilder) {
+        self.configuration_access_builder = Some(conf_access_builder);
+    }
+
+    pub fn add_storage_access_builder(&mut self, storage_access_builder: StorageAccessorBuilder) {
+        self.storage_access_builder = Some(storage_access_builder);
+    }
+
+    pub fn add_pub_sub_access_builder(&mut self, pub_sub_access_builder: PubSubAccessorBuilder) {
+        self.pub_sub_access_builder = Some(pub_sub_access_builder);
+    }
+
     pub fn get_storage_accessor(&self) -> StorageAccessor {
-        self.storage_access_builder.build_accessor()
+        let builder = self
+            .storage_access_builder
+            .as_ref()
+            .expect("There is no storage accessor builder");
+        builder.build_accessor()
     }
 
     pub fn get_pub_sub_accessor(&self) -> PubSubAccessor {
-        self.pub_sub_access_builder.build_accessor()
+        self.pub_sub_access_builder
+            .as_ref()
+            .expect("No pub sub access builder")
+            .build_accessor()
     }
 
     pub fn get_configuration_accessor(&self) -> ConfAccessor {
-        self.configuration_access_builder.build_accessor()
+        let builder = self
+            .configuration_access_builder
+            .as_ref()
+            .expect("There is no configuration accessor builder");
+        builder.build_accessor()
     }
 
     pub fn get_logger(&self) -> Logger<File> {
-        self.logger_builder.build_logger()
+        let builder = self
+            .logger_builder
+            .as_ref()
+            .expect("There is no logger builder");
+        builder.build_logger()
     }
 
     pub fn get_verbose(&self) -> Verbose {
-        self.verbose
+        let accessor = self
+            .configuration_access_builder
+            .as_ref()
+            .expect("there is no conf accessor")
+            .build_accessor();
+        let verbose_result = match accessor.access(ConfAction::GetVerbose) {
+            Ok(ConfResult::Verbose(value)) => Ok(value),
+            _ => Err("There is no verbose".to_string()),
+        };
+        match verbose_result {
+            Ok(v) => v,
+            Err(_) => {
+                let verbose = Verbose::new("1");
+                verbose.print("Command execution: could not get verbose object");
+                verbose
+            }
+        }
+    }
+
+    pub fn get_dbfilename(&self) -> Result<String, String> {
+        let accessor = self
+            .configuration_access_builder
+            .as_ref()
+            .expect("there is no conf accessor")
+            .build_accessor();
+        match accessor.access(ConfAction::GetParameters("dbfilename".to_string()))? {
+            ConfResult::Vector(value) => {
+                Ok(value.get(1).expect("could not get dbfilename").to_owned())
+            }
+            _ => Err("There is no verbose".to_string()),
+        }
     }
 
     pub fn get_conf(&self) -> Result<Configuration, GlobalResourcesError> {
-        let accessor = self.configuration_access_builder.build_accessor();
+        let accessor = self
+            .configuration_access_builder
+            .as_ref()
+            .expect("There is no conf accessor")
+            .build_accessor();
         match accessor.access(ConfAction::Get) {
             Ok(ConfResult::OkConf(value)) => Ok(value),
             _ => Err(GlobalResourcesError::GetConfError),
@@ -77,5 +134,11 @@ impl GlobalResources {
     }
     pub fn get_client_accessor(&self) -> Option<ClientAccessor> {
         self.client_pub_sub_sender.as_ref().cloned()
+    }
+}
+
+impl Default for GlobalResources {
+    fn default() -> Self {
+        Self::new()
     }
 }
