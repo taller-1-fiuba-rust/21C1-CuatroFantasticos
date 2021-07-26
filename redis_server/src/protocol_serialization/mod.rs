@@ -39,17 +39,56 @@ impl ProtocolSerializer for Vec<String> {
         let len = self.len();
         let mut response = format!("*{}\r\n", len);
         for x in self.iter() {
-            response.push_str(&x.protocol_serialize_to_bulk_string());
+            response.push_str(&x.protocol_serialize_to_simple_string());
         }
         response
     }
 
     fn protocol_serialize_to_int(&self) -> String {
-        self.protocol_serialize_to_simple_string()
+        let len = self.len();
+        let mut response = format!("*{}\r\n", len);
+        for x in self.iter() {
+            response.push_str(&x.protocol_serialize_to_int());
+        }
+        response
     }
 
     fn protocol_serialize_to_bulk_string(&self) -> String {
-        self.protocol_serialize_to_simple_string()
+        let len = self.len();
+        let mut response = format!("*{}\r\n", len);
+        for x in self.iter() {
+            response.push_str(&x.protocol_serialize_to_bulk_string());
+        }
+        response
+    }
+}
+
+impl ProtocolSerializer for Vec<&str> {
+    fn protocol_serialize_to_simple_string(&self) -> String {
+        let len = self.len();
+        let mut response = format!("*{}\r\n", len);
+        for x in self.iter() {
+            response.push_str(&x.protocol_serialize_to_simple_string());
+        }
+        response
+    }
+
+    fn protocol_serialize_to_int(&self) -> String {
+        let len = self.len();
+        let mut response = format!("*{}\r\n", len);
+        for x in self.iter() {
+            response.push_str(&x.protocol_serialize_to_int());
+        }
+        response
+    }
+
+    fn protocol_serialize_to_bulk_string(&self) -> String {
+        let len = self.len();
+        let mut response = format!("*{}\r\n", len);
+        for x in self.iter() {
+            response.push_str(&x.protocol_serialize_to_bulk_string());
+        }
+        response
     }
 }
 

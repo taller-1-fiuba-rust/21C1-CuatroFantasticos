@@ -1,5 +1,6 @@
 use crate::command::append::RedisCommandAppend;
 use crate::command::config_get::RedisCommandConfigGet;
+use crate::command::config_set::RedisCommandConfigSet;
 use crate::command::copy::RedisCommandCopy;
 use crate::command::dbsize::RedisCommandDbSize;
 use crate::command::decrby::RedisCommandDecrBy;
@@ -18,11 +19,13 @@ use crate::command::llen::RedisCommandLlen;
 use crate::command::lpop::RedisCommandLPop;
 use crate::command::lpush::RedisCommandLPush;
 use crate::command::lpushx::RedisCommandLPushx;
+use crate::command::lrange::RedisCommandLRange;
 use crate::command::lset::RedisCommandLSet;
 use crate::command::mget::RedisCommandMGet;
 use crate::command::mset::RedisCommandMSet;
 use crate::command::persist::RedisCommandPersist;
 use crate::command::ping::RedisCommandPing;
+use crate::command::publish::RedisCommandPublish;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::rpop::RedisCommandRPop;
@@ -44,6 +47,7 @@ use crate::global_resources::GlobalResources;
 
 pub mod append;
 pub mod config_get;
+pub mod config_set;
 pub mod copy;
 pub mod dbsize;
 pub mod decrby;
@@ -62,11 +66,13 @@ pub mod llen;
 pub mod lpop;
 pub mod lpush;
 pub mod lpushx;
+pub mod lrange;
 pub mod lset;
 pub mod mget;
 pub mod mset;
 pub mod persist;
 pub mod ping;
+pub mod publish;
 pub mod rename;
 pub mod rpop;
 pub mod rpush;
@@ -88,6 +94,7 @@ pub mod r#type;
 pub enum RedisCommand {
     Append(RedisCommandAppend),
     ConfigGet(RedisCommandConfigGet),
+    ConfigSet(RedisCommandConfigSet),
     Copy(RedisCommandCopy),
     Dbsize(RedisCommandDbSize),
     DecrBy(RedisCommandDecrBy),
@@ -106,11 +113,13 @@ pub enum RedisCommand {
     Lpop(RedisCommandLPop),
     Lpush(RedisCommandLPush),
     Lpushx(RedisCommandLPushx),
+    Lrange(RedisCommandLRange),
     Lset(RedisCommandLSet),
     Mget(RedisCommandMGet),
     Mset(RedisCommandMSet),
     Persist(RedisCommandPersist),
     Ping(RedisCommandPing),
+    Publish(RedisCommandPublish),
     Rename(RedisCommandRename),
     Rpop(RedisCommandRPop),
     Rpush(RedisCommandRPush),
@@ -134,6 +143,7 @@ impl RedisCommand {
         match self {
             RedisCommand::Append(c) => c.execute(global_resources),
             RedisCommand::ConfigGet(c) => c.execute(global_resources),
+            RedisCommand::ConfigSet(c) => c.execute(global_resources),
             RedisCommand::Copy(c) => c.execute(global_resources),
             RedisCommand::Dbsize(c) => c.execute(global_resources),
             RedisCommand::DecrBy(c) => c.execute(global_resources),
@@ -152,11 +162,13 @@ impl RedisCommand {
             RedisCommand::Lpop(c) => c.execute(global_resources),
             RedisCommand::Lpush(c) => c.execute(global_resources),
             RedisCommand::Lpushx(c) => c.execute(global_resources),
+            RedisCommand::Lrange(c) => c.execute(global_resources),
             RedisCommand::Lset(c) => c.execute(global_resources),
             RedisCommand::Mget(c) => c.execute(global_resources),
             RedisCommand::Mset(c) => c.execute(global_resources),
             RedisCommand::Persist(c) => c.execute(global_resources),
             RedisCommand::Ping(c) => c.execute(global_resources),
+            RedisCommand::Publish(c) => c.execute(global_resources),
             RedisCommand::Rename(c) => c.execute(global_resources),
             RedisCommand::Rpop(c) => c.execute(global_resources),
             RedisCommand::Rpush(c) => c.execute(global_resources),

@@ -46,6 +46,19 @@ impl RedisValueList {
         }
     }
 
+    pub fn lrange(&self, start: i32, stop: i32) -> Result<Vec<String>, RedisError> {
+        match self.index(start) {
+            Ok(start_idx) => match self.index(stop) {
+                Ok(stop_idx) => match self.contents.get(start_idx..stop_idx + 1) {
+                    Some(value) => Ok(value.to_vec()),
+                    None => Err(RedisError::IdxOutOfRange),
+                },
+                Err(_) => Err(RedisError::IdxOutOfRange),
+            },
+            Err(_) => Err(RedisError::IdxOutOfRange),
+        }
+    }
+
     pub fn sort(&self) -> Result<Vec<String>, RedisError> {
         let mut contents: Vec<i32> = vec![];
         for x in &self.contents {

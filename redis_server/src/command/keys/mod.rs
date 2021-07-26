@@ -46,7 +46,7 @@ impl RedisCommandKeys {
             .get_storage_accessor()
             .access(StorageAction::Keys(self.pattern.clone()))?;
         let response = match response.get_value() {
-            StorageResult::Vector(vec) => vec.protocol_serialize_to_simple_string(),
+            StorageResult::Vector(vec) => vec.protocol_serialize_to_bulk_string(),
             _ => RedisError::Unknown.protocol_serialize_to_simple_string(),
         };
         verbose.print("Finalizing execution of command Keys");
