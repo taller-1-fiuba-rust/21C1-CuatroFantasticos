@@ -30,7 +30,7 @@ impl RedisCommandCopy {
         }
     }
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources.get_verbose();
+        let verbose = global_resources.get_verbose().expect("There is no verbose");
         verbose.print(&format!(
             "Executing command Copy with source_key: {} and destination_key: {}",
             self.source_key, self.destination_key

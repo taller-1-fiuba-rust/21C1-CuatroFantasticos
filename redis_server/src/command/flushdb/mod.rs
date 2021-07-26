@@ -18,7 +18,7 @@ impl RedisCommandFlushDb {
         RedisCommandFlushDb {}
     }
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources.get_verbose();
+        let verbose = global_resources.get_verbose().expect("There is no verbose");
         verbose.print("Executing command FlushDb");
         let response = global_resources
             .get_storage_accessor()

@@ -1,4 +1,5 @@
 use crate::configuration::Configuration;
+use crate::configuration::verbose::Verbose;
 
 pub struct ConfResponseMessage {
     value_response: ConfResult,
@@ -17,6 +18,7 @@ impl ConfResponseMessage {
 pub enum ConfResult {
     Ok,
     Vector(Vec<String>),
+    Verbose(Verbose),
     OkConf(Configuration),
     Error(ConfError),
 }

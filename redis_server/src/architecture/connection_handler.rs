@@ -21,7 +21,7 @@ impl ConnectionHandler {
         }
     }
     pub fn handle_connection(&mut self) {
-        let verbose = self.global_resources.get_verbose();
+        let verbose = self.global_resources.get_verbose().expect("There is no verbose");
         loop {
             let mut buffer = [0; 1024];
 

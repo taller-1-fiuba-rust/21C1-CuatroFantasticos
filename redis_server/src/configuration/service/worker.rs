@@ -2,6 +2,7 @@ use crate::configuration::service::request_message::{ConfAction, ConfRequestMess
 use crate::configuration::service::response_message::{ConfError, ConfResult};
 use crate::configuration::Configuration;
 use std::sync::mpsc;
+use crate::configuration::verbose::Verbose;
 
 pub struct ConfWorker {
     conf_receiver: mpsc::Receiver<ConfRequestMessage>,
@@ -41,6 +42,11 @@ impl ConfWorker {
                         let _ = message.respond(ConfResult::Error(ConfError::NonExistent));
                     }
                 },
+                ConfAction::GetVerbose => {
+                    let verbose = self.configuration.get("verbose").expect("There is no verbose");
+                    let verbose_struct = Verbose::new(verbose);
+                    let _ =  message.respond(ConfResult::Verbose(verbose_struct));
+                }
                 ConfAction::GetParameters(pattern) => {
                     let keys = self.configuration.values_by_pattern(&pattern);
                     let response = ConfResult::Vector(keys);

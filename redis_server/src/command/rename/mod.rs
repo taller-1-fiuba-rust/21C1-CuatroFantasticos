@@ -23,7 +23,7 @@ impl RedisCommandRename {
         RedisCommandRename { key, new_key }
     }
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources.get_verbose();
+        let verbose = global_resources.get_verbose().expect("There is no verbose");
         verbose.print(&format!(
             "Executing command Rename with key: {} and replacing key: {} ",
             self.key, self.new_key

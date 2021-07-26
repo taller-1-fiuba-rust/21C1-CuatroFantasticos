@@ -12,7 +12,7 @@ impl RedisCommandPing {
         RedisCommandPing {}
     }
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources.get_verbose();
+        let verbose = global_resources.get_verbose().expect("There is no verbose");
         verbose.print("Executing command Ping");
         let response = "PONG".protocol_serialize_to_simple_string();
         verbose.print("Finalizing execution of command Ping");

@@ -25,7 +25,7 @@ impl RedisCommandSAdd {
         RedisCommandSAdd { key, members }
     }
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources.get_verbose();
+        let verbose = global_resources.get_verbose().expect("There is no verbose");
         verbose.print(&format!(
             "Executing command SAdd with key: {} and members: {:?} ",
             self.key, self.members

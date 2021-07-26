@@ -13,7 +13,7 @@ impl RedisCommandRPop {
         RedisCommandRPop { key, times }
     }
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources.get_verbose();
+        let verbose = global_resources.get_verbose().expect("There is no verbose");
         verbose.print(&format!(
             "Executing command RPop with key: {} and times: {}",
             self.key, self.times

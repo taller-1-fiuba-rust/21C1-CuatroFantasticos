@@ -30,6 +30,7 @@ impl ConfRequestMessage {
 #[derive(Clone)]
 pub enum ConfAction {
     Terminate,
+    GetVerbose,
     Get,
     GetParameters(String),
     Set(String, String),

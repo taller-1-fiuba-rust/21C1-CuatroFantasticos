@@ -19,7 +19,7 @@ impl RedisCommandTouch {
         RedisCommandTouch { key }
     }
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources.get_verbose();
+        let verbose = global_resources.get_verbose().expect("There is no verbose");
         verbose.print(&format!("Executing command Touch with key: {}", self.key));
         let response = global_resources
             .get_storage_accessor()

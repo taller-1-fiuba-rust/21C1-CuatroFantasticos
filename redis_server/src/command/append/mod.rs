@@ -23,7 +23,7 @@ impl RedisCommandAppend {
         RedisCommandAppend { key, new_value }
     }
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources.get_verbose();
+        let verbose = global_resources.get_verbose().expect("There is no verbose");
         verbose.print(&format!(
             "Executing command Append with key: {} and new_value: {}",
             self.key, self.new_value
