@@ -25,7 +25,7 @@ impl RedisCommandIncrBy {
         RedisCommandIncrBy { key, new_value }
     }
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources.get_verbose().expect("There is no verbose");
+        let verbose = global_resources.get_verbose();
         verbose.print(&format!(
             "Executing command IncrBy with key: {} and value: {}",
             self.key, self.new_value

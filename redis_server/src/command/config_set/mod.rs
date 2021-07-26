@@ -2,6 +2,7 @@ use crate::configuration::service::request_message::ConfAction;
 use crate::configuration::service::response_message::{ConfError, ConfResult};
 use crate::global_resources::GlobalResources;
 use crate::protocol_serialization::ProtocolSerializer;
+
 pub struct RedisCommandConfigSet {
     key: String,
     value: String,
@@ -13,9 +14,7 @@ impl RedisCommandConfigSet {
     }
 
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources
-            .get_verbose()
-            .expect("Could not get Verbose");
+        let verbose = global_resources.get_verbose();
         verbose.print(&format!(
             "Executing command ConfigSet with key: {} and value: {}",
             self.key, self.value

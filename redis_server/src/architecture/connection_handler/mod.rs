@@ -66,10 +66,7 @@ impl ConnectionHandler {
     }
 
     fn handle_connection_default(&mut self) -> ConnectionState {
-        let verbose = self
-            .global_resources
-            .get_verbose()
-            .expect("Could not get Verbose");
+        let verbose = self.global_resources.get_verbose();
         verbose.print("handle_connection: Waiting for request");
 
         let mut buffer = [0; 1024];
@@ -129,10 +126,7 @@ impl ConnectionHandler {
         ConnectionState::Alive
     }
     fn handle_connection_pubsub(&mut self) -> ConnectionState {
-        let verbose = self
-            .global_resources
-            .get_verbose()
-            .expect("Could not get Verbose");
+        let verbose = self.global_resources.get_verbose();
         verbose.print(&format!(
             "handle_connection: Client {} waiting in pub sub state",
             self.client_id

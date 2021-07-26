@@ -84,15 +84,23 @@ impl GlobalResources {
         builder.build_logger()
     }
 
-    pub fn get_verbose(&self) -> Result<Verbose, String> {
+    pub fn get_verbose(&self) -> Verbose {
         let accessor = self
             .configuration_access_builder
             .as_ref()
             .expect("there is no conf accessor")
             .build_accessor();
-        match accessor.access(ConfAction::GetVerbose)? {
-            ConfResult::Verbose(value) => Ok(value),
+        let verbose_result = match accessor.access(ConfAction::GetVerbose) {
+            Ok(ConfResult::Verbose(value)) => Ok(value),
             _ => Err("There is no verbose".to_string()),
+        };
+        match verbose_result {
+            Ok(v) => v,
+            Err(_) => {
+                let verbose = Verbose::new("1");
+                verbose.print("Command execution: could not get verbose object");
+                verbose
+            }
         }
     }
 

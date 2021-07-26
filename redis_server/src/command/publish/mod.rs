@@ -23,9 +23,7 @@ impl RedisCommandPublish {
         RedisCommandPublish { channel, message }
     }
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources
-            .get_verbose()
-            .expect("Could not get Verbose");
+        let verbose = global_resources.get_verbose();
         let client_accessor = global_resources
             .get_client_accessor()
             .ok_or_else(|| "-Unexpected error executing PUBLISH".to_owned())?;

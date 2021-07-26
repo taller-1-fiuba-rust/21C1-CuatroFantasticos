@@ -76,4 +76,5 @@ pub enum StorageAction {
     RPop(String, i32),
     LSet(String, i32, String),
     LRange(String, i32, i32),
+    LRem(String, i32, String),
 }

@@ -12,7 +12,7 @@ impl RedisCommandLPush {
         RedisCommandLPush { key, values }
     }
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources.get_verbose().expect("There is no verbose");
+        let verbose = global_resources.get_verbose();
         verbose.print(&format!(
             "Executing command LPush with key: {} and values: {:?}",
             self.key, self.values

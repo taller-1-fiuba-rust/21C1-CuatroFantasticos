@@ -13,9 +13,7 @@ pub fn run_server(global_resources: GlobalResources) {
     let conf = global_resources
         .get_conf()
         .expect("run_server: Could not get a configuration");
-    let verbose = global_resources
-        .get_verbose()
-        .expect("run_server: There is no verbose");
+    let verbose = global_resources.get_verbose();
     verbose.print(&format!(
         "run_server: Starting server with configuration \n {:?}",
         conf

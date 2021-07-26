@@ -22,9 +22,7 @@ impl RedisCommandSubscribe {
         RedisCommandSubscribe { channels: channel }
     }
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources
-            .get_verbose()
-            .expect("Could not get verbose");
+        let verbose = global_resources.get_verbose();
         let client_accessor = global_resources
             .get_client_accessor()
             .ok_or_else(|| "-Unexpected error executing SUBSCRIBE".to_owned())?;

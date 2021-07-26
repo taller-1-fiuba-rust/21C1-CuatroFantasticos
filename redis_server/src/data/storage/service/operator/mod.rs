@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{Error, Read, Write};
+use std::io::{Read, Write};
 use std::sync::mpsc;
 
 use crate::data::redis_value::list::RedisValueList;
@@ -13,6 +13,7 @@ use crate::data::storage::service::operator::response_message::StorageResult;
 use crate::data::storage::service::operator::result_error::RedisError;
 use crate::data::storage::RedisStorage;
 use crate::global_resources::GlobalResources;
+use std::cmp::Ordering;
 
 pub mod accessor;
 pub mod accessor_builder;
@@ -606,6 +607,33 @@ impl StorageOperatorService {
                             let _ = message.respond(response);
                         }
                     },
+                    Some(_) => {
+                        let response = StorageResult::Error(RedisError::NotAList);
+                        let _ = message.respond(response);
+                    }
+                    None => {
+                        let response = StorageResult::Error(RedisError::Nil);
+                        let _ = message.respond(response);
+                    }
+                },
+                StorageAction::LRem(key, count, element) => match self.storage.mut_get(&key) {
+                    Some(RedisValue::List(value)) => {
+                        let response = match count.cmp(&0) {
+                            Ordering::Greater => {
+                                let response = value.lrem(count, element);
+                                StorageResult::Int(response)
+                            }
+                            Ordering::Less => {
+                                let response = value.rrem(count.abs(), element);
+                                StorageResult::Int(response)
+                            }
+                            Ordering::Equal => {
+                                let response = value.rem_all(element);
+                                StorageResult::Int(response)
+                            }
+                        };
+                        let _ = message.respond(response);
+                    }
                     Some(_) => {
                         let response = StorageResult::Error(RedisError::NotAList);
                         let _ = message.respond(response);

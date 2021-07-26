@@ -16,9 +16,7 @@ impl RedisCommandLRange {
     }
 
     pub fn execute(&self, global_resources: GlobalResources) -> Result<String, String> {
-        let verbose = global_resources
-            .get_verbose()
-            .expect("Could not get Verbose");
+        let verbose = global_resources.get_verbose();
         verbose.print(&format!(
             "Executing command LRange with key : {}, start: {} and stop: {}",
             self.key, self.start, self.stop
