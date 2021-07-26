@@ -30,7 +30,7 @@ impl StorageOperatorService {
     pub fn new<T>(
         mut persistence_object: T,
         receiver: mpsc::Receiver<StorageRequestMessage>,
-        global_resources: GlobalResources
+        global_resources: GlobalResources,
     ) -> StorageOperatorService
     where
         T: Read + Send + 'static,
@@ -42,7 +42,11 @@ impl StorageOperatorService {
             Ok(_) => RedisStorage::deserialize(contents),
             Err(_) => RedisStorage::new(),
         };
-        StorageOperatorService { storage, receiver, global_resources }
+        StorageOperatorService {
+            storage,
+            receiver,
+            global_resources,
+        }
     }
 
     pub fn init(mut self) {
