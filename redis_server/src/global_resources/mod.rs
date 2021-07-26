@@ -96,6 +96,19 @@ impl GlobalResources {
         }
     }
 
+    pub fn get_dbfilename(&self) -> Result<String,String> {
+        let accessor = self
+            .configuration_access_builder
+            .as_ref()
+            .expect("there is no conf accessor")
+            .build_accessor();
+        match accessor.access(ConfAction::GetParameters("dbfilename".to_string()))? {
+            ConfResult::Vector(value) => Ok(value.get(1).expect("could not get dbfilename").to_owned()),
+            _ => Err("There is no verbose".to_string()),
+        }
+
+    }
+
     pub fn get_conf(&self) -> Result<Configuration, GlobalResourcesError> {
         let accessor = self
             .configuration_access_builder

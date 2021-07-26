@@ -34,7 +34,7 @@ fn main() {
         .read(true)
         .open(db_filename)
         .expect("main: Couldn't open database file");
-    let storage_service = StorageService::new(db_file);
+    let storage_service = StorageService::new(db_file, global_resources.clone());
     let storage_accessor_builder = storage_service.get_accessor_builder();
     global_resources.add_storage_access_builder(storage_accessor_builder);
 

@@ -12,6 +12,7 @@ use crate::data::storage::service::operator::request_message::{
 use crate::data::storage::service::operator::StorageOperatorService;
 use crate::data::storage::service::persistence_job::PersistenceJob;
 use crate::job_recurser_service::JobRecurserService;
+use crate::global_resources::GlobalResources;
 
 mod expiration_job;
 pub mod operator;
@@ -23,19 +24,20 @@ const PERSISTENCE_PERIOD_IN_MILLIS: u128 = 10 * 1000;
 pub struct StorageService {
     operator_request_sender: mpsc::Sender<StorageRequestMessage>,
     operator_thread_handler: Option<thread::JoinHandle<()>>,
+    _global_resources : GlobalResources,
     _expiration_service: JobRecurserService,
     _persistence_service: JobRecurserService,
 }
 
 impl StorageService {
-    pub fn new<T>(persistence_object: T) -> Self
+    pub fn new<T>(persistence_object: T, global_resources: GlobalResources) -> Self
     where
         T: Read + Send + 'static,
     {
         let (operator_tx, operator_rx) = mpsc::channel::<StorageRequestMessage>();
-
+        let global_resources_copied = global_resources.clone();
         let operator_th = thread::spawn(move || {
-            let storage = StorageOperatorService::new(persistence_object, operator_rx);
+            let storage = StorageOperatorService::new(persistence_object, operator_rx, global_resources_copied);
             storage.init();
         });
 
@@ -54,6 +56,7 @@ impl StorageService {
         StorageService {
             operator_request_sender: operator_tx,
             operator_thread_handler: Some(operator_th),
+            _global_resources: global_resources,
             _expiration_service: expiration_service,
             _persistence_service: persistence_service,
         }

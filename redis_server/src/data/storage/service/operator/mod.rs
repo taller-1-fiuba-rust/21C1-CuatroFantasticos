@@ -12,6 +12,7 @@ use crate::data::storage::service::operator::request_message::{
 use crate::data::storage::service::operator::response_message::StorageResult;
 use crate::data::storage::service::operator::result_error::RedisError;
 use crate::data::storage::RedisStorage;
+use crate::global_resources::GlobalResources;
 
 pub mod accessor;
 pub mod accessor_builder;
@@ -22,12 +23,14 @@ pub mod result_error;
 pub struct StorageOperatorService {
     storage: RedisStorage,
     receiver: mpsc::Receiver<StorageRequestMessage>,
+    global_resources: GlobalResources,
 }
 
 impl StorageOperatorService {
     pub fn new<T>(
         mut persistence_object: T,
         receiver: mpsc::Receiver<StorageRequestMessage>,
+        global_resources: GlobalResources
     ) -> StorageOperatorService
     where
         T: Read + Send + 'static,
@@ -39,7 +42,7 @@ impl StorageOperatorService {
             Ok(_) => RedisStorage::deserialize(contents),
             Err(_) => RedisStorage::new(),
         };
-        StorageOperatorService { storage, receiver }
+        StorageOperatorService { storage, receiver, global_resources }
     }
 
     pub fn init(mut self) {
@@ -613,7 +616,8 @@ impl StorageOperatorService {
                     let _ = message.respond(StorageResult::Ok);
                 }
                 StorageAction::Save => {
-                    let mut file = File::create("./dump.rdb").expect("could not create file");
+                    let filename = self.global_resources.get_dbfilename().unwrap();
+                    let mut file = File::create(filename).expect("could not create file");
                     for line in self.storage.serialize() {
                         let _ = file.write(&line.as_bytes());
                     }
