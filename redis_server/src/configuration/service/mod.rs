@@ -6,15 +6,15 @@ use accessor_builder::ConfAccessorBuilder;
 use response_message::ConfResult;
 use worker::ConfWorker;
 
-use crate::configuration::service::error::ConfServiceError;
 use crate::configuration::service::request_message::{ConfAction, ConfRequestMessage};
+use crate::configuration::service::service_error::ConfServiceError;
 use crate::configuration::Configuration;
 
 pub mod accesor;
 pub mod accessor_builder;
-mod error;
 pub mod request_message;
 pub mod response_message;
+mod service_error;
 mod worker;
 
 pub struct ConfService {
