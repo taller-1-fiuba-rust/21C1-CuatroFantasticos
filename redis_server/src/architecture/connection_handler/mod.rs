@@ -104,14 +104,24 @@ impl ConnectionHandler {
                         }
                         Err(e) => e,
                     },
-                    Err(e) => e,
+                    Err(e) => {
+                        verbose.print(&format!("{:?}", e));
+                        format!("{}", e)
+                    }
                 };
-
+                verbose.print(&format!(
+                    "handle_connection: Writing response {{{}}} to client {}",
+                    message, self.client_id
+                ));
                 if self.stream.write_all(message.as_ref()).is_err() {
                     verbose.print("handle_connection: Could not write response");
                     return ConnectionState::Shutdown;
                 }
 
+                verbose.print(&format!(
+                    "handle_connection: Flushing response to client {}",
+                    self.client_id
+                ));
                 if self.stream.flush().is_err() {
                     verbose.print("handle_connection: Could not flush response");
                     return ConnectionState::Shutdown;
