@@ -28,7 +28,7 @@ pub fn run_server(global_resources: GlobalResources) {
     let listener = TcpListener::bind(addr).expect("run_server :Server was not able to connect");
     verbose.print("run_server: Succesfully connected");
 
-    for stream in listener.incoming() {
+    for (client_id, stream) in listener.incoming().enumerate() {
         let stream = stream.unwrap();
 
         let timeout = conf.get("timeout").unwrap().parse().unwrap();
@@ -36,7 +36,8 @@ pub fn run_server(global_resources: GlobalResources) {
         let global_resources = global_resources.clone();
 
         thread::spawn(move || {
-            let mut connection_handler = ConnectionHandler::new(stream, global_resources);
+            let mut connection_handler =
+                ConnectionHandler::new(client_id, stream, global_resources);
             connection_handler.handle_connection();
         });
     }

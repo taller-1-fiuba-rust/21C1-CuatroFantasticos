@@ -25,6 +25,7 @@ use crate::command::mget::RedisCommandMGet;
 use crate::command::mset::RedisCommandMSet;
 use crate::command::persist::RedisCommandPersist;
 use crate::command::ping::RedisCommandPing;
+use crate::command::publish::RedisCommandPublish;
 use crate::command::r#type::RedisCommandType;
 use crate::command::rename::RedisCommandRename;
 use crate::command::rpop::RedisCommandRPop;
@@ -110,6 +111,7 @@ impl Parser {
             "MSET" => self.parse_command_mset(&mut command_iter, command_qty),
             "MGET" => self.parse_command_mget(&mut command_iter, command_qty),
             "SUBSCRIBE" => self.parse_command_subscribe(&mut command_iter, command_qty),
+            "PUBLISH" => self.parse_command_publish(&mut command_iter, command_qty),
             "LPOP" => self.parse_command_lpop(&mut command_iter, command_qty),
             "RPOP" => self.parse_command_rpop(&mut command_iter, command_qty),
             "LSET" => self.parse_command_lset(&mut command_iter),
@@ -396,6 +398,19 @@ impl Parser {
             channels,
         )))
     }
+
+    fn parse_command_publish(
+        &self,
+        command_iter: &mut Split<&str>,
+        _command_qty: usize,
+    ) -> Result<RedisCommand, String> {
+        let channel = self.parse_string(command_iter)?;
+        let message = self.parse_string(command_iter)?;
+        Ok(RedisCommand::Publish(RedisCommandPublish::new(
+            channel, message,
+        )))
+    }
+
     fn parse_command_lpop(
         &self,
         command_iter: &mut Split<&str>,
