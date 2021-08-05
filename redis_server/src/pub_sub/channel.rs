@@ -3,6 +3,7 @@ use crate::pub_sub::subscriptor::PubSubSubscriptor;
 use std::collections::HashSet;
 
 #[derive(Default, Debug)]
+/// Pub Sub Channel, it has
 pub struct PubSubChannel {
     broadcasting_list: HashSet<PubSubSubscriptor>,
 }

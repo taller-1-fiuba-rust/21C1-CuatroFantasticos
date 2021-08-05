@@ -1,2 +1,2 @@
 [workspace]
-members = ["logger", "redis_server"]
+members = ["logger", "redis_server", "http_server"]
