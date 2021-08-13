@@ -7,9 +7,7 @@ pub struct PageNotFoundHandler {}
 
 impl PageNotFoundHandler {
     pub fn handle(_request: &HttpRequest) -> HttpResponse {
-        println!("Entro en 404");
-        let file = fs::read_to_string("404.html");
-        println!("{:?}", file);
+        let file = fs::read_to_string("http_server/src/server/handler/page_not_found/404.html");
         HttpResponse::new("404", None, file.ok())
     }
 }
