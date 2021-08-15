@@ -26,10 +26,21 @@ impl Router {
                     }
                 }
             },
-            Method::Post => {
-                let resp: HttpResponse = CommandHandler::handle(&req);
-                let _ = resp.send_response(stream);
-            }
+            Method::Post => match &req.resource {
+                http::request::Resource::Path(s) => {
+                    let route: Vec<&str> = s.split('/').collect();
+                    match route[1] {
+                        "execute_command" => {
+                            let resp: HttpResponse = CommandHandler::handle(&req);
+                            let _ = resp.send_response(stream);
+                        }
+                        _ => {
+                            let resp: HttpResponse = PageNotFoundHandler::handle(&req);
+                            let _ = resp.send_response(stream);
+                        }
+                    }
+                }
+            },
             _ => {
                 let resp: HttpResponse = PageNotFoundHandler::handle(&req);
                 let _ = resp.send_response(stream);
