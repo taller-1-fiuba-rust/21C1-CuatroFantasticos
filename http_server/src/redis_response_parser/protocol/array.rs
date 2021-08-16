@@ -10,10 +10,13 @@ impl ArrayResponse {
     }
 }
 impl DisplayRedisResponse for ArrayResponse {
-    pub fn to_client_string(&self) -> String {
+    fn to_client_string(&self) -> String {
         let mut result = "".to_owned();
         for (i, value) in self.values.iter().enumerate() {
-            result.push_str(&format!("{}) {}", i, value.to_client_string()));
+            result.push_str(&format!("{}) {}", i + 1, value.to_client_string()));
+            if i + 1 < self.values.len() {
+                result.push('\n');
+            }
         }
         result
     }

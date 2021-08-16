@@ -11,29 +11,23 @@ impl CommandHandler {
     pub fn handle(request: &HttpRequest) -> HttpResponse {
         let redis_request =
             server::handler::command::CommandHandler::parse_command(request.msg_body.clone());
-        let mut client = Client::new().expect("could not create a client");
+        let mut client = Client::new().expect("Could not create a client");
         let response = client.execute_command(redis_request);
-        server::handler::command::CommandHandler::format_response(response)
+        HttpResponse::new("200", None, Some(response))
     }
 }
 
 impl CommandHandler {
     pub fn parse_command(body: String) -> String {
-        let args = body.split(' ');
-        let qty_args = args.count();
-
-        //esto esta feo, pero sino me dice que se mueve el args
-
-        let args = body.split(' ');
+        let body = body.trim_matches(char::from(0)).trim();
+        let qty_args = body.split(' ').count();
         let mut result = format!("*{}\r\n", qty_args);
+
+        let args = body.split(' ');
         for arg in args {
-            result = result.add(&format!("${}\r\n", arg));
+            result = result.add(&format!("${}\r\n{}\r\n", arg.len(), arg));
         }
         result = result.add("\r\n");
         result
-    }
-
-    pub fn format_response(_response: String) -> HttpResponse<'static> {
-        todo!()
     }
 }

@@ -12,6 +12,6 @@ impl ErrorResponse {
 
 impl DisplayRedisResponse for ErrorResponse {
     fn to_client_string(&self) -> String {
-        format!("(error) {}\n", self.value)
+        format!("(error) {}", self.value)
     }
 }

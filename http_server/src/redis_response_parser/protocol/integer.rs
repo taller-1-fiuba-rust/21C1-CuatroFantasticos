@@ -12,6 +12,6 @@ impl IntegerResponse {
 
 impl DisplayRedisResponse for IntegerResponse {
     fn to_client_string(&self) -> String {
-        format!("(integer) {}\n", self.value)
+        format!("(integer) {}", self.value)
     }
 }

@@ -9,9 +9,10 @@
 <script>
     $(function() {
         $('body').terminal(function(command, term) {
-            return $.post('execute_command', {command: command});
+            return $.post('execute_command', command);
         }, {
-            greetings: 'Redis terminal'
+            greetings: 'Redis terminal Cuatro Fantasticos\n',
+            prompt: "[[;green;]redis> ]"
         });
     });
 </script>

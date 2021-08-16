@@ -1,3 +1,4 @@
+use crate::redis_response_parser::RedisResponseParser;
 use std::io::{Read, Write};
 use std::net::TcpStream;
 
@@ -20,13 +21,13 @@ impl Client {
         let read_size = self.connection.read(&mut buffer);
         match read_size {
             Ok(_size) => {
-                //tomar resultado de size bytes y convertirlo a un String
-                todo!()
+                let response = RedisResponseParser::new().parse(&buffer);
+                match response {
+                    Ok(response) => response,
+                    Err(_) => "Bad server response".to_owned(),
+                }
             }
-            Err(_error) => {
-                //capaz panickear, tendria que haber un problema con el server si tira error esto
-                todo!()
-            }
+            Err(_error) => "Bad server response".to_owned(),
         }
     }
 }
