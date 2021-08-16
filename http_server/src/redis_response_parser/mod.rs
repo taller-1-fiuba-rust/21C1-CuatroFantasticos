@@ -1,6 +1,7 @@
 mod protocol;
 mod response_type;
 
+use crate::redis_response_parser::protocol::array::ArrayResponse;
 use crate::redis_response_parser::protocol::bulk_string::BulkStringResponse;
 use crate::redis_response_parser::protocol::error::ErrorResponse;
 use crate::redis_response_parser::protocol::integer::IntegerResponse;
@@ -35,58 +36,47 @@ impl RedisResponseParser {
         &self,
         mut response_iter: Split<&str>,
     ) -> Result<String, RedisResponseParserError> {
-        let command_type = self.parse_response_type(&mut response_iter)?;
-        match command_type {
-            RedisResponseType::BulkString => self.parse_bulk_string(&mut response_iter),
-            RedisResponseType::SimpleString(string) => {
-                let response = SimpleStringResponse::new(string);
-                Ok(response.to_client_string())
-            }
-            RedisResponseType::Error(string) => {
-                let response = ErrorResponse::new(string);
-                Ok(response.to_client_string())
-            }
-            RedisResponseType::Array(size) => {
-                todo!()
-            }
-            RedisResponseType::Integer(value) => {
-                let response = IntegerResponse::new(value);
-                Ok(response.to_client_string())
-            }
-            RedisResponseType::Nil => {
-                let response = NilResponse::new();
-                Ok(response.to_client_string())
-            }
-        }
+        let response = self.parse_response_by_type(&mut response_iter);
+        response.map(|v| v.to_client_string())
     }
-    pub fn parse_response_type(
+    pub fn parse_response_by_type(
         &self,
         response_iter: &mut Split<&str>,
-    ) -> Result<RedisResponseType, RedisResponseParserError> {
+    ) -> Result<Box<dyn DisplayRedisResponse>, RedisResponseParserError> {
         let response_type = response_iter
             .next()
             .ok_or(RedisResponseParserError::EmptyCommand)?;
+        if response_type == "$-1" {
+            return Ok(Box::new(NilResponse::new()));
+        }
         match &response_type[..1] {
             "*" => {
-                let size = (&response_type[1..])
+                let len = (&response_type[1..])
                     .parse()
                     .map_err(|_| RedisResponseParserError::NotAValidServerResponse)?;
-                Ok(RedisResponseType::Array(size))
+                let response = self.parse_array(response_iter, len)?;
+                Ok(Box::new(response))
             }
-            "$" => Ok(RedisResponseType::BulkString),
+            "$" => {
+                let response = self.parse_bulk_string(response_iter)?;
+                Ok(Box::new(response))
+            }
             ":" => {
                 let len = (&response_type[1..])
                     .parse()
                     .map_err(|_| RedisResponseParserError::NotAValidServerResponse)?;
-                Ok(RedisResponseType::Integer(len))
+                let response = self.parse_integer(len)?;
+                Ok(Box::new(response))
             }
             "-" => {
                 let error = &response_type[1..];
-                Ok(RedisResponseType::Error(error.to_owned()))
+                let response = self.parse_error(error.to_owned())?;
+                Ok(Box::new(response))
             }
             "+" => {
                 let string = &response_type[1..];
-                Ok(RedisResponseType::SimpleString(string.to_owned()))
+                let response = self.parse_simple_string(string.to_owned())?;
+                Ok(Box::new(response))
             }
             _ => Err(RedisResponseParserError::NotAValidServerResponse),
         }
@@ -94,12 +84,43 @@ impl RedisResponseParser {
     pub fn parse_bulk_string(
         &self,
         response_iter: &mut Split<&str>,
-    ) -> Result<String, RedisResponseParserError> {
+    ) -> Result<BulkStringResponse, RedisResponseParserError> {
         let value = response_iter
             .next()
             .ok_or(RedisResponseParserError::NotAValidServerResponse)?;
         let response = BulkStringResponse::new(value.to_owned());
-        Ok(response.to_client_string())
+        Ok(response)
+    }
+    pub fn parse_simple_string(
+        &self,
+        string: String,
+    ) -> Result<SimpleStringResponse, RedisResponseParserError> {
+        let response = SimpleStringResponse::new(string);
+        Ok(response)
+    }
+    pub fn parse_error(&self, string: String) -> Result<ErrorResponse, RedisResponseParserError> {
+        let response = ErrorResponse::new(string);
+        Ok(response)
+    }
+    pub fn parse_integer(&self, value: i64) -> Result<IntegerResponse, RedisResponseParserError> {
+        let response = IntegerResponse::new(value);
+        Ok(response)
+    }
+    pub fn parse_nil(&self) -> Result<NilResponse, RedisResponseParserError> {
+        let response = NilResponse::new();
+        Ok(response)
+    }
+    pub fn parse_array(
+        &self,
+        response_iter: &mut Split<&str>,
+        len: usize,
+    ) -> Result<ArrayResponse, RedisResponseParserError> {
+        let mut members = Vec::new();
+        for _ in 1..len {
+            let member = self.parse_response_by_type(response_iter)?;
+            members.push(member);
+        }
+        Ok(ArrayResponse::new(members))
     }
 }
 

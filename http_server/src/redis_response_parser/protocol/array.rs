@@ -1,13 +1,15 @@
 use crate::redis_response_parser::protocol::DisplayRedisResponse;
 
-pub struct ArrayResponse<T: DisplayRedisResponse> {
-    values: Vec<T>,
+pub struct ArrayResponse {
+    values: Vec<Box<dyn DisplayRedisResponse>>,
 }
 
-impl<T: DisplayRedisResponse> ArrayResponse<T> {
-    pub fn new(values: Vec<T>) -> Self {
+impl ArrayResponse {
+    pub fn new(values: Vec<Box<dyn DisplayRedisResponse>>) -> Self {
         ArrayResponse { values }
     }
+}
+impl DisplayRedisResponse for ArrayResponse {
     pub fn to_client_string(&self) -> String {
         let mut result = "".to_owned();
         for (i, value) in self.values.iter().enumerate() {
