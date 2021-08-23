@@ -12,6 +12,6 @@ impl SimpleStringResponse {
 
 impl DisplayRedisResponse for SimpleStringResponse {
     fn to_client_string(&self) -> String {
-        format!("{}", self.value)
+        self.value.to_string()
     }
 }

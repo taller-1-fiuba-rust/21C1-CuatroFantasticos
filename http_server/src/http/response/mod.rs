@@ -1,6 +1,15 @@
 use std::collections::HashMap;
 use std::io::{Result, Write};
 
+/// HttpResponse
+/// Struct that stores a Http Response
+/// # Arguments
+/// * version - str
+/// * status_code - str
+/// * status_text - str
+/// * headers - Option<HashMap<str,str>>
+/// * body - Option<String>
+///
 #[derive(Debug, PartialEq, Clone)]
 pub struct HttpResponse<'a> {
     version: &'a str,
@@ -152,7 +161,7 @@ mod tests {
             body: Some("Response number three".to_owned()),
         };
         let http_string: String = response_expected.into();
-        let response_actual = "HTTP/1.1 404 Not Found\r\nContent-type:text/html\r\nContent-Length: 33\r\n\r\nResponse number three";
+        let response_actual = "HTTP/1.1 404 Not Found\r\nContent-type:text/html\r\nContent-Length: 21\r\n\r\nResponse number three";
         assert_eq!(http_string, response_actual);
     }
 }

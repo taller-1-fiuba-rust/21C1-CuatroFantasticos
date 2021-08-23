@@ -4,7 +4,10 @@ use crate::http::response::HttpResponse;
 use crate::server;
 use std::ops::Add;
 
-/// Ejecuta un comando
+/// CommandHandler
+///
+/// Takes a command and executes it (parses it too)
+///
 pub struct CommandHandler {}
 
 impl CommandHandler {

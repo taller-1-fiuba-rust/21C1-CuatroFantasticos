@@ -10,6 +10,15 @@ pub enum Resource {
     Path(String),
 }
 
+/// HttpRequest struct
+/// Stores the request that comes from the Http Client
+/// # Arguments
+/// * method - Method
+/// * version - Version
+/// * resource - Resource
+/// * headers - HashMap<String,String>
+/// * msg_body - String
+
 #[derive(Debug)]
 pub struct HttpRequest {
     pub method: Method,
@@ -51,6 +60,9 @@ impl From<String> for HttpRequest {
     }
 }
 
+/// Process_req_line
+/// Divides a request into a tuple (Method, Resource, Version)
+///
 fn process_req_line(s: &str) -> (Method, Resource, Version) {
     let mut words = s.split_whitespace();
     let method = words.next().unwrap();
@@ -63,7 +75,9 @@ fn process_req_line(s: &str) -> (Method, Resource, Version) {
         version.into(),
     )
 }
-
+/// Process_header_line
+/// Divides a header line into (key,value)
+///
 fn process_header_line(s: &str) -> (String, String) {
     let mut header_items = s.split(':');
     let mut key = String::from("");

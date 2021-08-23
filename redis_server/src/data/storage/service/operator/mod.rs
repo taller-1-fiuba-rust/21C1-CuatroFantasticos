@@ -659,7 +659,7 @@ impl StorageOperatorService {
                         }
                     };
                     for line in self.storage.serialize() {
-                        let _ = file.write(&line.as_bytes());
+                        let _ = file.write(line.as_bytes());
                     }
                     let _ = message.respond(StorageResult::Ok);
                 }
