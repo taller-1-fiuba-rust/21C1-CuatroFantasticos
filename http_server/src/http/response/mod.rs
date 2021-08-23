@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 use std::io::{Result, Write};
 
-
-
 /// HttpResponse
 /// Struct that stores a Http Response
 /// # Arguments

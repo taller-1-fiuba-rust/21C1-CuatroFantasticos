@@ -15,7 +15,6 @@ use std::str;
 /// * socket_addr - str
 ///
 
-
 pub struct Server<'a> {
     socket_addr: &'a str,
 }

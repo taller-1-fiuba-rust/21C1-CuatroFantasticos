@@ -8,14 +8,12 @@ use std::net::TcpStream;
 /// * connection - TcpStream
 ///
 
-
 pub struct Client {
     connection: TcpStream,
 }
 
 impl Client {
-   
-    /// New function - creates a new connection 
+    /// New function - creates a new connection
     pub fn new() -> Result<Client, String> {
         if let Ok(connection) = TcpStream::connect("127.0.0.1:6379") {
             Ok(Client { connection })
@@ -23,7 +21,7 @@ impl Client {
             Err(String::from("Could not connect to redis server"))
         }
     }
-        
+
     /// Execute_command
     /// Sends a command to the Redis Server and waits for the response, calls the response Parser
     pub fn execute_command(&mut self, command: String) -> String {

@@ -22,7 +22,6 @@ const TOKEN_SEPARATOR: &str = "\r\n";
 /// * parse_"type"
 ///
 
-
 pub struct RedisResponseParser {}
 
 pub enum RedisResponseParserError {
