@@ -6,7 +6,11 @@ use crate::server::handler::command::CommandHandler;
 use crate::server::handler::default::DefaultHandler;
 use crate::server::handler::page_not_found::PageNotFoundHandler;
 use std::io::Write;
-
+/// Router
+///
+/// Receives an HttpRequest, and depending on the method, routes to the correct handler for the method type
+///
+///
 pub struct Router;
 impl Router {
     pub fn route<T: Write>(req: HttpRequest, stream: &mut T) {

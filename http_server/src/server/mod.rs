@@ -6,6 +6,16 @@ use std::io::prelude::*;
 use std::net::TcpListener;
 use std::str;
 
+/// Server
+///
+/// Main implementation of the Http Server
+///
+/// # Arguments
+///
+/// * socket_addr - str
+///
+
+
 pub struct Server<'a> {
     socket_addr: &'a str,
 }

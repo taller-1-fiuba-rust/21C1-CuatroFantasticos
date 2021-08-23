@@ -12,6 +12,17 @@ use std::str::Split;
 
 const TOKEN_SEPARATOR: &str = "\r\n";
 
+/// RedisResponseParser
+/// Parses Redis Responses into Http Responses
+///
+/// # Methods
+/// * parse
+/// * parse_response
+/// * parse_response_by_type
+/// * parse_"type"
+///
+
+
 pub struct RedisResponseParser {}
 
 pub enum RedisResponseParserError {

@@ -1,3 +1,8 @@
+
+/// Version
+/// Enum that categorizes different Http versions
+/// Possible values: V1_1, V2_0, Uninitialized
+
 #[derive(Debug, PartialEq)]
 pub enum Version {
     V1_1,

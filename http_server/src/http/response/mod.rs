@@ -1,6 +1,17 @@
 use std::collections::HashMap;
 use std::io::{Result, Write};
 
+
+
+/// HttpResponse
+/// Struct that stores a Http Response
+/// # Arguments
+/// * version - str
+/// * status_code - str
+/// * status_text - str
+/// * headers - Option<HashMap<str,str>>
+/// * body - Option<String>
+///
 #[derive(Debug, PartialEq, Clone)]
 pub struct HttpResponse<'a> {
     version: &'a str,

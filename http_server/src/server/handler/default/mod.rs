@@ -2,7 +2,9 @@ use crate::http::request::HttpRequest;
 use crate::http::response::HttpResponse;
 use std::fs;
 
-/// Devuelve la pagina principal
+/// DefaultHandler
+///
+/// Shows the default menu screen (whenever a get method is sent)
 pub struct DefaultHandler {}
 
 impl DefaultHandler {

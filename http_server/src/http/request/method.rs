@@ -1,3 +1,8 @@
+
+/// Method
+/// Enum that categorizes different Http methods
+/// Possible values: Get, Post, Uninitialized
+
 #[derive(Debug, PartialEq)]
 pub enum Method {
     Get,

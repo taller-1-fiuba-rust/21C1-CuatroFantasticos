@@ -2,7 +2,10 @@ use crate::http::request::HttpRequest;
 use crate::http::response::HttpResponse;
 use std::fs;
 
-/// Devuelve un aviso de pagina no encontrada
+/// PageNotFoundHandler
+///
+/// Shows a page that displays a 404 error, due to a page not found
+///
 pub struct PageNotFoundHandler {}
 
 impl PageNotFoundHandler {
