@@ -20,7 +20,7 @@ impl RedisCommandSet {
         let response = global_resources
             .get_storage_accessor()
             .access(StorageAction::Set(self.key.clone(), self.new_value.clone()))?;
-        let response = response.get_value().protocol_serialize_to_bulk_string();
+        let response = response.get_value().protocol_serialize_to_simple_string();
         verbose.print("Finalizing execution of command Set");
         Ok(response)
     }
