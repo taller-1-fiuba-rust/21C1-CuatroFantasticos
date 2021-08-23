@@ -21,7 +21,7 @@ pub fn run_server(global_resources: GlobalResources) {
     let port = conf
         .get("port")
         .expect("run_server: There is no port in Configuration");
-    let addr = "127.0.0.1:".to_owned() + &port;
+    let addr = "127.0.0.1:".to_owned() + port;
 
     verbose.print(&format!("run_server: connecting to {}", addr));
 
