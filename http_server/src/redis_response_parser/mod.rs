@@ -107,7 +107,7 @@ impl RedisResponseParser {
         len: usize,
     ) -> Result<ArrayResponse, RedisResponseParserError> {
         let mut members = Vec::new();
-        for _ in 1..len {
+        for _ in 0..len {
             let member = self.parse_response_by_type(response_iter)?;
             members.push(member);
         }
